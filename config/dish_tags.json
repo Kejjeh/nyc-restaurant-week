@@ -1,0 +1,18 @@
+{
+  "_doc": "tag -> list of rules. Each rule: {pattern: regex (case-insensitive), confidence: high|low, note: optional}. Adding a tag = add an entry here and re-run `python src/tag_dishes.py`. No code edits needed.",
+  "snails": [
+    {"pattern": "\\bsnails?\\b", "confidence": "high"},
+    {"pattern": "\\bescargots?\\b", "confidence": "high"},
+    {"pattern": "\\blumache\\b", "confidence": "low", "note": "usually the pasta shape, not the animal"}
+  ],
+  "braised": [
+    {"pattern": "\\bbraise[ds]?\\b", "confidence": "high"},
+    {"pattern": "\\bbrasato\\b", "confidence": "high"},
+    {"pattern": "\\bosso\\s?buco\\b", "confidence": "high"},
+    {"pattern": "\\bbraised[^.\\n]{0,50}\\bshort\\s?ribs?\\b", "confidence": "high", "note": "short rib only when described as braised"},
+    {"pattern": "\\bshort\\s?ribs?\\b[^.\\n]{0,50}\\bbraised\\b", "confidence": "high", "note": "short rib only when described as braised"}
+  ],
+  "confit": [
+    {"pattern": "\\bconfit\\b", "confidence": "high"}
+  ]
+}

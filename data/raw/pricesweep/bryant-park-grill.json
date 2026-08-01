@@ -1,0 +1,1 @@
+{"slug": "bryant-park-grill", "website": "https://bryantparkgrillnyc.com", "method": "v2-render", "pages_fetched": 0, "prices": [], "error": "TimeoutError: Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"https://bryantparkgrillnyc.com/\", waiting until \"networkidle\"\n", "confidence": "none"}

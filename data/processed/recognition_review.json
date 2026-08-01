@@ -1,0 +1,207 @@
+{
+ "michelin": [
+  {
+   "name": "Masa",
+   "address": "10 Columbus Circle, Ste. 401, New York, NY 10019",
+   "level": "2 stars",
+   "year": 2025,
+   "url": "https://guide.michelin.com/us/en/new-york-state/new-york/restaurant/masa",
+   "reason": "fuzzy 0.89 below threshold",
+   "candidates": [
+    "amasa"
+   ]
+  },
+  {
+   "name": "Roberta's",
+   "address": "261 Moore St., Brooklyn, NY 11206",
+   "level": "bib_gourmand",
+   "year": 2025,
+   "url": "https://guide.michelin.com/us/en/new-york-state/brooklyn/restaurant/roberta-s",
+   "reason": "fuzzy 0.86 below threshold",
+   "candidates": [
+    "robert"
+   ]
+  },
+  {
+   "name": "Tonchin",
+   "address": "13 W. 36th St., New York, NY 10018",
+   "level": "bib_gourmand",
+   "year": 2025,
+   "url": "https://guide.michelin.com/us/en/new-york-state/new-york/restaurant/tonchin",
+   "reason": "name match, address mismatch",
+   "candidate": "tonchin-brooklyn"
+  },
+  {
+   "name": "Ci Siamo",
+   "address": "440 W. 33rd St., Ste. 100, New York, NY 10001",
+   "level": "recommended",
+   "year": 2025,
+   "url": "https://guide.michelin.com/us/en/new-york-state/new-york/restaurant/ci-siamo",
+   "reason": "name match, address mismatch",
+   "candidate": "ci-siamo"
+  },
+  {
+   "name": "Madre",
+   "address": "Franklin Guesthouse, 214 Franklin St., Brooklyn, NY 11222",
+   "level": "recommended",
+   "year": 2025,
+   "url": "https://guide.michelin.com/us/en/new-york-state/brooklyn/restaurant/madre-1185329",
+   "reason": "fuzzy 0.89 below threshold",
+   "candidates": [
+    "ma-de"
+   ]
+  }
+ ],
+ "james_beard": [
+  {
+   "name": "Suzanne Cupps",
+   "restaurant": "Lola's",
+   "award": "Best Chef: New York",
+   "level": "semifinalist",
+   "year": 2025,
+   "url": "https://www.jamesbeard.org/awards/search-past-awards?keyword=Suzanne%20Cupps&year=2025",
+   "city": "New York",
+   "reason": "fuzzy 0.89 below threshold",
+   "candidates": [
+    "bar-lola"
+   ]
+  },
+  {
+   "name": "Mariana Gonzalez-Trasvina",
+   "restaurant": "Bar 'Cino",
+   "award": "Rising Star Chef of the Year",
+   "level": "semifinalist",
+   "year": 2020,
+   "url": "https://www.jamesbeard.org/awards/search-past-awards?keyword=Mariana%20Gonzalez-Trasvina&year=2020",
+   "city": "New York",
+   "reason": "fuzzy 0.86 below threshold",
+   "candidates": [
+    "ino"
+   ]
+  },
+  {
+   "name": "Carlo Mirarchi",
+   "restaurant": "Roberta's",
+   "award": "Best Chef: New York City",
+   "level": "semifinalist",
+   "year": 2014,
+   "url": "https://www.jamesbeard.org/awards/search-past-awards?keyword=Carlo%20Mirarchi&year=2014",
+   "city": "Brooklyn",
+   "reason": "fuzzy 0.86 below threshold",
+   "candidates": [
+    "robert"
+   ]
+  },
+  {
+   "name": "Carlo Mirarchi",
+   "restaurant": "Roberta's",
+   "award": "Best Chef: New York City",
+   "level": "semifinalist",
+   "year": 2013,
+   "url": "https://www.jamesbeard.org/awards/search-past-awards?keyword=Carlo%20Mirarchi&year=2013",
+   "city": "New York",
+   "reason": "fuzzy 0.86 below threshold",
+   "candidates": [
+    "robert"
+   ]
+  },
+  {
+   "name": "Max Sussman",
+   "restaurant": "Roberta's",
+   "award": "Rising Star Chef of the Year",
+   "level": "semifinalist",
+   "year": 2012,
+   "url": "https://www.jamesbeard.org/awards/search-past-awards?keyword=Max%20Sussman&year=2012",
+   "city": "New York",
+   "reason": "fuzzy 0.86 below threshold",
+   "candidates": [
+    "robert"
+   ]
+  },
+  {
+   "name": "Masa Takayama",
+   "restaurant": "Masa",
+   "award": "Best Chef: New York City",
+   "level": "semifinalist",
+   "year": 2011,
+   "url": "https://www.jamesbeard.org/awards/search-past-awards?keyword=Masa%20Takayama&year=2011",
+   "city": "New York",
+   "reason": "fuzzy 0.89 below threshold",
+   "candidates": [
+    "amasa"
+   ]
+  },
+  {
+   "name": "Anne Rosenzweig",
+   "restaurant": "Arcadia",
+   "award": "Best Chef: New York City",
+   "level": "nominee",
+   "year": 1997,
+   "url": "https://www.jamesbeard.org/awards/search-past-awards?keyword=Anne%20Rosenzweig&year=1997",
+   "city": "New York",
+   "reason": "fuzzy 0.92, no address confirm",
+   "candidate": "acadia"
+  },
+  {
+   "name": "Anne Rosenzweig",
+   "restaurant": "Arcadia",
+   "award": "Best Chef: New York City",
+   "level": "nominee",
+   "year": 1996,
+   "url": "https://www.jamesbeard.org/awards/search-past-awards?keyword=Anne%20Rosenzweig&year=1996",
+   "city": "New York",
+   "reason": "fuzzy 0.92, no address confirm",
+   "candidate": "acadia"
+  },
+  {
+   "name": "Anne Rosenzweig",
+   "restaurant": "Arcadia",
+   "award": "Best Chef: New York City",
+   "level": "nominee",
+   "year": 1995,
+   "url": "https://www.jamesbeard.org/awards/search-past-awards?keyword=Anne%20Rosenzweig&year=1995",
+   "city": "New York",
+   "reason": "fuzzy 0.92, no address confirm",
+   "candidate": "acadia"
+  },
+  {
+   "name": "Anne Rosenzweig",
+   "restaurant": "Arcadia",
+   "award": "Best Chef: New York City",
+   "level": "nominee",
+   "year": 1992,
+   "url": "https://www.jamesbeard.org/awards/search-past-awards?keyword=Anne%20Rosenzweig&year=1992",
+   "city": "New York",
+   "reason": "fuzzy 0.92, no address confirm",
+   "candidate": "acadia"
+  }
+ ],
+ "nyt": [
+  {
+   "name": "M\u1eafm",
+   "address": null,
+   "level": "nyt_100_best",
+   "year": 2026,
+   "url": "https://secretnyc.co/new-york-times-top-100-nyc-restaurants-2026/",
+   "verified": true,
+   "notes": "Ranked No. 26 on the NYT 2026 list as reproduced in full by Secret NYC (published May 11-15, 2026; top 10 unveiled May 12). Independently corroborated by: Food Talk Central forum.",
+   "reason": "fuzzy 0.86 below threshold",
+   "candidates": [
+    "mamo-restaurant"
+   ]
+  },
+  {
+   "name": "Lola's",
+   "address": null,
+   "level": "nyt_100_best",
+   "year": 2026,
+   "url": "https://secretnyc.co/new-york-times-top-100-nyc-restaurants-2026/",
+   "verified": true,
+   "notes": "Ranked No. 71 on the NYT 2026 list as reproduced in full by Secret NYC (published May 11-15, 2026; top 10 unveiled May 12).",
+   "reason": "fuzzy 0.89 below threshold",
+   "candidates": [
+    "bar-lola"
+   ]
+  }
+ ]
+}

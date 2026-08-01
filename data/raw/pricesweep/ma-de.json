@@ -1,0 +1,1 @@
+{"slug": "ma-de", "website": "https://www.ma-de-nyc.com", "method": "v2-render", "pages_fetched": 0, "prices": [], "error": "TimeoutError: Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"https://www.ma-de-nyc.com/\", waiting until \"networkidle\"\n", "confidence": "none"}

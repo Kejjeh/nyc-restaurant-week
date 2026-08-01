@@ -1,0 +1,1 @@
+{"slug": "one-dine", "website": "https://www.oneworldobservatory.com/bar-restaurant", "method": "v2-render", "pages_fetched": 0, "prices": [], "error": "TimeoutError: Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"https://www.oneworldobservatory.com/bar-restaurant\", waiting until \"networkidle\"\n", "confidence": "none"}

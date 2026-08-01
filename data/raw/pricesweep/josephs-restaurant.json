@@ -1,0 +1,1 @@
+{"slug": "josephs-restaurant", "website": "https://www.josephsnyc.com", "method": "v2", "pages_fetched": 4, "prices": [30, 60, 30, 60, 30, 60, 30, 60, 30, 60, 30, 60, 17, 21, 19, 30, 60, 15, 18, 16, 18, 16, 24, 24, 7, 14], "error": null, "comparable_3course": 64, "gaps": {"$30": 34, "$60": 4}, "confidence": "high"}

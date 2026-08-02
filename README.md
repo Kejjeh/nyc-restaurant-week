@@ -1,9 +1,16 @@
 # NYC Restaurant Week — Summer 2026 tracker
 
-**PRIVATE REPO — must stay private.** The SQLite DB contains menu text extracted
-from restaurants' PDFs; publishing that would violate nyctourism.com's terms
-(personal/noncommercial use, no republication). See "ToS rules" below before
-building anything public-facing from this data.
+**PUBLIC REPO as of 2026-08-02.** Dashboard:
+<https://kejjeh.github.io/nyc-restaurant-week/>
+
+This repo was private until 2026-08-02. It was opened after the owner spoke to
+NYC Tourism, who said the only violation would be **hosting the exact PDFs** —
+extracted text is fine. That conversation is the authority for this change; if
+it is ever contradicted, revert to private and re-read "ToS rules" below.
+
+**The one line that must never be crossed: do not host or mirror the menu PDFs.**
+`data/raw/menus/*.pdf` is gitignored and 0 PDFs are tracked — keep it that way.
+Menus are linked to the official S3 URL, never copied.
 
 Local dataset + pipeline tracking all **648** participants in NYC Restaurant Week
 Summer 2026 (Jul 20–Aug 16, extension weeks through Sep 6; Saturdays excluded,
@@ -223,17 +230,27 @@ comparable (left blank — never backfilled) · 120 restaurants with dish tags �
 
 ## ToS rules — HARD REQUIREMENTS for any output built from this repo
 
-nyctourism.com terms: personal/noncommercial use; no reproduction/republication
-of site content. Applied here as:
-1. Any published/derived artifact (dashboard, export, screenshot) uses
-   **derived/factual data only**: names, locations, prices, tiers, windows,
-   flags, computed gaps, recognition, tag hits.
-2. **NO `menus.raw_text`, NO full menu reproduction** anywhere public. Menus are
-   linked via the official S3 PDF URL (`restaurants.menu_url`), never mirrored.
-   Menu content may appear only as the short `menu_item_tags.matched_text`
-   snippets.
-3. This repo stays **private** (raw_text + parsed menu items live in the DB).
-4. Rate limits stay at ≤1 req/sec against nyctourism hosts for any future crawl.
+Position as of **2026-08-02**, per the owner's conversation with NYC Tourism:
+extracted menu TEXT is acceptable; **hosting the exact PDFs is not**.
+
+1. **NEVER host, mirror, re-upload or commit the menu PDFs.** This is the only
+   hard prohibition NYC Tourism named. `data/raw/menus/*.pdf` stays gitignored;
+   menus are linked via the official S3 URL (`restaurants.menu_url`). Verify
+   with `git ls-files | grep -c '\.pdf$'` — it must print 0.
+2. Rate limits stay at **≤1 req/sec** against nyctourism hosts and the S3
+   bucket for any future crawl (`config.throttle()`). Do not parallelise.
+3. Personal/noncommercial use. `docs/` keeps `<meta name="robots" content=
+   "noindex">` — this is a personal tool, not a publication.
+4. The dashboard payload (`docs/data/restaurants.json`) still ships
+   **derived/factual fields only** and carries no `raw_text`, no `menu_items`
+   and no dish/description fields. That is now a design choice for payload size
+   and honesty rather than a ToS requirement, and `assert_tos_clean()` in
+   `src/export_site_data.py` still enforces it. Menu text appears only as short
+   keyword-centred snippets (≤5% of a menu, or 40 chars, whichever is greater).
+
+Superseded: before 2026-08-02 this section required the repo to stay private
+because `menus.raw_text` lives in the committed SQLite. That requirement is
+lifted by the NYC Tourism conversation above; rule 1 is not.
 
 ## Repo layout
 

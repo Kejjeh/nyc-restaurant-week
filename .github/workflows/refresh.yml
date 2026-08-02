@@ -120,6 +120,22 @@ jobs:
               print("</details>\n")
           PY
 
+      # The one thing NYC Tourism prohibits is hosting the exact PDFs. The repo
+      # is public, so a stray `git add` of data/raw/menus would publish 470 of
+      # them. Fail the run rather than commit one.
+      - name: Guard — no menu PDFs may enter the repo
+        run: |
+          git add -An data/raw/menus 2>/dev/null | grep -i '\.pdf' && {
+            echo "::error::A menu PDF would be committed. PDFs must never be hosted."
+            exit 1
+          }
+          n=$(git ls-files | grep -ci '\.pdf$' || true)
+          if [ "$n" != "0" ]; then
+            echo "::error::$n PDF(s) are tracked in git. PDFs must never be hosted."
+            exit 1
+          fi
+          echo "OK — 0 PDFs tracked."
+
       - name: Commit changes
         run: |
           git config user.name  "github-actions[bot]"

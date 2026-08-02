@@ -17,7 +17,12 @@ def main():
     old_p, new_p = snaps[-2], snaps[-1]
     old, new = index(json.loads(old_p.read_text())), index(json.loads(new_p.read_text()))
     # shortlist call-out first: any change touching config/shortlist.json slugs
-    sl_file = LISTING_DIR.parents[1] / "config" / "shortlist.json"
+    # parents: [0]=data/raw, [1]=data, [2]=repo root. parents[1] resolved to
+    # data/config/shortlist.json, which never exists, so the whole SHORTLIST
+    # ALERTS block was silently skipped on every run.
+    sl_file = LISTING_DIR.parents[2] / "config" / "shortlist.json"
+    if not sl_file.exists():
+        print(f"WARNING: shortlist not found at {sl_file} — no shortlist alerts")
     if sl_file.exists():
         sl = set(json.loads(sl_file.read_text())["slugs"])
         alerts = []

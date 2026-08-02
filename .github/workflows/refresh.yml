@@ -39,10 +39,14 @@ jobs:
       # none of them and download_menus.py would re-fetch ~470 PDFs at the
       # mandatory <=1 req/sec (~10 min) every single run. The rolling cache key
       # means each run restores the newest cache and saves an updated one.
+      # Cache ONLY the PDFs. data/raw/menus also holds three GIT-TRACKED files
+      # (manifest.json, parsed.json, parsed-progress.json); caching the whole
+      # directory would restore stale copies over them after checkout and
+      # silently revert committed state.
       - name: Restore menu PDF cache
         uses: actions/cache@v4
         with:
-          path: data/raw/menus
+          path: data/raw/menus/*.pdf
           key: rw-menus-${{ github.run_id }}
           restore-keys: |
             rw-menus-
@@ -133,4 +137,12 @@ jobs:
           echo "Changed files:"
           git diff --cached --name-only
           git commit -m "Weekly refresh $(date -u +%Y-%m-%d): listing, menus, dashboard payload"
-          git push
+          # A human commit landing mid-run would make a plain push fail and
+          # throw away ~10 minutes of polite crawling. Rebase and retry instead.
+          for i in 1 2 3; do
+            if git push; then exit 0; fi
+            echo "push rejected (attempt $i) — rebasing on origin/main"
+            git pull --rebase --autostash origin main || exit 1
+          done
+          echo "push failed after 3 attempts" >&2
+          exit 1

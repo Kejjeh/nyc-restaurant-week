@@ -26,7 +26,10 @@ const el = (tag, cls, text) => {
 const fold = (s) =>
   (s == null ? '' : String(s))
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[̀-ͯ]/g, '')          // combining diacritics
+    .replace(/[‘’ʼ′]/g, "'")  // curly apostrophes -> '
+    .replace(/[–—‒−]/g, '-')  // en/em dash, minus -> -
+    .replace(/[“”]/g, '"')
     .toLowerCase();
 
 const todayISO = () => {
@@ -85,7 +88,11 @@ const FACETS = [
   { key: 'basis',       title: 'Gap basis',     values: (r) => [r.gap_basis || 'none'],
                                                 labels: { verified: 'Verified', estimate: 'Estimate', none: 'No comparable' } },
   { key: 'recognition', title: 'Recognition',   values: (r) => [...new Set((r.recognition || []).map((x) => x.source))] },
-  { key: 'tag',         title: 'Dish tags',     values: (r) => [...new Set((r.tags || []).map((t) => t.tag))] },
+  // Seeded from the exported tag_vocabulary (= config/dish_tags.json keys), so a
+  // newly configured tag that matched nothing shows "0" instead of vanishing —
+  // a missing chip reads as a broken pipeline rather than as the real answer.
+  { key: 'tag',         title: 'Dish tags',     values: (r) => [...new Set((r.tags || []).map((t) => t.tag))],
+                                                seed: () => (DATA && DATA.tag_vocabulary) || [] },
   { key: 'menu',        title: 'Menu PDF',      values: (r) => [r.menu_state || 'none'],
                                                 labels: { pdf: 'Readable PDF', image_only: 'Image-only PDF', none: 'No menu published' } },
 ];
@@ -95,12 +102,15 @@ const labelFor = (facet, v) => (facet.labels && facet.labels[v]) || RECOG_LABEL[
 
 /* ---------- filtering --------------------------------------------------- */
 
-function matches(r) {
+/** `exceptFacet` skips one facet's own selection — used when counting that
+ *  facet's chips, so its unselected values keep a live, non-zero count. */
+function matches(r, exceptFacet) {
   if (QUERY) {
     if (!r._hay.includes(QUERY)) return false;
   }
 
   for (const f of FACETS) {
+    if (f.key === exceptFacet) continue;
     const sel = FILTERS[f.key];
     if (!sel || sel.size === 0) continue;
     const vals = f.values(r);
@@ -160,14 +170,21 @@ function renderGapCell(r) {
     return cell;
   }
 
-  let usd = money(r.gap_usd);
-  if (r.gap_usd_high != null && r.gap_usd_high !== r.gap_usd) usd += `–${r.gap_usd_high}`;
-  cell.append(el('div', 'gapUsd', usd));
+  // A negative gap means RW costs MORE than the comparable. 38 estimates are
+  // negative; rendering "$-11 / -22% off" would read as a discount.
+  const over = r.gap_usd < 0;
+  if (over) cell.classList.add('over');
+
+  let usd = money(Math.abs(r.gap_usd));
+  if (r.gap_usd_high != null && r.gap_usd_high !== r.gap_usd) usd += `–${Math.abs(r.gap_usd_high)}`;
+  cell.append(el('div', 'gapUsd', (over ? '+' : '') + usd));
 
   if (r.gap_pct != null) {
-    let pct = `${r.gap_pct}%`;
-    if (r.gap_pct_high != null && r.gap_pct_high !== r.gap_pct) pct = `${r.gap_pct}–${r.gap_pct_high}%`;
-    cell.append(el('div', 'gapPct', pct + ' off'));
+    let pct = `${Math.abs(r.gap_pct)}%`;
+    if (r.gap_pct_high != null && r.gap_pct_high !== r.gap_pct) {
+      pct = `${Math.abs(r.gap_pct)}–${Math.abs(r.gap_pct_high)}%`;
+    }
+    cell.append(el('div', 'gapPct', pct + (over ? ' MORE' : ' off')));
   }
   cell.append(el('div', 'gapLabel', r.gap_basis === 'estimate' ? 'estimate' : 'verified'));
   return cell;
@@ -213,8 +230,12 @@ function renderRow(r) {
 
   const pills = el('div', 'pills');
   if (urgent) {
-    pills.append(pill('crit', `book by ${fmtDate(DATA.book_by)}`,
-      `RW window ends ${fmtDate(r.end_date)}`));
+    // Show the row's OWN closing date, not the program-wide Aug 16 headline —
+    // 18 rows close earlier than that, and a tooltip is not a disclosure.
+    pills.append(pill('crit', `book by ${fmtDate(r.end_date)}`,
+      r.end_date_source === 'conflict'
+        ? 'Two verified sources disagree — the earlier date is shown'
+        : `RW window ends ${fmtDate(r.end_date)}`));
   } else if (r.end_date) {
     pills.append(pill('quiet', `thru ${fmtDate(r.end_date)}`,
       r.end_date_source === 'printed' ? 'End date printed by the restaurant'
@@ -238,9 +259,17 @@ function renderRow(r) {
       ? pill('value', 'sunday ✓', 'Sunday service verified against the restaurant')
       : pill('quiet', 'sunday', 'Sunday per the listing API — unverified'));
   }
+  // Dedupe on (source, level) for the row — Union Square Cafe alone has 12
+  // badges that would otherwise render as a wall of identical pills. The full
+  // per-year list stays in the detail panel.
+  const seenRec = new Set();
   (r.recognition || []).forEach((x) => {
+    const key = `${x.source}|${x.level}`;
+    if (seenRec.has(key)) return;
+    seenRec.add(key);
+    const n = (r.recognition || []).filter((y) => `${y.source}|${y.level}` === key).length;
     const lvl = x.level ? ` ${x.level}` : '';
-    pills.append(pill('rec', `${RECOG_LABEL[x.source] || x.source}${lvl}`,
+    pills.append(pill('rec', `${RECOG_LABEL[x.source] || x.source}${lvl}${n > 1 ? ` ×${n}` : ''}`,
       `${x.matched_name || r.name}${x.year ? ` · ${x.year}` : ''}${x.name_match_only ? ' · name match only' : ''}`));
   });
   (r.tags || []).forEach((t, i, arr) => {
@@ -325,15 +354,26 @@ function renderDetail(r) {
   field(dl, 'Comparable', r.comparable_usd != null
     ? money(r.comparable_usd) + (r.comparable_usd_high ? `–${r.comparable_usd_high}` : '')
     : null, true);
+  // Name the tier the estimate was computed against — the gap is always taken
+  // at ONE tier, and without saying which, the comparable minus the headline
+  // price appears not to add up.
+  field(dl, 'Estimated at tier', r.estimate_tier || null, true);
   field(dl, 'Gap basis', r.gap_basis === 'verified' ? 'Verified — own-menu arithmetic'
-    : r.gap_basis === 'estimate' ? 'Heuristic estimate — triage only' : 'No comparable published');
+    : r.gap_basis === 'estimate'
+      ? `Heuristic estimate — triage only (${r.estimate_confidence || '?'} confidence)`
+      : 'No comparable published');
   field(dl, 'Window ends', r.end_date
     ? `${fmtDate(r.end_date)}${r.end_date_source === 'printed' ? ' (printed)' : r.end_date_source === 'conflict' ? ' (conservative)' : ' (listing API)'}`
     : 'Not stated', true);
   field(dl, 'Days / service', r.days);
-  field(dl, 'Sunday', r.sunday === true ? (r.sunday_source === 'verified' ? 'Yes — verified' : 'Yes — per listing (unverified)')
-    : r.sunday === false ? 'No — verified'
-    : 'Not established');
+  // "verified" only when it actually came from the restaurant. 160 rows are
+  // false purely because the listing API says so — that is not verification.
+  field(dl, 'Sunday',
+    r.sunday === true
+      ? (r.sunday_source === 'verified' ? 'Yes — verified' : 'Yes — per listing (unverified)')
+      : r.sunday === false
+        ? (r.sunday_source === 'verified' ? 'No — verified' : 'No — per listing (unverified)')
+        : 'Not established');
   field(dl, 'Courses', r.courses != null ? `${r.courses}-course` : null);
   field(dl, 'Meal periods', (r.meal_periods || []).join(', ') || null);
   field(dl, 'Price tiers', (r.price_tiers || []).join(' / ') || null, true);
@@ -357,11 +397,18 @@ function renderDetail(r) {
         a.href = x.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
         li.append(a);
       } else li.append(el('span', null, label));
+      if (x.rank != null) li.append(pill('rec', `No. ${x.rank}`, 'Rank on the NYT 100 list'));
       if (x.name_match_only) li.append(pill('quiet', 'name match only',
         'Matched on name alone — this source publishes no addresses'));
       if (x.matched_name && fold(x.matched_name) !== fold(r.name)) {
         li.append(el('span', 'gapLabel', `matched “${x.matched_name}”`));
       }
+      // The award name (and the chef) exist only in the raw James Beard file;
+      // without this the (source, level, year) dedupe would hide them.
+      if (x.awards && x.awards.length) {
+        li.append(el('span', 'awardList', x.awards.join(' · ')));
+      }
+      if (x.via) li.append(el('span', 'gapLabel', `via ${x.via}`));
       ul.append(li);
     });
     s.append(ul);
@@ -418,11 +465,15 @@ function buildFacets() {
   const host = $('#facets');
   host.textContent = '';
 
-  // Counts reflect the CURRENT result set so the panel stays honest as you filter.
-  const visible = ROWS.filter(matches);
-
   for (const f of FACETS) {
+    // Count each facet against the rows surviving every OTHER facet — never
+    // its own. Counting against the fully-filtered set would zero out every
+    // unselected value in the facet you just used, making a second selection
+    // in the same facet impossible (i.e. OR-within-a-facet unreachable).
+    const visible = ROWS.filter((r) => matches(r, f.key));
+
     const counts = new Map();
+    if (f.seed) for (const v of f.seed()) counts.set(v, 0);
     for (const r of visible) for (const v of new Set(f.values(r))) counts.set(v, (counts.get(v) || 0) + 1);
     // Selected values must stay visible even at zero, or they can't be turned off.
     for (const v of FILTERS[f.key]) if (!counts.has(v)) counts.set(v, 0);
@@ -539,7 +590,10 @@ function readHash() {
   });
   if (p.get('by')) FILTERS.bookableBy = p.get('by');
   if (p.get('q')) { QUERY = fold(p.get('q')); $('#q').value = p.get('q'); }
-  if (p.get('sort') && SORTS[p.get('sort')]) { SORT = p.get('sort'); $('#sort').value = SORT; }
+  // Object.hasOwn, not truthiness: "sort=constructor" inherits from
+  // Object.prototype, would pass a truthy check and then be used as a comparator.
+  const s = p.get('sort');
+  if (s && Object.hasOwn(SORTS, s)) { SORT = s; $('#sort').value = SORT; }
 }
 
 /* ---------- theme ------------------------------------------------------- */
@@ -605,7 +659,9 @@ async function boot() {
 
   // The estimate caveat only matters while estimates are actually in view.
   const banner = $('#estBanner');
-  const bannerDismissed = localStorage.getItem('rw-banner') === 'off';
+  // Read the flag on every apply(), not once at boot — capturing it in a const
+  // meant the next filter/sort/keystroke un-dismissed the banner.
+  const isDismissed = () => localStorage.getItem('rw-banner') === 'off';
   $('#dismissBanner').addEventListener('click', () => {
     localStorage.setItem('rw-banner', 'off');
     banner.hidden = true;
@@ -616,7 +672,7 @@ async function boot() {
     apply();
   });
   BANNER = () => {
-    banner.hidden = bannerDismissed
+    banner.hidden = isDismissed()
       || SORT !== 'gap_usd_desc'
       || FILTERS.basis.size > 0;
   };

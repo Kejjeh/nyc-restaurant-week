@@ -447,7 +447,11 @@ def build_payload():
                 "rw_price": v.get("rw_price"), "price_source": "verified",
             }
             stats["verified"] += 1
-        elif est and not v:
+        # A verified entry only blocks the estimate if it actually says
+        # something about price. Entries that record e.g. Saturday service or a
+        # Sunday correction shouldn't strip a restaurant of its estimate.
+        elif (est and not v.get("rw_price")
+              and "dropped_in_verification" not in v.get("flags", [])):
             gap = {
                 "gap_usd": est["gap_usd"], "gap_usd_high": None,
                 "gap_pct": est["gap_pct"], "gap_pct_high": None,

@@ -14,7 +14,8 @@
   "four-twenty-five",
   "quality-meats",
   "frenchette",
-  "code-red-restaurant-and-lounge",
-  "victors-cafe"
- ]
+  "victors-cafe",
+  "code-red-restaurant-and-lounge"
+ ],
+ "note": "Order = final-bookings rank (reports/rw-final-bookings.md). Tudor City dropped in verification."
 }

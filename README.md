@@ -36,7 +36,11 @@ python src/refresh.py --force-menus    # also re-download PDFs (catches in-place
 `fetch_details` (new slugs only) → `download_menus` (skips cached) →
 `parse_menus` (resumable) → `build_db` (rebuilds SQLite + CSV; reloads
 `price_sweep` from cached sweep files) → `tag_dishes` → `enrich_recognition`
-(re-matches from `data/raw/recognition/*.json`) → `diff_report`.
+(re-matches from `data/raw/recognition/*.json`) → `export_site_data` →
+`diff_report`.
+
+`export_site_data` MUST stay after both `tag_dishes` and `enrich_recognition`:
+`build_db` drops and recreates the DB, wiping the tag and recognition tables.
 
 **Diff report** compares the two latest snapshots: a `SHORTLIST ALERTS` block
 first (any change to `config/shortlist.json` restaurants' meal types, weeks, or
@@ -83,7 +87,9 @@ The API key survives seasons and self-rediscovers if rotated.
 - `meal_types_raw` JSON array, verbatim API labels (e.g. `"$60 Sunday Dinner Price"`) — the ground truth `meal_periods`/`sunday_participation` derive from
 - `weeks` JSON array, verbatim week labels; last element ⇒ end week
 - `sunday_participation` 0/1 (derived: any "Sunday" meal type)
-- `menu_url` (NULL = restaurant publishes no RW menu PDF — 178 rows) · `website`
+- `menu_url` — **the EMPTY STRING `''` (never NULL) when the restaurant publishes
+  no RW menu PDF — 178 rows.** `WHERE menu_url IS NULL` matches ZERO rows; use
+  `menu_url = ''`, or branch on whether a `menus` row exists. · `website`
 - `reservation_partner`/`reservation_partner_id`/`reservation_link` (link built for OpenTable only)
 - `listing_url` · `summary` · `collections` JSON · `snapshot_date`
 
@@ -104,9 +110,13 @@ The API key survives seasons and self-rediscovers if rotated.
   short quote) · `source` item/raw_text
 
 **recognition** (195) — external recognition matched to participants
-- `restaurant_slug` · `source` michelin/james_beard/nyt · `level` (michelin:
-  `1 star`/`2 stars`/`bib_gourmand`/`recommended`; james_beard:
-  `winner`/`nominee`/`semifinalist`; nyt: `nyt_100_best`/`nyt_starred_review`)
+- `restaurant_slug` · `source` michelin/james_beard/nyt · `level` — only **7**
+  strings actually occur: michelin `1 star`(6)/`bib_gourmand`(13)/
+  `recommended`(38, = Michelin's "The Plate"); james_beard `winner`(30)/
+  `nominee`(56)/`semifinalist`(46); nyt `nyt_100_best`(6). `2 stars` and
+  `nyt_starred_review` exist in the RAW files but no such restaurant
+  participates — don't assume they render, don't crash if a future snapshot
+  adds them.
 - `year` · `source_url` · `matched_name` · `notes`
 - `match_confidence`: 1.0 = exact name + street-number match; 0.9 = exact unique
   name, no address available (ALL james_beard rows — JBF publishes no addresses);
@@ -131,6 +141,41 @@ The API key survives seasons and self-rediscovers if rotated.
 - `rw-summer-2026-value-report.md` — archive: full value analysis, traps,
   evidence grades ([A] own menu … [D] uncorroborated), 3 addenda, source tables.
 
+## Dashboard (`docs/`, served by GitHub Pages)
+
+Static sort/filter dashboard over the 648 participants. No backend, no build
+step: `docs/index.html` + `docs/app.js` + `docs/styles.css` read
+`docs/data/restaurants.json`. Preview locally with
+`python -m http.server 8137 --directory docs` (a `file://` open will NOT work —
+the payload is fetched).
+
+`src/export_site_data.py` builds the payload (`--check` validates and prints
+without writing). It merges, in this precedence order:
+
+1. **`config/verified_values.json`** — hand-verified facts transcribed from
+   `reports/rw-final-bookings.md` and the caveat list below. The restaurant's
+   own printed materials always win over the listing API. 23 entries: the 15
+   ranked bookings plus 8 verified caveat rows.
+2. **listing API fields** from `restaurants` (end date parsed from the last
+   `weeks` label).
+3. **`price_sweep`** — heuristic only, always rendered as an "estimate", never
+   allowed to populate a verified field.
+
+`config/recognition_suppress.json` drops recognition rows that are in the DB but
+demonstrably wrong (see caveats). Set `active: false` to restore them.
+
+**ToS enforcement is in code, not convention.** `assert_tos_clean()` fails the
+export rather than publish a banned field. Menu text may leave only as dish-tag
+snippets, and the rule is: **at most 5% of a menu's extracted text, or 40
+characters, whichever is greater**, re-centred on the matched keyword (never
+right-truncated), with overlapping and adjacent snippets pruned so they cannot
+be stitched back into a passage. The published payload carries no `raw_text`,
+no `menu_items`, and no dish/description fields.
+
+Coverage today: 648 rows · 14 verified gaps · 345 estimates · 289 with no
+comparable (left blank — never backfilled) · 120 restaurants with dish tags ·
+78 with recognition badges. Payload ~780 KB raw, ~76 KB gzipped.
+
 ## Data caveats (read before trusting anything)
 
 - **4 restaurants have NULL address**: alta-calidad, casa-brazilian, catria-nyc,
@@ -139,6 +184,23 @@ The API key survives seasons and self-rediscovers if rotated.
   (Masa, Roberta's, Tonchin, Ci Siamo, Madre, Lola's, Bar 'Cino, Arcadia, Mắm) —
   awaiting a human ruling; none touch the final-bookings shortlist. Do not
   auto-accept.
+- **10 recognition rows in the DB are FALSE POSITIVES** (distinct from the 17
+  pending above — these were auto-accepted at match time). `norm_name()` in
+  `enrich_recognition.py` strips a stopword list before comparing, and where
+  stripping collapses two different restaurants onto one string the match still
+  scores 0.9 with notes `' [exact name]'`. So **0.9 + "[exact name]" does NOT
+  mean the names resemble each other.** Confirmed cases: `osteria-brooklyn`
+  absorbed all 8 James Beard awards belonging to the Seagram Building's
+  *Brasserie* (both normalise to the EMPTY STRING); `cafe-boulud` absorbed 2
+  nominations belonging to *Bar Boulud* (both normalise to `boulud`). Listed in
+  `config/recognition_suppress.json` and excluded from the dashboard; the DB is
+  untouched. **A real fix belongs in `norm_name()`** — it will re-occur on every
+  `enrich_recognition` run.
+- **`config/shortlist.json` ranks 3–5 disagree with the decision doc.** The
+  report ranks David Burke Tavern 3, Zuma 4, Casa Lever 5; `shortlist.json` has
+  Casa Lever 3, David Burke Tavern 4, Zuma 5. The other 12 match. The dashboard
+  uses the REPORT order (it is the decision doc and supersedes). Reconcile the
+  two files when convenient.
 - **~240 restaurants have no price comparable** (publish no prices anywhere).
   HARD RULE: never backfill from delivery aggregators — markup distortion makes
   them worse than an honest blank. The gap stays a gap.
@@ -177,9 +239,14 @@ of site content. Applied here as:
 
 ```
 src/        pipeline (config, fetch_listing, fetch_details, download_menus,
-            parse_menus, build_db, tag_dishes, enrich_recognition, diff_report,
-            refresh, hours_lookup, price_sweep, price_rescue)
-config/     dish_tags.json (tag rules) · shortlist.json (15 booking targets)
+            parse_menus, build_db, tag_dishes, enrich_recognition,
+            export_site_data, diff_report, refresh, hours_lookup, price_sweep,
+            price_rescue)
+config/     dish_tags.json (tag rules) · shortlist.json (15 booking targets) ·
+            verified_values.json (hand-verified facts, merged over the API) ·
+            recognition_suppress.json (known-bad recognition matches)
+docs/       the dashboard (index.html, app.js, styles.css, data/restaurants.json)
+.github/    workflows/refresh.yml — Monday 07:00 ET cron + manual dispatch
 data/raw/   listing snapshots+page cache · details (addresses) · recognition
             (Michelin/JB/NYT source data) · pricesweep (heuristic crawl cache) ·
             menus/manifest.json + parsed.json (PDFs themselves are gitignored)

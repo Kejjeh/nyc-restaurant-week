@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
+<meta name="referrer" content="no-referrer">
+<title>NYC Restaurant Week — value dashboard</title>
+<meta name="description" content="Personal sort/filter tool for NYC Restaurant Week Summer 2026. Not a publication.">
+<meta name="theme-color" content="#0d6a5f">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230d6a5f'/%3E%3Ctext x='8' y='12' font-family='monospace' font-size='10' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%24%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <h1>NYC Restaurant Week</h1>
+    <span class="season" id="seasonLabel">Summer 2026</span>
+    <span class="spacer"></span>
+    <button type="button" class="themeToggle" id="themeToggle" aria-label="Switch colour theme">Theme</button>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="wrap">
+
+    <div class="searchRow">
+      <input type="search" class="search" id="q" autocomplete="off" spellcheck="false"
+             placeholder="Search name, neighborhood, cuisine, dish tag…"
+             aria-label="Search restaurants">
+      <button type="button" class="btn" id="filterBtn" aria-expanded="false" aria-controls="panel">
+        Filters<span class="n" id="filterCount" hidden>0</span>
+      </button>
+      <label class="sr-only" for="sort">Sort by</label>
+      <select class="sortSel" id="sort" aria-label="Sort by">
+        <option value="gap_usd_desc">Gap $ — high to low</option>
+        <option value="gap_pct_desc">Gap % — high to low</option>
+        <option value="price_asc">RW price — low to high</option>
+        <option value="price_desc">RW price — high to low</option>
+        <option value="end_asc">End date — soonest first</option>
+        <option value="end_desc">End date — latest first</option>
+        <option value="name_asc">Name — A to Z</option>
+        <option value="rank_asc">Final-list rank</option>
+      </select>
+    </div>
+
+    <div class="statusbar">
+      <span><strong id="shown">0</strong> of <strong id="total">0</strong> restaurants</span>
+      <span id="urgentCount"></span>
+      <button type="button" class="linkish" id="clearBtn" hidden>Clear filters</button>
+    </div>
+
+  </div>
+
+  <section class="panel" id="panel" hidden aria-label="Filters">
+    <div class="wrap">
+      <div class="facets" id="facets"></div>
+    </div>
+  </section>
+</div>
+
+<main class="wrap results">
+  <div class="banner" id="estBanner" hidden>
+    <p><strong>Heads up:</strong> the default “gap $” sort pools <em>verified</em> gaps with
+       <em>heuristic estimates</em>, and the estimates crowd the top — they read a restaurant's
+       cheapest tier against a scraped price list, which overstates casual formats.
+       Estimates are marked <span class="pill warn">estimate</span> and underlined.</p>
+    <div class="bannerActions">
+      <button type="button" class="btn" id="verifiedOnly">Show verified only</button>
+      <button type="button" class="linkish" id="dismissBanner">Dismiss</button>
+    </div>
+  </div>
+  <div id="rows"></div>
+  <div class="empty" id="empty" hidden>
+    <p>Nothing matches those filters.</p>
+    <button type="button" class="btn" id="clearBtn2">Clear filters</button>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p id="footProvenance"></p>
+    <p><strong>Verified</strong> windows, days and gaps come from the restaurants' own printed
+       materials (hand-checked). <strong>Estimates</strong> are heuristic website triage — they
+       understate expensive kitchens and overstate casual ones, and are never a substitute for
+       checking. Where a restaurant publishes no prices, the gap is left blank rather than guessed.</p>
+    <p>Menus are linked to the official PDF, never reproduced here. Personal, non-commercial tool.</p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

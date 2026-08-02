@@ -1,0 +1,26 @@
+{
+  "_doc": {
+    "purpose": "Recognition rows that ARE in the DB (auto-accepted at match time) but are demonstrably WRONG. The exporter drops these from the published badges. This is separate from data/processed/recognition_review.json, which holds matches that were never accepted and still await a human ruling.",
+    "why_a_config": "src/build_db.py destroys and recreates the DB on every refresh, so recognition.id values are NOT stable across runs. Suppression is therefore keyed on (slug, source, matched_name), which is stable.",
+    "review_status": "PROPOSED by the dashboard build on 2026-08-01, pending the owner's ruling. Each entry states the mechanism, not just the conclusion. Setting `active: false` restores the badges without touching code.",
+    "root_cause": "norm_name() in src/enrich_recognition.py strips a stopword list before comparing names. Where stripping collapses two different restaurants onto the same string, the match is spurious yet still scores 0.9 with notes ' [exact name]'. match_confidence 0.9 therefore does NOT imply the names resemble each other."
+  },
+  "suppress": [
+    {
+      "slug": "osteria-brooklyn",
+      "source": "james_beard",
+      "matched_name": "Brasserie",
+      "rows": 8,
+      "active": true,
+      "reason": "norm_name() strips the stopwords 'osteria', 'brooklyn' AND 'brasserie', so both 'Osteria Brooklyn' and 'Brasserie' normalise to the EMPTY STRING. osteria-brooklyn is the only one of the 648 participants that normalises to '', so it absorbed all 8 James Beard awards belonging to the Seagram Building's Brasserie (winner, 2000). None of these awards belong to Osteria Brooklyn."
+    },
+    {
+      "slug": "cafe-boulud",
+      "source": "james_beard",
+      "matched_name": "Bar Boulud",
+      "rows": 2,
+      "active": true,
+      "reason": "norm_name() strips both 'bar' and 'cafe', collapsing 'Bar Boulud' and 'Cafe Boulud' onto 'boulud'. These two nominations (2009, 2014) belong to Bar Boulud, a different Dinex room. Cafe Boulud's own six James Beard rows (matched_name 'Cafe Boulud') are genuine and are NOT suppressed, nor is its Michelin 1 star."
+    }
+  ]
+}

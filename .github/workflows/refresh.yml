@@ -1,0 +1,136 @@
+name: Weekly refresh
+
+# Monday 07:00 America/New_York. GitHub cron is UTC-only and does not observe
+# DST, so 11:00 UTC is 07:00 EDT during the season (and 06:00 EST after
+# November). The Restaurant Week season ends 2026-09-06, well inside EDT.
+on:
+  schedule:
+    - cron: '0 11 * * 1'
+  workflow_dispatch:
+    inputs:
+      force_menus:
+        description: 'Re-download every menu PDF (catches in-place menu edits, ~10 min)'
+        type: boolean
+        default: false
+
+# Never let two refreshes overlap: both would crawl nyctourism at once and
+# blow through the <=1 req/sec ToS limit that src/config.py enforces per process.
+concurrency:
+  group: rw-refresh
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+
+      # data/raw/menus/*.pdf is gitignored (~406 MB), so a fresh checkout has
+      # none of them and download_menus.py would re-fetch ~470 PDFs at the
+      # mandatory <=1 req/sec (~10 min) every single run. The rolling cache key
+      # means each run restores the newest cache and saves an updated one.
+      - name: Restore menu PDF cache
+        uses: actions/cache@v4
+        with:
+          path: data/raw/menus
+          key: rw-menus-${{ github.run_id }}
+          restore-keys: |
+            rw-menus-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # refresh.py runs the whole chain in order, single-threaded on purpose:
+      # fetch_listing -> fetch_details -> download_menus -> parse_menus ->
+      # build_db -> tag_dishes -> enrich_recognition -> export_site_data ->
+      # diff_report. Do NOT parallelise any of it against nyctourism or the S3
+      # bucket; the throttle in src/config.py is a ToS requirement.
+      - name: Run refresh
+        id: refresh
+        run: |
+          set -o pipefail
+          ARGS=""
+          if [ "${{ inputs.force_menus }}" = "true" ]; then ARGS="--force-menus"; fi
+          python src/refresh.py $ARGS 2>&1 | tee refresh.log
+
+      - name: Build job summary
+        if: always()
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import pathlib, re
+          log = pathlib.Path("refresh.log")
+          text = log.read_text(encoding="utf-8", errors="replace") if log.exists() else ""
+
+          # refresh.py prints "=== <script> <args> ===" before each step.
+          sections, cur = {}, "start"
+          for line in text.splitlines():
+              m = re.match(r"^=== (\S+?)\.py.*===$", line)
+              if m:
+                  cur = m.group(1)
+                  sections[cur] = []
+              else:
+                  sections.setdefault(cur, []).append(line)
+
+          diff = "\n".join(sections.get("diff_report", [])).strip()
+          export = "\n".join(sections.get("export_site_data", [])).strip()
+
+          # Shortlist alerts lead — they are the booking-relevant changes.
+          alerts = []
+          grab = False
+          for line in diff.splitlines():
+              if "SHORTLIST ALERTS" in line:
+                  grab = True
+                  continue
+              if grab:
+                  if line.startswith("#" * 10):
+                      break
+                  if line.strip():
+                      alerts.append(line.strip())
+
+          print("# NYC Restaurant Week — weekly refresh\n")
+          changed = [a for a in alerts if a.startswith("!!")]
+          if changed:
+              print("## ⚠️ Shortlist changes — booking-relevant\n")
+              for a in changed:
+                  print(f"- **{a.lstrip('! ').strip()}**")
+              print()
+          else:
+              print("## Shortlist: unchanged\n")
+
+          if export:
+              print("## Dashboard payload\n")
+              print("```\n" + export + "\n```\n")
+          if diff:
+              print("<details><summary>Full program diff</summary>\n")
+              print("```\n" + diff[:50000] + "\n```\n")
+              print("</details>\n")
+          PY
+
+      - name: Commit changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # refresh.log is a build artifact, never committed.
+          rm -f refresh.log
+          # Stage FIRST, then test. `git diff --quiet` ignores untracked files,
+          # so on the first run a brand-new docs/data/restaurants.json would
+          # look like "no changes" and never be committed.
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          echo "Changed files:"
+          git diff --cached --name-only
+          git commit -m "Weekly refresh $(date -u +%Y-%m-%d): listing, menus, dashboard payload"
+          git push

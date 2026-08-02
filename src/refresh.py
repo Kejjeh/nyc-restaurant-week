@@ -28,6 +28,7 @@ def main():
     run("build_db.py")
     run("tag_dishes.py")          # build_db recreates the DB, so re-tag
     run("enrich_recognition.py")  # re-match from cached raw recognition files
+    run("export_site_data.py")    # docs/ payload; must follow tag+recognition
     run("diff_report.py")
 
 

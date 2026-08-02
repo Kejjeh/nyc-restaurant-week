@@ -128,6 +128,21 @@ function matches(r, exceptFacet) {
   return true;
 }
 
+/** Match quality against the query, lower = better.
+ *  The haystack deliberately spans borough/neighborhood/cuisine so you can
+ *  search those too — but that means "Manhatta" (a restaurant) also matches
+ *  all 549 Manhattan rows. Rank name matches above field matches so the
+ *  restaurant you typed comes first; the broader matches still follow. */
+function relevance(r) {
+  if (!QUERY) return 0;
+  const n = r._nf;
+  if (n === QUERY) return 0;
+  if (n.startsWith(QUERY)) return 1;
+  if (r._words.some((w) => w.startsWith(QUERY))) return 2;
+  if (n.includes(QUERY)) return 3;
+  return 4;
+}
+
 /* nulls always sort last, in every direction */
 const cmpNullLast = (a, b, dir) => {
   const an = a == null, bn = b == null;
@@ -550,7 +565,11 @@ function activeCount() {
 }
 
 function apply() {
-  const out = ROWS.filter(matches).sort(SORTS[SORT] || SORTS.gap_usd_desc);
+  const cmp = SORTS[SORT] || SORTS.gap_usd_desc;
+  // With a query active, match quality leads and the chosen sort orders within
+  // each tier, so the sort control still does what it says.
+  const out = ROWS.filter(matches)
+    .sort(QUERY ? (a, b) => relevance(a) - relevance(b) || cmp(a, b) : cmp);
 
   const host = $('#rows');
   host.textContent = '';
@@ -634,6 +653,8 @@ function initTheme() {
 function prepare(r) {
   // One folded haystack per row, built once — search is then a substring test.
   r._name = r.name || '';
+  r._nf = fold(r._name);
+  r._words = r._nf.split(/[^a-z0-9']+/).filter(Boolean);
   r._hay = fold([
     r.name, r.slug, r.borough, r.neighborhood, r.address,
     (r.cuisines || []).join(' '),

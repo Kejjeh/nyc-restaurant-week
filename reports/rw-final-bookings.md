@@ -6,7 +6,7 @@ Program rule: no Saturdays (restaurant-printed exceptions: Chito Gvrito, Playa B
 ## The list
 
 **1. Yingtao — $60 dinner · Michelin ★ · Hell's Kitchen · Sunday ✓ · 🔴 BOOK-BY Aug 16 (API; own site prints no end date — two independent checks ⚠)**
-Only other way into this kitchen is the $150 tasting, and the RW menu carries tasting dishes — the best access-arbitrage in the program. Tue–Sun (closed Mon). End date lives in an unreadable image menu; 30-second phone check before counting on late-August: (845) 236-6577, answers 2–5pm.
+Only other way into this kitchen is the $150 tasting, and the RW menu carries tasting dishes — the best access-arbitrage in the program. Menu image now read directly [A]: $60 3-course confirmed, Tue–Thu & Sun 5–8:30 / Fri–Sat 5–9:30 (Sunday ✓), short rib +$14 / urchin +$16 — and definitively NO end date printed. API says Aug 16: book by then. Phone check for later dates: (845) 236-6577, 2–5pm.
 Book: SevenRooms https://www.sevenrooms.com/explore/yingtao/reservations/create/search
 
 **2. 53 — $45 SUNDAY dim sum brunch (also M–F lunch) · Midtown/MoMA · 🔴 BOOK-BY Aug 16 [A window]**
@@ -26,7 +26,7 @@ Identical dishes à la carte $107 → save $47 (44%). RW menu verified on their 
 Book: Resy https://resy.com/cities/ny/casa-lever
 
 **6. Mark's Off Madison — $45 dinner ($30 lunch) · NoMad · ⚠ window/days unprinted (API: Sundays ✓, thru Aug 31)**
-Two à la carte courses alone run $57–68 → save ~$27–38 (38–46%) on three. ⚠ Second check: no Sunday DINNER service exists (Sun brunch only, 10:30–3) — the listing's Sunday-dinner flag looks wrong; book a weekday.
+Two à la carte courses alone run $57–68 → save ~$27–38 (38–46%) on three. RW dinner PDF now read in full [A]: $45 3-course confirmed (crab cake, latke-crusted orata, skate) — and NO dates/days printed on it. No Sunday DINNER service exists (Sun brunch only) — book a weekday.
 Book: Resy https://resy.com/cities/new-york-ny/venues/marks-off-madison
 
 **7. Hawksmoor — $60 two-course lunch · Gramercy · Mon–Fri ONLY, thru Sep 6 [A window]**
@@ -38,7 +38,7 @@ $30 RW lunch vs their own $45 Express Lunch → 33% under the house's own deal; 
 Book: OpenTable https://www.opentable.com/booking/experiences-availability?rid=1266931&restref=1266931&experienceId=766288
 
 **9. Café Boulud — $60 dinner · Michelin ★ · UES · NO Sunday · ⚠ window unprinted (API: thru Aug 31)**
-À la carte ~$94 → save ~$34 (36%). ⚠ CONTESTED: one check found the RW menu posted with Fri–Sat service; a second found no RW posting at all and reads those as regular hours. Treat the offer as listing-grounded, days unverified, no Sunday either way (no Sunday service exists). Supplements +$12/+$18. Confirm RW availability when booking.
+À la carte ~$94 → save ~$34 (36%). CONTEST RESOLVED by rendered-page read [A]: RW menu IS posted (it's JS-rendered — the null check hit raw HTML). Printed: 3 courses $60, served Mon–Thu 6–9pm AND Fri–Sat 5–9:30pm — a printed SATURDAY RW service, program-rule exception. No Sunday (no Sunday service). Supplements +$12 daurade / +$18 seafood risotto. No end date printed (API: thru ~Aug 31).
 Book: Resy https://resy.com/cities/new-york-ny/venues/cafe-boulud-at-maison-barnes
 
 **10. Lincoln Ristorante — $60 dinner · Lincoln Center · Tue–Sat, NO Sunday · 🔴 BOOK-BY Aug 15–16 (two own-site checks disagree by one day — book by the 15th to be safe)**
@@ -61,8 +61,8 @@ Book: SevenRooms https://www.sevenrooms.com/explore/frenchette/reservations/crea
 Same-dish 3-course ~$63 → save ~$18 (29%). 1963 Cuban landmark, no house deal undercuts it. Relaxed timeline.
 Book: OpenTable via victorscafe.com/reservations
 
-**15. Code Red — $45? dinner · Laconia, the Bronx · Sunday likely (open daily) · ⚠ PRICE UNSETTLED: $45 listing / $50 their page / $60 their page metadata — CALL FIRST (718) 881-1808**
-5-item like-for-like $78 → save 36–42% even at $50. Your borough's best; fine print: 18% auto-grat (parties under 10), 3% card fee, 120-minute seating limit. Sunday RW dinner unconfirmed.
+**15. Code Red — $50 dinner · Laconia, the Bronx · Sunday likely (open daily 11am–1/2am) · PRICE SETTLED at $50 by live page read [A]** (listing's $45 is wrong; $60 was stale metadata)
+5 items (app + entrée + side + dessert + NA beverage), like-for-like $78 → **save $28 (36%)**. Signature cocktail +$10. Fine print printed: dine-in only, 18% grat + 120-min limit under 10 (20%/180-min for 10+), chip cards only. No dates/Sunday printed — quick call still wise: (718) 881-1808.
 Book: Resy https://resy.com/cities/new-york-ny/venues/code-red-ny
 
 ## Dropped in final verification

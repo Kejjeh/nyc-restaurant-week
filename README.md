@@ -152,10 +152,8 @@ The API key survives seasons and self-rediscovers if rotated.
   LUNCH-only, $60 = 2 courses (API implies $60 dinner) · Four Twenty Five
   extended to Sep 6 · Tudor City's site shows stale winter pages; its $30 lunch
   exists only in the API — dropped from bookings · Mark's Off Madison has no
-  Sunday-dinner service (API flags Sunday) · Café Boulud RW posting contested
-  between passes; no Sunday service either way · Momofuku Noodle Bar's $45 tier
-  is a weekend lunch; ends Aug 30 · Code Red prints $50 (meta $60) vs API $45 —
-  unresolved, call first · David Burke Tavern Jul 21–Aug 16 (own nav says 8/14);
+  Sunday-dinner service (API flags Sunday) · Café Boulud RW posting resolved (JS-rendered page): $60 3-course, Mon–Thu 6–9 + Fri–Sat 5–9:30 — printed Saturday RW service; no Sunday · Momofuku Noodle Bar's $45 tier
+  is a weekend lunch; ends Aug 30 · Code Red SETTLED at $50 by live page read (API $45 wrong; $60 stale metadata) · David Burke Tavern Jul 21–Aug 16 (own nav says 8/14);
   Sunday dinner unprinted · 53's $45 RW Sunday brunch vs their standing $78 dim
   sum — confirm at booking · Chito Gvrito and Playa Betty's print SATURDAY
   service despite the program-wide Saturday exclusion.

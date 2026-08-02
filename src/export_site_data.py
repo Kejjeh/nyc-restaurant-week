@@ -423,10 +423,14 @@ def build_payload():
 
         # --- window -----------------------------------------------------
         api_end = end_date_from_weeks(jload(weeks, []))
-        if "end_date" in v and v["end_date"]:
-            end_date, end_src = v["end_date"], v.get("end_date_source", "printed")
-        elif v.get("end_date_source") == "api_fallback":
+        # api_fallback is checked FIRST and always takes the LIVE listing value.
+        # Those entries mean "the restaurant prints no date"; the date written
+        # into verified_values.json was only a copy of the API at transcription
+        # time, and honouring it would freeze a stale date after the API moves.
+        if v.get("end_date_source") == "api_fallback":
             end_date, end_src = api_end, "api_fallback"
+        elif v.get("end_date"):
+            end_date, end_src = v["end_date"], v.get("end_date_source", "printed")
         else:
             end_date, end_src = api_end, "api"
 
@@ -444,7 +448,10 @@ def build_payload():
                 "gap_pct": v.get("gap_pct"), "gap_pct_high": v.get("gap_pct_high"),
                 "gap_basis": "verified", "comparable_usd": v.get("comparable_usd"),
                 "comparable_usd_high": v.get("comparable_usd_high"),
-                "rw_price": v.get("rw_price"), "price_source": "verified",
+                "rw_price": v.get("rw_price"),
+                # only "verified" if the PRICE itself was verified -- otherwise
+                # the tier backfill below supplies it from the listing
+                "price_source": "verified" if v.get("rw_price") else None,
             }
             stats["verified"] += 1
         # A verified entry only blocks the estimate if it actually says

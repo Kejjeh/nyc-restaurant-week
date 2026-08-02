@@ -463,6 +463,13 @@ function renderDetail(r) {
 
 function buildFacets() {
   const host = $('#facets');
+  // Every chip node is destroyed and rebuilt on each render, which drops
+  // keyboard focus to <body> and swallows the next Tab. Remember which chip
+  // was focused and restore it after the rebuild.
+  const active = document.activeElement;
+  const refocus = active && active.classList && active.classList.contains('chip')
+    ? { facet: active.dataset.facet, value: active.dataset.value } : null;
+
   host.textContent = '';
 
   for (const f of FACETS) {
@@ -492,6 +499,8 @@ function buildFacets() {
     for (const [v, c] of entries) {
       const b = el('button', 'chip');
       b.type = 'button';
+      b.dataset.facet = f.key;
+      b.dataset.value = String(v);
       b.setAttribute('aria-pressed', FILTERS[f.key].has(v) ? 'true' : 'false');
       b.append(document.createTextNode(labelFor(f, v)));
       b.append(el('span', 'c', String(c)));
@@ -523,6 +532,12 @@ function buildFacets() {
   wrapEl.append(clear);
   sec.append(wrapEl);
   host.append(sec);
+
+  if (refocus) {
+    const again = host.querySelector(
+      `.chip[data-facet="${CSS.escape(refocus.facet)}"][data-value="${CSS.escape(refocus.value)}"]`);
+    if (again) again.focus();
+  }
 }
 
 /* ---------- apply / render loop ----------------------------------------- */
@@ -573,7 +588,10 @@ function clearAll() {
 function writeHash() {
   const p = new URLSearchParams();
   FACETS.forEach((f) => { if (FILTERS[f.key].size) p.set(f.key, [...FILTERS[f.key]].join('~')); });
-  if (FILTERS.bookableBy) p.set('by', FILTERS.bookableBy);
+  // "any" is written explicitly: an absent `by` means "no state yet", which
+  // boot resolves to today — so clearing the date filter has to be recorded,
+  // or a reload silently re-applies today's date.
+  p.set('by', FILTERS.bookableBy || 'any');
   if (QUERY) p.set('q', QUERY);
   if (SORT !== 'gap_usd_desc') p.set('sort', SORT);
   const s = p.toString();
@@ -588,7 +606,8 @@ function readHash() {
     const v = p.get(f.key);
     if (v) v.split('~').filter(Boolean).forEach((x) => FILTERS[f.key].add(x));
   });
-  if (p.get('by')) FILTERS.bookableBy = p.get('by');
+  const by = p.get('by');
+  if (by) FILTERS.bookableBy = by === 'any' ? null : by;
   if (p.get('q')) { QUERY = fold(p.get('q')); $('#q').value = p.get('q'); }
   // Object.hasOwn, not truthiness: "sort=constructor" inherits from
   // Object.prototype, would pass a truthy check and then be used as a comparator.

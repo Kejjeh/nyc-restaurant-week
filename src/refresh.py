@@ -19,8 +19,17 @@ def run(script, *args):
 def main():
     force = "--force-menus" in sys.argv
     if force:
-        for f in (SRC.parent / "data" / "raw" / "menus").glob("*.pdf"):
+        menus = SRC.parent / "data" / "raw" / "menus"
+        for f in menus.glob("*.pdf"):
             f.unlink()
+        # parse_menus.py skips any slug already in parsed-progress.json, so
+        # without clearing it the re-downloaded PDFs are never re-parsed and
+        # in-place menu edits never reach the DB or the site -- which is the
+        # entire reason --force-menus exists.
+        progress = menus / "parsed-progress.json"
+        if progress.exists():
+            progress.unlink()
+            print("cleared parsed-progress.json (forcing a full re-parse)")
     run("fetch_listing.py")
     run("fetch_details.py")
     run("download_menus.py")

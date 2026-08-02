@@ -22,9 +22,10 @@
   --surface-2:  #eef3f1;
   --ink:        #141d1b;
   --ink-2:      #55645f;
-  --ink-3:      #7d8a85;
-  --rule:       #d8e2de;
+  --ink-3:      #63716b;   /* >=4.5:1 on --surface; was #7d8a85 (~3.2:1) */
+  --rule:       #d8e2de;   /* decorative separators */
   --rule-2:     #e8efec;
+  --rule-strong:#818f8a;   /* >=3:1 — boundaries of INTERACTIVE controls */
 
   --accent:     #0d6a5f;
   --accent-ink: #ffffff;
@@ -54,9 +55,10 @@
     --surface-2:  #1c2624;
     --ink:        #e7eeeb;
     --ink-2:      #9daca7;
-    --ink-3:      #75837e;
+    --ink-3:      #8b9994;
     --rule:       #2a3634;
     --rule-2:     #212c2a;
+    --rule-strong:#61716d;
 
     --accent:     #4ecdbb;
     --accent-ink: #06201d;
@@ -75,9 +77,12 @@
 
 /* The viewer's explicit toggle must win over the OS preference, both ways. */
 :root[data-theme="light"] {
+  /* re-declare, or native controls (select, date picker, scrollbars) keep
+     rendering for the OS theme while the page renders for the forced one */
+  color-scheme: light;
   --paper: #f4f7f6; --surface: #ffffff; --surface-2: #eef3f1;
-  --ink: #141d1b; --ink-2: #55645f; --ink-3: #7d8a85;
-  --rule: #d8e2de; --rule-2: #e8efec;
+  --ink: #141d1b; --ink-2: #55645f; --ink-3: #63716b;
+  --rule: #d8e2de; --rule-2: #e8efec; --rule-strong: #818f8a;
   --accent: #0d6a5f; --accent-ink: #ffffff; --accent-sub: #e3f0ed;
   --value: #1c7a3e; --value-sub: #e4f2e8;
   --warn: #96610a; --warn-sub: #f8efdc;
@@ -85,9 +90,10 @@
   --shadow: 0 1px 2px rgb(20 29 27 / .06), 0 4px 12px rgb(20 29 27 / .04);
 }
 :root[data-theme="dark"] {
+  color-scheme: dark;
   --paper: #0e1413; --surface: #151d1c; --surface-2: #1c2624;
-  --ink: #e7eeeb; --ink-2: #9daca7; --ink-3: #75837e;
-  --rule: #2a3634; --rule-2: #212c2a;
+  --ink: #e7eeeb; --ink-2: #9daca7; --ink-3: #8b9994;
+  --rule: #2a3634; --rule-2: #212c2a; --rule-strong: #61716d;
   --accent: #4ecdbb; --accent-ink: #06201d; --accent-sub: #14312d;
   --value: #5fc27e; --value-sub: #142c1d;
   --warn: #d9a441; --warn-sub: #2f2617;
@@ -118,7 +124,13 @@ a:hover { text-decoration-thickness: 2px; }
   border-radius: 3px;
 }
 
-.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 12px; }
+/* padding-INLINE, not the `padding` shorthand: the shorthand also resets
+   padding-block, silently cancelling .results' vertical padding wherever a
+   .wrap rule of equal specificity comes later in the cascade. */
+.wrap {
+  max-width: var(--maxw); margin: 0 auto;
+  padding-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right));
+}
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -147,7 +159,7 @@ a:hover { text-decoration-thickness: 2px; }
 .themeToggle {
   font: inherit; font-size: 12px;
   background: var(--surface-2); color: var(--ink-2);
-  border: 1px solid var(--rule); border-radius: var(--r);
+  border: 1px solid var(--rule-strong); border-radius: var(--r);
   padding: 4px 9px; cursor: pointer;
 }
 .themeToggle:hover { color: var(--ink); border-color: var(--ink-3); }
@@ -171,7 +183,7 @@ a:hover { text-decoration-thickness: 2px; }
   font: inherit; font-size: 15px;
   padding: 8px 11px;
   color: var(--ink); background: var(--paper);
-  border: 1px solid var(--rule); border-radius: var(--r);
+  border: 1px solid var(--rule-strong); border-radius: var(--r);
 }
 .search::placeholder { color: var(--ink-3); }
 .search:focus { border-color: var(--accent); background: var(--surface); }
@@ -180,14 +192,14 @@ a:hover { text-decoration-thickness: 2px; }
   font: inherit; font-size: 13px;
   padding: 8px 9px; max-width: 46vw;
   color: var(--ink); background: var(--paper);
-  border: 1px solid var(--rule); border-radius: var(--r);
+  border: 1px solid var(--rule-strong); border-radius: var(--r);
 }
 
 .btn {
   font: inherit; font-size: 13px; white-space: nowrap;
   padding: 8px 11px; cursor: pointer;
   color: var(--ink); background: var(--paper);
-  border: 1px solid var(--rule); border-radius: var(--r);
+  border: 1px solid var(--rule-strong); border-radius: var(--r);
 }
 .btn:hover { border-color: var(--ink-3); }
 .btn[aria-expanded="true"] { background: var(--accent-sub); border-color: var(--accent); color: var(--accent); }
@@ -235,7 +247,7 @@ a:hover { text-decoration-thickness: 2px; }
   padding: 4px 9px; cursor: pointer;
   display: inline-flex; align-items: baseline; gap: 5px;
   color: var(--ink-2); background: var(--surface);
-  border: 1px solid var(--rule); border-radius: 20px;
+  border: 1px solid var(--rule-strong); border-radius: 20px;
 }
 .chip:hover { border-color: var(--ink-3); color: var(--ink); }
 .chip .c {
@@ -254,7 +266,7 @@ a:hover { text-decoration-thickness: 2px; }
 .dateFacet input[type="date"] {
   font: inherit; font-family: var(--mono); font-size: 12.5px;
   padding: 5px 7px; color: var(--ink); background: var(--surface);
-  border: 1px solid var(--rule); border-radius: var(--r);
+  border: 1px solid var(--rule-strong); border-radius: var(--r);
 }
 
 /* ---------- results ----------------------------------------------------- */
@@ -428,7 +440,7 @@ a:hover { text-decoration-thickness: 2px; }
   font-size: 12.5px; text-decoration: none;
   padding: 6px 11px; border-radius: var(--r);
   background: var(--surface); color: var(--ink);
-  border: 1px solid var(--rule);
+  border: 1px solid var(--rule-strong);
 }
 .linkBtn:hover { border-color: var(--accent); color: var(--accent); }
 .linkBtn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 550; }
@@ -463,7 +475,10 @@ a:hover { text-decoration-thickness: 2px; }
 
 @media (max-width: 640px) {
   body { font-size: 15px; }
-  .wrap { padding: 0 10px; }
+  .wrap { padding-inline: max(10px, env(safe-area-inset-left)) max(10px, env(safe-area-inset-right)); }
+  /* iOS Safari auto-zooms the page on focus for any field under 16px */
+  .search, .sortSel, .btn, .dateFacet input[type="date"] { font-size: 16px; }
+  .results { padding-bottom: max(56px, env(safe-area-inset-bottom)); }
   .rowHead { grid-template-columns: 1fr auto; padding: 10px 11px; gap: 2px 10px; }
   .gapCell { min-width: 78px; }
   .gapUsd { font-size: 19px; }

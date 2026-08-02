@@ -133,6 +133,25 @@ def main():
                 for i, x in enumerate(p.get("items", []))
             ],
         )
+    # price_sweep triage table (heuristic comparables; see README) — reload
+    # from cached sweep results so DB rebuilds don't lose it
+    sweep_dir = DB.parents[1] / "raw" / "pricesweep"
+    if sweep_dir.exists():
+        con.executescript("""
+        CREATE TABLE IF NOT EXISTS price_sweep (
+          restaurant_slug TEXT PRIMARY KEY, comparable_3course INTEGER,
+          gaps TEXT, confidence TEXT, pages_fetched INTEGER, n_prices INTEGER,
+          error TEXT, swept_date TEXT, comparable_basis TEXT);
+        """)
+        for f in sweep_dir.glob("*.json"):
+            r = json.loads(f.read_text())
+            con.execute(
+                "INSERT OR REPLACE INTO price_sweep VALUES (?,?,?,?,?,?,?,?,?)",
+                (r["slug"], r.get("comparable_3course"), json.dumps(r.get("gaps")),
+                 r.get("confidence"), r.get("pages_fetched", 0),
+                 len(r.get("prices", [])), r.get("error"), "2026-08-01",
+                 "heuristic"),
+            )
     con.commit()
 
     # flat CSV

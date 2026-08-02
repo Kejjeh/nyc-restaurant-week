@@ -66,8 +66,14 @@ const FILTERS = {
   sunday: new Set(),      // 'yes' | 'no'
   basis: new Set(),       // 'verified' | 'estimate' | 'none'
   menu: new Set(),        // 'pdf' | 'image_only' | 'none'
-  bookableBy: null,       // ISO date string
+  bookableBy: null,       // ISO date — keep rows still open ON this date
+  endingBy: null,         // ISO date — keep rows that CLOSE on/before this date
 };
+
+const PAGE_SIZE = 50;     // 648 rows is ~100 phone-screens; render in chunks
+let RENDERED = 0;
+let RESULTS = [];
+let LAST_GROUP = null;
 let SORT = 'gap_usd_desc';
 let QUERY = '';
 let BANNER = () => {};   // set during boot, once the banner nodes exist
@@ -123,6 +129,11 @@ function matches(r, exceptFacet) {
     // Unknown end dates are KEPT (an unprinted window is not a closed one),
     // but they are visibly flagged in the row.
     if (r.end_date && r.end_date < FILTERS.bookableBy) return false;
+  }
+  if (FILTERS.endingBy) {
+    // "closing soon" — here an unknown end date is excluded, because we can't
+    // claim a restaurant is expiring when nothing says so.
+    if (!r.end_date || r.end_date > FILTERS.endingBy) return false;
   }
 
   return true;
@@ -557,31 +568,169 @@ function buildFacets() {
 
 /* ---------- apply / render loop ----------------------------------------- */
 
+/* ---------- quick views -------------------------------------------------- */
+
+/* Each preset is a named destination: what it selects, and how to tell whether
+   you're already there. They exist so the common questions ("what closes this
+   week?", "show me the shortlist") don't require opening a 164-chip panel. */
+const PRESETS = [
+  {
+    key: 'ranked', label: 'The 15',
+    count: () => ROWS.filter((r) => r.rank != null).length,
+    is: () => FILTERS.verdict.has('Ranked pick'),
+    set() { FILTERS.verdict.add('Ranked pick'); SORT = 'rank_asc'; },
+  },
+  {
+    key: 'urgent', label: 'Closing soon',
+    count: () => ROWS.filter((r) => r.end_date && r.end_date <= DATA.book_by).length,
+    is: () => FILTERS.endingBy === DATA.book_by,
+    set() { FILTERS.endingBy = DATA.book_by; SORT = 'end_asc'; },
+  },
+  {
+    key: 'verified', label: 'Verified gaps',
+    count: () => ROWS.filter((r) => r.gap_basis === 'verified').length,
+    is: () => FILTERS.basis.has('verified'),
+    set() { FILTERS.basis.add('verified'); SORT = 'gap_usd_desc'; },
+  },
+  {
+    key: 'sunday', label: 'Sunday',
+    count: () => ROWS.filter((r) => r.sunday === true).length,
+    is: () => FILTERS.sunday.has('yes'),
+    set() { FILTERS.sunday.add('yes'); },
+  },
+  {
+    key: 'michelin', label: 'Michelin',
+    count: () => ROWS.filter((r) => (r.recognition || []).some((x) => x.source === 'michelin')).length,
+    is: () => FILTERS.recognition.has('michelin'),
+    set() { FILTERS.recognition.add('michelin'); },
+  },
+];
+
+function buildPresets() {
+  const host = $('#presets');
+  host.textContent = '';
+  PRESETS.forEach((p) => {
+    const b = el('button', 'preset');
+    b.type = 'button';
+    b.setAttribute('aria-pressed', p.is() ? 'true' : 'false');
+    b.append(document.createTextNode(p.label));
+    b.append(el('span', 'c', String(p.count())));
+    b.addEventListener('click', () => {
+      const wasOn = p.is();
+      clearAll(true);          // a quick view is a destination, not another layer
+      if (!wasOn) p.set();     // clicking the active one takes you back to all
+      apply();
+    });
+    host.append(b);
+  });
+}
+
+/* ---------- active filters (visible once the panel is closed) ------------ */
+
+function buildActiveFilters() {
+  const host = $('#activeFilters');
+  host.textContent = '';
+  const add = (label, value, onRemove) => {
+    const c = el('button', 'afChip');
+    c.type = 'button';
+    c.title = `Remove ${label}: ${value}`;
+    c.append(el('span', 'k', label));
+    c.append(document.createTextNode(value));
+    c.append(el('span', 'x', '×'));
+    c.addEventListener('click', () => { onRemove(); apply(); });
+    host.append(c);
+  };
+
+  FACETS.forEach((f) => {
+    FILTERS[f.key].forEach((v) => {
+      add(f.title, labelFor(f, v), () => FILTERS[f.key].delete(v));
+    });
+  });
+  if (FILTERS.bookableBy) {
+    add('Open on', fmtDate(FILTERS.bookableBy), () => { FILTERS.bookableBy = null; });
+  }
+  if (FILTERS.endingBy) {
+    add('Closes by', fmtDate(FILTERS.endingBy), () => { FILTERS.endingBy = null; });
+  }
+  if (QUERY) {
+    add('Search', $('#q').value, () => { QUERY = ''; $('#q').value = ''; });
+  }
+  host.hidden = host.childNodes.length === 0;
+}
+
+/* ---------- apply / render loop ----------------------------------------- */
+
 function activeCount() {
   let n = FACETS.reduce((acc, f) => acc + FILTERS[f.key].size, 0);
   if (FILTERS.bookableBy) n += 1;
+  if (FILTERS.endingBy) n += 1;
   if (QUERY) n += 1;
   return n;
+}
+
+/** Rows are grouped by closing date when sorted by date — the only sort where
+ *  a run of adjacent rows shares a meaningful heading. */
+const groupKeyOf = (r) =>
+  (SORT === 'end_asc' || SORT === 'end_desc') ? (r.end_date || 'none') : null;
+
+function groupHeader(key) {
+  const h = el('div', 'groupHead');
+  const n = RESULTS.filter((r) => groupKeyOf(r) === key).length;
+  if (key === 'none') {
+    h.append(el('h2', null, 'No end date published'));
+  } else {
+    const urgent = DATA.book_by && key <= DATA.book_by;
+    if (urgent) h.classList.add('urgent');
+    h.append(el('h2', null, `${urgent ? 'Closes' : 'Runs through'} ${fmtDate(key)}`));
+  }
+  h.append(el('span', 'n', `${n} restaurant${n === 1 ? '' : 's'}`));
+  return h;
+}
+
+/** Append the next chunk — first render, Show more, and scroll all use this. */
+function renderPage() {
+  const frag = document.createDocumentFragment();
+  const slice = RESULTS.slice(RENDERED, RENDERED + PAGE_SIZE);
+
+  slice.forEach((r) => {
+    const key = groupKeyOf(r);
+    if (key !== null && key !== LAST_GROUP) {
+      frag.append(groupHeader(key));
+      LAST_GROUP = key;
+    }
+    frag.append(renderRow(r));
+  });
+
+  $('#rows').append(frag);
+  RENDERED += slice.length;
+
+  const left = RESULTS.length - RENDERED;
+  const more = $('#showMore');
+  more.hidden = left <= 0;
+  more.textContent = left > 0 ? `Show ${Math.min(PAGE_SIZE, left)} more  ·  ${left} remaining` : '';
 }
 
 function apply() {
   const cmp = SORTS[SORT] || SORTS.gap_usd_desc;
   // With a query active, match quality leads and the chosen sort orders within
   // each tier, so the sort control still does what it says.
-  const out = ROWS.filter(matches)
+  RESULTS = ROWS.filter(matches)
     .sort(QUERY ? (a, b) => relevance(a) - relevance(b) || cmp(a, b) : cmp);
 
-  const host = $('#rows');
-  host.textContent = '';
-  const frag = document.createDocumentFragment();
-  out.forEach((r) => frag.append(renderRow(r)));
-  host.append(frag);
+  $('#rows').textContent = '';
+  RENDERED = 0;
+  LAST_GROUP = null;
+  renderPage();
 
-  $('#shown').textContent = out.length;
+  // Presets and URL state both change SORT programmatically; keep the control
+  // showing the truth rather than whatever was last picked by hand.
+  if ($('#sort').value !== SORT) $('#sort').value = SORT;
+
+  $('#shown').textContent = RESULTS.length;
   $('#total').textContent = ROWS.length;
-  const urgent = out.filter(isUrgent).length;
+  const urgent = RESULTS.filter(isUrgent).length;
   $('#urgentCount').textContent = urgent ? `· ${urgent} ending by ${fmtDate(DATA.book_by)}` : '';
-  $('#empty').hidden = out.length !== 0;
+  $('#empty').hidden = RESULTS.length !== 0;
 
   const n = activeCount();
   const badge = $('#filterCount');
@@ -589,17 +738,23 @@ function apply() {
   badge.hidden = n === 0;
   $('#clearBtn').hidden = n === 0;
 
+  buildPresets();
+  buildActiveFilters();
+
   buildFacets();
   BANNER();
   writeHash();
 }
 
-function clearAll() {
+/** `silent` resets state without re-rendering — presets clear then set, and
+ *  would otherwise render an empty intermediate view. */
+function clearAll(silent) {
   FACETS.forEach((f) => FILTERS[f.key].clear());
   FILTERS.bookableBy = null;
+  FILTERS.endingBy = null;
   QUERY = '';
   $('#q').value = '';
-  apply();
+  if (!silent) apply();
 }
 
 /* ---------- URL state (so a filtered view survives a reload / bookmark) -- */
@@ -611,6 +766,7 @@ function writeHash() {
   // boot resolves to today — so clearing the date filter has to be recorded,
   // or a reload silently re-applies today's date.
   p.set('by', FILTERS.bookableBy || 'any');
+  if (FILTERS.endingBy) p.set('to', FILTERS.endingBy);
   if (QUERY) p.set('q', QUERY);
   if (SORT !== 'gap_usd_desc') p.set('sort', SORT);
   const s = p.toString();
@@ -627,6 +783,7 @@ function readHash() {
   });
   const by = p.get('by');
   if (by) FILTERS.bookableBy = by === 'any' ? null : by;
+  if (p.get('to')) FILTERS.endingBy = p.get('to');
   if (p.get('q')) { QUERY = fold(p.get('q')); $('#q').value = p.get('q'); }
   // Object.hasOwn, not truthiness: "sort=constructor" inherits from
   // Object.prototype, would pass a truthy check and then be used as a comparator.
@@ -694,8 +851,10 @@ async function boot() {
 
   $('#q').addEventListener('input', (e) => { QUERY = fold(e.target.value.trim()); apply(); });
   $('#sort').addEventListener('change', (e) => { SORT = e.target.value; apply(); });
-  $('#clearBtn').addEventListener('click', clearAll);
-  $('#clearBtn2').addEventListener('click', clearAll);
+  // Wrapped, not passed directly: as a bare handler clearAll would receive the
+  // Event as its `silent` argument, which is truthy, and skip the re-render.
+  $('#clearBtn').addEventListener('click', () => clearAll());
+  $('#clearBtn2').addEventListener('click', () => clearAll());
 
   // The estimate caveat only matters while estimates are actually in view.
   const banner = $('#estBanner');
@@ -722,6 +881,39 @@ async function boot() {
     const open = fb.getAttribute('aria-expanded') === 'true';
     fb.setAttribute('aria-expanded', open ? 'false' : 'true');
     $('#panel').hidden = open;
+  });
+
+  // --- progressive rendering -------------------------------------------
+  $('#showMore').addEventListener('click', renderPage);
+  // Auto-load as the button nears the viewport; the button stays as the
+  // keyboard/no-IntersectionObserver path.
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting) && RENDERED < RESULTS.length) renderPage();
+    }, { rootMargin: '600px' }).observe($('#showMore'));
+  }
+
+  // --- back to top -------------------------------------------------------
+  const toTop = $('#toTop');
+  toTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    $('#q').focus({ preventScroll: true });
+  });
+  let ticking = false;
+  addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { toTop.hidden = scrollY < 900; ticking = false; });
+  }, { passive: true });
+
+  // --- keyboard ----------------------------------------------------------
+  addEventListener('keydown', (e) => {
+    const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName);
+    if (e.key === '/' && !typing) { e.preventDefault(); $('#q').focus(); return; }
+    if (e.key === 'Escape') {
+      if (typing && $('#q').value) { QUERY = ''; $('#q').value = ''; apply(); }
+      else if (fb.getAttribute('aria-expanded') === 'true') fb.click();
+    }
   });
 
   apply();

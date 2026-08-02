@@ -209,6 +209,56 @@ a:hover { text-decoration-thickness: 2px; }
   border-radius: 20px; padding: 1px 6px; margin-left: 5px;
 }
 
+/* ---------- quick views + active filters -------------------------------- */
+
+.presets {
+  display: flex; gap: 6px; padding-bottom: 9px;
+  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.presets::-webkit-scrollbar { display: none; }
+
+.preset {
+  font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer;
+  display: inline-flex; align-items: baseline; gap: 5px;
+  padding: 5px 11px; border-radius: 20px;
+  color: var(--ink); background: var(--surface-2);
+  border: 1px solid var(--rule-strong);
+}
+.preset:hover { border-color: var(--accent); color: var(--accent); }
+.preset .c {
+  font-family: var(--mono); font-size: 10.5px; color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.preset[aria-pressed="true"] {
+  background: var(--accent); border-color: var(--accent);
+  color: var(--accent-ink); font-weight: 550;
+}
+.preset[aria-pressed="true"] .c { color: var(--accent-ink); opacity: .8; }
+
+.activeFilters {
+  display: flex; flex-wrap: wrap; gap: 5px; padding-bottom: 9px;
+}
+.activeFilters[hidden] { display: none; }
+
+.afChip {
+  font: inherit; font-size: 12px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 6px 3px 9px; border-radius: 20px;
+  color: var(--accent); background: var(--accent-sub);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.afChip .k {
+  font-family: var(--mono); font-size: 9.5px; text-transform: uppercase;
+  letter-spacing: .06em; opacity: .75;
+}
+.afChip .x {
+  font-size: 14px; line-height: 1; opacity: .7;
+  /* keep the hit area >=24px tall without inflating the chip */
+  padding: 4px; margin: -4px -2px -4px 0;
+}
+.afChip:hover { background: var(--accent); color: var(--accent-ink); }
+.afChip:hover .x { opacity: 1; }
+
 .statusbar {
   display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;
   padding-bottom: 10px;
@@ -458,6 +508,49 @@ a:hover { text-decoration-thickness: 2px; }
 .banner strong { color: var(--ink); }
 .banner .pill { vertical-align: baseline; }
 .bannerActions { display: flex; align-items: center; gap: 10px; }
+
+/* ---------- deadline group headers -------------------------------------- */
+
+.groupHead {
+  display: flex; align-items: baseline; gap: 8px;
+  margin: 16px 0 7px; padding-bottom: 5px;
+  border-bottom: 1px solid var(--rule);
+}
+.groupHead:first-child { margin-top: 2px; }
+.groupHead h2 {
+  margin: 0; font-family: var(--mono); font-size: 11.5px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .07em; color: var(--ink-2);
+}
+.groupHead .n {
+  font-family: var(--mono); font-size: 11px; color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.groupHead.urgent h2 { color: var(--crit); }
+
+/* ---------- progressive rendering + back to top ------------------------- */
+
+.showMore {
+  display: block; width: 100%; margin-top: 10px;
+  font: inherit; font-size: 14px; cursor: pointer;
+  padding: 12px; border-radius: var(--r);
+  color: var(--accent); background: var(--surface);
+  border: 1px dashed var(--rule-strong);
+}
+.showMore:hover { border-color: var(--accent); background: var(--accent-sub); }
+.showMore[hidden] { display: none; }
+
+.toTop {
+  position: fixed; z-index: 40;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  font: inherit; font-family: var(--mono); font-size: 12px; cursor: pointer;
+  padding: 9px 13px; border-radius: 20px;
+  color: var(--accent-ink); background: var(--accent);
+  border: 1px solid var(--accent);
+  box-shadow: var(--shadow);
+}
+.toTop[hidden] { display: none; }
+.toTop:hover { filter: brightness(1.08); }
 
 .empty {
   padding: 46px 14px; text-align: center; color: var(--ink-2);

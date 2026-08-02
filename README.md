@@ -156,6 +156,16 @@ step: `docs/index.html` + `docs/app.js` + `docs/styles.css` read
 `python -m http.server 8137 --directory docs` (a `file://` open will NOT work —
 the payload is fetched).
 
+Navigating it: five **quick views** (The 15 / Closing soon / Verified gaps /
+Sunday / Michelin) each set filters *and* sort in one tap and are toggles —
+tapping the active one returns you to everything. Applied filters show as
+removable chips under the search box, so you never have to open the panel to
+see what's on. Rows render 50 at a time (auto-loading on scroll, with a
+`Show more` button as the keyboard path), which keeps the initial page ~1,600
+DOM nodes instead of ~14,500. Sorting by end date groups rows under closing-date
+headings. `/` focuses search, `Esc` clears it or closes the panel. Filter state
+lives in the URL hash, so any view can be bookmarked.
+
 `src/export_site_data.py` builds the payload (`--check` validates and prints
 without writing). It merges, in this precedence order:
 

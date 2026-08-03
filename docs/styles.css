@@ -211,6 +211,15 @@ a:hover { text-decoration-thickness: 2px; }
 
 /* ---------- quick views + active filters -------------------------------- */
 
+/* Not sticky. Search and Filters stay pinned because you reach for them
+   mid-scroll; quick views and counts are orientation you take once and then
+   scroll past. Pinning all of it left 43% of a phone screen for content. */
+.subbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--rule);
+}
+.subbar .wrap { padding-top: 9px; }
+
 .presets {
   display: flex; gap: 6px; padding-bottom: 9px;
   overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
@@ -261,7 +270,7 @@ a:hover { text-decoration-thickness: 2px; }
 
 .statusbar {
   display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;
-  padding-bottom: 10px;
+  padding-bottom: 9px;
   font-family: var(--mono); font-size: 11.5px; color: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
@@ -394,6 +403,7 @@ a:hover { text-decoration-thickness: 2px; }
 .pill.value { background: var(--value-sub); color: var(--value); border-color: color-mix(in srgb, var(--value) 35%, transparent); }
 .pill.rec   { background: var(--accent-sub); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
 .pill.tag   { background: var(--surface-2); color: var(--ink-2); border-color: var(--rule); text-transform: none; letter-spacing: 0; }
+.pill.saved { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .pill.quiet { background: var(--surface-2); color: var(--ink-3); border-color: var(--rule); text-transform: none; letter-spacing: 0; font-weight: 500; }
 
 /* the gap column — the number the whole tool exists to surface */
@@ -493,6 +503,21 @@ a:hover { text-decoration-thickness: 2px; }
   border: 1px solid var(--rule-strong);
 }
 .linkBtn:hover { border-color: var(--accent); color: var(--accent); }
+.saveBtn { font-variant-numeric: tabular-nums; }
+.saveBtn.on { background: var(--accent-sub); color: var(--accent); border-color: var(--accent); font-weight: 600; }
+
+.facetFind {
+  width: 100%; font: inherit; font-size: 13px;
+  padding: 7px 10px; margin-bottom: 10px;
+  color: var(--ink); background: var(--surface);
+  border: 1px solid var(--rule-strong); border-radius: var(--r);
+}
+.facet .moreLink {
+  font: inherit; font-size: 11.5px; margin-top: 4px; padding: 0;
+  background: none; border: 0; cursor: pointer;
+  color: var(--accent); text-decoration: underline; text-underline-offset: 2px;
+}
+
 .linkBtn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 550; }
 .linkBtn.primary:hover { color: var(--accent-ink); filter: brightness(1.08); }
 
@@ -582,6 +607,15 @@ a:hover { text-decoration-thickness: 2px; }
   .facet .scroller { max-height: 132px; }
   .panel { max-height: 70vh; }
   .dgrid { grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+
+  /* The caveat matters, but 128px of it before the first result does not.
+     Tighten to roughly two lines and let the actions sit inline. */
+  .banner { padding: 8px 10px; gap: 6px 10px; }
+  .banner p { flex: 1 1 100%; font-size: 12.5px; line-height: 1.35; }
+  .bannerActions { gap: 12px; }
+  .bannerActions .btn { padding: 5px 9px; font-size: 13px; }
+  .masthead .wrap { padding-block: 10px 9px; }
+  .presets { padding-bottom: 8px; }
 }
 
 @media (max-width: 380px) {

@@ -68,15 +68,31 @@ const FILTERS = {
   menu: new Set(),        // 'pdf' | 'image_only' | 'none'
   bookableBy: null,       // ISO date — keep rows still open ON this date
   endingBy: null,         // ISO date — keep rows that CLOSE on/before this date
+  savedOnly: false,       // your own shortlist
 };
 
 const PAGE_SIZE = 50;     // 648 rows is ~100 phone-screens; render in chunks
 let RENDERED = 0;
 let RESULTS = [];
 let LAST_GROUP = null;
+let BOOTED = false;       // suppress scroll correction during the first render
+
+/** Document offset of the top of the results list. */
+const RESULTS_TOP = () => {
+  const m = document.querySelector('.results');
+  return m ? m.getBoundingClientRect().top + scrollY : 0;
+};
+
+/* Your own shortlist, kept in this browser. The dataset ships a curated
+   ranking, but choosing what to actually book is a separate, personal pass. */
+const SAVED = new Set(JSON.parse(localStorage.getItem('rw-saved') || '[]'));
+const persistSaved = () =>
+  localStorage.setItem('rw-saved', JSON.stringify([...SAVED]));
 let SORT = 'gap_usd_desc';
 let QUERY = '';
 let BANNER = () => {};   // set during boot, once the banner nodes exist
+let FACET_FIND = '';                    // "find a filter" query
+const EXPANDED_FACETS = new Set();      // facets the user expanded past the cap
 
 /* Facet groups are declared once. Adding a facet = one entry here; the panel,
    the counts, the URL state and the clear-all all follow automatically. */
@@ -135,6 +151,7 @@ function matches(r, exceptFacet) {
     // claim a restaurant is expiring when nothing says so.
     if (!r.end_date || r.end_date > FILTERS.endingBy) return false;
   }
+  if (FILTERS.savedOnly && !SAVED.has(r.slug)) return false;
 
   return true;
 }
@@ -255,6 +272,7 @@ function renderRow(r) {
   main.append(meta);
 
   const pills = el('div', 'pills');
+  if (SAVED.has(r.slug)) pills.append(pill('saved', '★ saved'));
   if (urgent) {
     // Show the row's OWN closing date, not the program-wide Aug 16 headline —
     // 18 rows close earlier than that, and a tooltip is not a disclosure.
@@ -470,6 +488,33 @@ function renderDetail(r) {
   }
 
   const links = el('div', 'linkRow');
+
+  // Save lives here rather than on the row: choosing what to book means
+  // reading the verdict and the caveats first, so you are already expanded.
+  const save = el('button', 'linkBtn saveBtn');
+  save.type = 'button';
+  const paint = () => {
+    const on = SAVED.has(r.slug);
+    save.textContent = on ? '★ Saved' : '☆ Save';
+    save.classList.toggle('on', on);
+    save.setAttribute('aria-pressed', on ? 'true' : 'false');
+  };
+  paint();
+  save.addEventListener('click', () => {
+    SAVED.has(r.slug) ? SAVED.delete(r.slug) : SAVED.add(r.slug);
+    persistSaved();
+    paint();
+    // Repaint the row's pills and the Saved preset count without collapsing
+    // the panel the user is reading.
+    buildPresets();
+    const pills = document.querySelector(`.row[data-slug="${CSS.escape(r.slug)}"] .pills`);
+    if (pills) {
+      const star = pills.querySelector('.pill.saved');
+      if (SAVED.has(r.slug) && !star) pills.prepend(pill('saved', '★ saved'));
+      if (!SAVED.has(r.slug) && star) star.remove();
+    }
+  });
+  links.append(save);
   const addLink = (href, text, primary) => {
     if (!href) return;
     const a = el('a', `linkBtn${primary ? ' primary' : ''}`, text);
@@ -512,6 +557,12 @@ function buildFacets() {
     for (const v of FILTERS[f.key]) if (!counts.has(v)) counts.set(v, 0);
 
     let entries = [...counts.entries()];
+    // "Find a filter" searches across every group at once — with 76
+    // neighborhoods and 56 cuisines, scanning by eye is the slow part.
+    if (FACET_FIND) {
+      entries = entries.filter(([v]) =>
+        fold(labelFor(f, v)).includes(FACET_FIND) || fold(f.title).includes(FACET_FIND));
+    }
     if (!entries.length) continue;
 
     if (f.key === 'tier') entries.sort((a, b) => (parseInt(a[0].replace(/\D/g, ''), 10) || 0) - (parseInt(b[0].replace(/\D/g, ''), 10) || 0));
@@ -522,6 +573,19 @@ function buildFacets() {
     sec.append(el('h3', null, f.title));
     const box = el('div', f.scroll ? 'scroller' : null);
     const chips = el('div', 'chips');
+
+    // Long tails (76 neighborhoods, 56 cuisines) are collapsed to the most
+    // populated values; selected ones always stay visible so they can be
+    // turned off. Searching or expanding reveals the rest.
+    const CAP = 12;
+    const capped = !FACET_FIND && !EXPANDED_FACETS.has(f.key) && entries.length > CAP + 3;
+    const hiddenCount = capped ? entries.length - CAP : 0;
+    if (capped) {
+      const keep = entries.slice(0, CAP);
+      const sel = entries.slice(CAP).filter(([v]) => FILTERS[f.key].has(v));
+      entries = keep.concat(sel);
+    }
+
     for (const [v, c] of entries) {
       const b = el('button', 'chip');
       b.type = 'button';
@@ -538,10 +602,26 @@ function buildFacets() {
     }
     box.append(chips);
     sec.append(box);
+    if (hiddenCount > 0) {
+      const more = el('button', 'moreLink', `Show all ${entries.length + hiddenCount - (entries.length - CAP)} …`);
+      more.textContent = `Show ${hiddenCount} more`;
+      more.type = 'button';
+      more.addEventListener('click', () => { EXPANDED_FACETS.add(f.key); buildFacets(); });
+      sec.append(more);
+    }
     host.append(sec);
   }
 
-  // Date facet is its own control, not a chipset.
+  // Date facet is its own control, not a chipset — but it must still answer to
+  // "find a filter", or it's the one group that never disappears when you search.
+  if (FACET_FIND && !'still bookable on date'.includes(FACET_FIND)) {
+    if (refocus) {
+      const again = host.querySelector(
+        `.chip[data-facet="${CSS.escape(refocus.facet)}"][data-value="${CSS.escape(refocus.value)}"]`);
+      if (again) again.focus();
+    }
+    return;
+  }
   const sec = el('div', 'facet');
   sec.append(el('h3', null, 'Still bookable on'));
   const wrapEl = el('div', 'dateFacet');
@@ -574,6 +654,14 @@ function buildFacets() {
    you're already there. They exist so the common questions ("what closes this
    week?", "show me the shortlist") don't require opening a 164-chip panel. */
 const PRESETS = [
+  {
+    // Only appears once you've actually saved something.
+    key: 'saved', label: '★ Saved',
+    show: () => SAVED.size > 0,
+    count: () => SAVED.size,
+    is: () => FILTERS.savedOnly,
+    set() { FILTERS.savedOnly = true; },
+  },
   {
     key: 'ranked', label: 'The 15',
     count: () => ROWS.filter((r) => r.rank != null).length,
@@ -609,7 +697,7 @@ const PRESETS = [
 function buildPresets() {
   const host = $('#presets');
   host.textContent = '';
-  PRESETS.forEach((p) => {
+  PRESETS.filter((p) => !p.show || p.show()).forEach((p) => {
     const b = el('button', 'preset');
     b.type = 'button';
     b.setAttribute('aria-pressed', p.is() ? 'true' : 'false');
@@ -652,6 +740,9 @@ function buildActiveFilters() {
   if (FILTERS.endingBy) {
     add('Closes by', fmtDate(FILTERS.endingBy), () => { FILTERS.endingBy = null; });
   }
+  if (FILTERS.savedOnly) {
+    add('Shortlist', `${SAVED.size} saved`, () => { FILTERS.savedOnly = false; });
+  }
   if (QUERY) {
     add('Search', $('#q').value, () => { QUERY = ''; $('#q').value = ''; });
   }
@@ -664,6 +755,7 @@ function activeCount() {
   let n = FACETS.reduce((acc, f) => acc + FILTERS[f.key].size, 0);
   if (FILTERS.bookableBy) n += 1;
   if (FILTERS.endingBy) n += 1;
+  if (FILTERS.savedOnly) n += 1;
   if (QUERY) n += 1;
   return n;
 }
@@ -722,6 +814,13 @@ function apply() {
   LAST_GROUP = null;
   renderPage();
 
+  // Filtering from deep in the list otherwise strands you mid-page — often
+  // past the end of a now-shorter result set. Only correct the scroll when
+  // you're actually below the results, and never on a Show-more append.
+  if (BOOTED && scrollY > RESULTS_TOP()) {
+    window.scrollTo({ top: Math.max(0, RESULTS_TOP() - 8), behavior: 'instant' });
+  }
+
   // Presets and URL state both change SORT programmatically; keep the control
   // showing the truth rather than whatever was last picked by hand.
   if ($('#sort').value !== SORT) $('#sort').value = SORT;
@@ -752,6 +851,7 @@ function clearAll(silent) {
   FACETS.forEach((f) => FILTERS[f.key].clear());
   FILTERS.bookableBy = null;
   FILTERS.endingBy = null;
+  FILTERS.savedOnly = false;
   QUERY = '';
   $('#q').value = '';
   if (!silent) apply();
@@ -767,6 +867,7 @@ function writeHash() {
   // or a reload silently re-applies today's date.
   p.set('by', FILTERS.bookableBy || 'any');
   if (FILTERS.endingBy) p.set('to', FILTERS.endingBy);
+  if (FILTERS.savedOnly) p.set('saved', '1');
   if (QUERY) p.set('q', QUERY);
   if (SORT !== 'gap_usd_desc') p.set('sort', SORT);
   const s = p.toString();
@@ -784,6 +885,7 @@ function readHash() {
   const by = p.get('by');
   if (by) FILTERS.bookableBy = by === 'any' ? null : by;
   if (p.get('to')) FILTERS.endingBy = p.get('to');
+  if (p.get('saved') === '1') FILTERS.savedOnly = true;
   if (p.get('q')) { QUERY = fold(p.get('q')); $('#q').value = p.get('q'); }
   // Object.hasOwn, not truthiness: "sort=constructor" inherits from
   // Object.prototype, would pass a truthy check and then be used as a comparator.
@@ -850,6 +952,10 @@ async function boot() {
   readHash();
 
   $('#q').addEventListener('input', (e) => { QUERY = fold(e.target.value.trim()); apply(); });
+  $('#facetFind').addEventListener('input', (e) => {
+    FACET_FIND = fold(e.target.value.trim());
+    buildFacets();          // panel only — the result set is unchanged
+  });
   $('#sort').addEventListener('change', (e) => { SORT = e.target.value; apply(); });
   // Wrapped, not passed directly: as a bare handler clearAll would receive the
   // Event as its `silent` argument, which is truthy, and skip the re-render.
@@ -917,6 +1023,7 @@ async function boot() {
   });
 
   apply();
+  BOOTED = true;
 }
 
 boot();

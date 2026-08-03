@@ -45,33 +45,37 @@
       </select>
     </div>
 
-    <!-- one tap for the views you actually want; skips the 164-chip panel -->
-    <div class="presets" id="presets" role="group" aria-label="Quick views"></div>
-
-    <!-- what's currently applied, removable, always visible once the panel closes -->
-    <div class="activeFilters" id="activeFilters" hidden aria-label="Active filters"></div>
-
-    <div class="statusbar" role="status" aria-live="polite" aria-atomic="true">
-      <span><strong id="shown">0</strong> of <strong id="total">0</strong> restaurants</span>
-      <span id="urgentCount"></span>
-      <button type="button" class="linkish" id="clearBtn" hidden>Clear filters</button>
-    </div>
-
   </div>
 
   <section class="panel" id="panel" hidden aria-label="Filters">
     <div class="wrap">
+      <input type="search" class="facetFind" id="facetFind" autocomplete="off"
+             placeholder="Find a filter — e.g. Tribeca, Korean, confit"
+             aria-label="Find a filter">
       <div class="facets" id="facets"></div>
     </div>
   </section>
 </div>
 
+<!-- Deliberately OUTSIDE the sticky bar: these are orientation, not controls
+     you need mid-scroll. Keeping them sticky cost 235px of a 844px phone. -->
+<div class="subbar">
+  <div class="wrap">
+    <div class="presets" id="presets" role="group" aria-label="Quick views"></div>
+    <div class="activeFilters" id="activeFilters" hidden aria-label="Active filters"></div>
+    <div class="statusbar" role="status" aria-live="polite" aria-atomic="true">
+      <span><strong id="shown">0</strong> of <strong id="total">0</strong> restaurants</span>
+      <span id="urgentCount"></span>
+      <button type="button" class="linkish" id="clearBtn" hidden>Clear filters</button>
+    </div>
+  </div>
+</div>
+
 <main class="wrap results">
   <div class="banner" id="estBanner" hidden>
-    <p><strong>Heads up:</strong> the default “gap $” sort pools <em>verified</em> gaps with
-       <em>heuristic estimates</em>, and the estimates crowd the top — they read a restaurant's
-       cheapest tier against a scraped price list, which overstates casual formats.
-       Estimates are marked <span class="pill warn">estimate</span> and underlined.</p>
+    <p><strong>Estimates crowd the top.</strong> This sort mixes verified gaps with heuristic
+       ones, which overstate casual restaurants. Estimates are
+       <span class="pill warn">estimate</span>-marked and underlined.</p>
     <div class="bannerActions">
       <button type="button" class="btn" id="verifiedOnly">Show verified only</button>
       <button type="button" class="linkish" id="dismissBanner">Dismiss</button>

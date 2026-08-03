@@ -1397,7 +1397,7 @@
  "psaraki": {
   "url": "https://nyc-tourism-public.s3.amazonaws.com/srw26/menus/49198-Psaraki-menu.pdf",
   "file": "49198-Psaraki-menu.pdf",
-  "sha256": "d80228082ca833bbd2aab42e838e83535a0cfc917293b62dd72272b1776c3b84"
+  "sha256": "85048ea6135a8d3035ae8c23a72d31fb560ecfc99b7be53f0a834f26aa172d94"
  },
  "maison-passerelle": {
   "url": "https://nyc-tourism-public.s3.amazonaws.com/srw26/menus/49698-MaisonPasserelle-menu.pdf",
@@ -1872,7 +1872,7 @@
  "casa-felix": {
   "url": "https://nyc-tourism-public.s3.amazonaws.com/srw26/menus/51080-CasaFelix-menu.pdf",
   "file": "51080-CasaFelix-menu.pdf",
-  "sha256": "69744b85aa641d9d68ee072d8a33cc06c926b669e125a867814e9b0e0ad7f990"
+  "sha256": "4e05d80f43a8a46ce6e7a7f5021ac24d36326f61e8a087b199ef96f71fee97de"
  },
  "brooklyn-chop-house-times-square": {
   "url": "https://nyc-tourism-public.s3.amazonaws.com/srw26/menus/48324-BrooklynChopHouse-TimesSquare-menu.pdf",

@@ -1,423 +1,574 @@
 {
-  "_doc": {
-    "purpose": "Hand-verified facts transcribed from reports/rw-final-bookings.md (the decision doc) and the README 'Data caveats' contradiction list. The exporter (src/export_site_data.py) MERGES THESE OVER API-derived fields. The restaurant's own printed materials always win over the listing API.",
-    "provenance": "Transcribed 2026-08-01 from reports/rw-final-bookings.md (15 ranked bookings, verified against restaurants' own printed materials via two independent own-site passes) + README 'Data caveats'. EXTENDED 2026-08-03 by a further own-site pass over the highest-value Sunday-dinner candidates; those entries carry a dated note naming the exact sentence relied on. NOTHING here comes from price_sweep -- price_sweep is heuristic triage and may never populate a verified field.",
-    "gap_convention": "gap_usd / gap_pct are the CONSERVATIVE (low) end where the report states a range; gap_usd_high / gap_pct_high carry the top of that range. Sorting uses the conservative value. Where the report states no numeric gap, both are null.",
-    "end_date_source": "'printed' = the restaurant's own materials state the window. 'api_fallback' = the restaurant prints no end date; value copied from the listing API and flagged unprinted. 'conflict' = two verified sources disagree; the conservative (earlier) date is used.",
-    "sunday_verified": "true/false = established from the restaurant's own materials. null = not established (fall back to the API value, rendered as unverified).",
-    "grade": "Evidence grade from the value report: A = own-menu arithmetic / own printed materials. Absent where the report states no graded gap.",
-    "flags": "Machine-readable vocabulary the UI drives off: book_by_aug16, end_date_unprinted, end_date_conflict, saturday_service, sunday_api_contradicted, no_sunday_dinner, price_api_wrong, confirm_at_booking, dropped_in_verification, ambiguous_entity, two_course_tier.",
-    "rank": "Position in reports/rw-final-bookings.md. Matches config/shortlist.json order. null = verified caveat only, not a ranked booking."
+ "_doc": {
+  "purpose": "Hand-verified facts transcribed from reports/rw-final-bookings.md (the decision doc) and the README 'Data caveats' contradiction list. The exporter (src/export_site_data.py) MERGES THESE OVER API-derived fields. The restaurant's own printed materials always win over the listing API.",
+  "provenance": "Transcribed 2026-08-01 from reports/rw-final-bookings.md (15 ranked bookings, verified against restaurants' own printed materials via two independent own-site passes) + README 'Data caveats'. EXTENDED 2026-08-03 by a further own-site pass over the highest-value Sunday-dinner candidates; those entries carry a dated note naming the exact sentence relied on. NOTHING here comes from price_sweep -- price_sweep is heuristic triage and may never populate a verified field.",
+  "gap_convention": "gap_usd / gap_pct are the CONSERVATIVE (low) end where the report states a range; gap_usd_high / gap_pct_high carry the top of that range. Sorting uses the conservative value. Where the report states no numeric gap, both are null.",
+  "end_date_source": "'printed' = the restaurant's own materials state the window. 'api_fallback' = the restaurant prints no end date; value copied from the listing API and flagged unprinted. 'conflict' = two verified sources disagree; the conservative (earlier) date is used.",
+  "sunday_verified": "true/false = established from the restaurant's own materials. null = not established (fall back to the API value, rendered as unverified).",
+  "grade": "Evidence grade from the value report: A = own-menu arithmetic / own printed materials. Absent where the report states no graded gap.",
+  "flags": "Machine-readable vocabulary the UI drives off: book_by_aug16, end_date_unprinted, end_date_conflict, saturday_service, sunday_api_contradicted, no_sunday_dinner, price_api_wrong, confirm_at_booking, dropped_in_verification, ambiguous_entity, two_course_tier.",
+  "rank": "Position in reports/rw-final-bookings.md. Matches config/shortlist.json order. null = verified caveat only, not a ranked booking."
+ },
+ "restaurants": {
+  "yingtao": {
+   "rank": 1,
+   "meal": "dinner",
+   "rw_price": 60,
+   "end_date": "2026-08-16",
+   "end_date_source": "api_fallback",
+   "days": "Tue-Thu & Sun 5-8:30; Fri-Sat 5-9:30",
+   "sunday_verified": true,
+   "gap_usd": null,
+   "gap_pct": null,
+   "grade": "A",
+   "verdict": "Best access-arbitrage in the program - the only other way into this Michelin-starred kitchen is the $150 tasting, and the RW menu carries tasting dishes. $60 3-course confirmed from the menu image. Supplements: short rib +$14, urchin +$16.",
+   "booking_url": "https://www.sevenrooms.com/explore/yingtao/reservations/create/search",
+   "flags": [
+    "book_by_aug16",
+    "end_date_unprinted"
+   ],
+   "notes": "Own site prints NO end date (two independent checks). API says Aug 16 - book by then. Phone for later dates: (845) 236-6577, 2-5pm."
   },
-
-  "restaurants": {
-    "yingtao": {
-      "rank": 1,
-      "meal": "dinner",
-      "rw_price": 60,
-      "end_date": "2026-08-16",
-      "end_date_source": "api_fallback",
-      "days": "Tue-Thu & Sun 5-8:30; Fri-Sat 5-9:30",
-      "sunday_verified": true,
-      "gap_usd": null,
-      "gap_pct": null,
-      "grade": "A",
-      "verdict": "Best access-arbitrage in the program - the only other way into this Michelin-starred kitchen is the $150 tasting, and the RW menu carries tasting dishes. $60 3-course confirmed from the menu image. Supplements: short rib +$14, urchin +$16.",
-      "booking_url": "https://www.sevenrooms.com/explore/yingtao/reservations/create/search",
-      "flags": ["book_by_aug16", "end_date_unprinted"],
-      "notes": "Own site prints NO end date (two independent checks). API says Aug 16 - book by then. Phone for later dates: (845) 236-6577, 2-5pm."
-    },
-
-    "53": {
-      "rank": 2,
-      "meal": "brunch",
-      "rw_price": 45,
-      "comparable_usd": 78,
-      "end_date": "2026-08-16",
-      "end_date_source": "printed",
-      "days": "Sunday dim sum brunch; also Mon-Fri lunch",
-      "sunday_verified": true,
-      "gap_usd": 33,
-      "gap_pct": 42,
-      "grade": "A",
-      "verdict": "Best single Sunday booking found. $45 RW dim sum brunch vs their standing $78 brunch prix fixe. Altamarea room.",
-      "booking_url": "https://www.sevenrooms.com/explore/53/reservations/create/search/",
-      "flags": ["book_by_aug16", "confirm_at_booking"],
-      "notes": "Their homepage currently advertises the $78 Sunday dim sum - confirm the $45 RW brunch is what's served on RW Sundays when booking. Avoid the black-cod +$12 route: it lands at ~their $59 lunch set."
-    },
-
-    "david-burke-tavern": {
-      "rank": 3,
-      "meal": "dinner",
-      "rw_price": 45,
-      "comparable_usd": 75,
-      "comparable_usd_high": 80,
-      "end_date": "2026-08-14",
-      "end_date_source": "printed",
-      "days": "Sunday open; Sunday DINNER unprinted",
-      "sunday_verified": null,
-      "gap_usd": 30,
-      "gap_usd_high": 35,
-      "gap_pct": 40,
-      "gap_pct_high": 44,
-      "grade": "A",
-      "verdict": "Best pure gap of the whole project. $45 RW dinner vs ~$75-80 for the same three courses a la carte. Also a $30 lunch/brunch tier.",
-      "booking_url": "https://www.opentable.com/booking/experiences-availability?rid=1028503&restref=1028503&experienceId=764859",
-      "flags": ["book_by_aug16"],
-      "notes": "SETTLED 2026-08-03: their own site's Calendar prints \"7/20 - 8/14 Restaurant Week\", so Aug 14 is the printed end date, not a conflict. The listing API's Aug 31 is wrong by 17 days. Sunday DINNER service is still not printed; treat Sunday as unconfirmed."
-    },
-
-    "zuma": {
-      "rank": 4,
-      "meal": "dinner",
-      "rw_price": 60,
-      "comparable_usd": 100,
-      "comparable_usd_high": 116,
-      "end_date": "2026-08-16",
-      "end_date_source": "printed",
-      "days": "Every day, incl. Sunday",
-      "sunday_verified": true,
-      "gap_usd": 40,
-      "gap_usd_high": 56,
-      "gap_pct": 40,
-      "gap_pct_high": 48,
-      "grade": "A",
-      "verdict": "Same-item 5-part build runs $100-116 a la carte vs the $60 RW dinner. Easiest trip from the Bronx. Skip the $45 lunch - it is their everyday Ebisu menu.",
-      "booking_url": "https://www.zumarestaurant.com/en/new-york/book-a-table",
-      "flags": ["book_by_aug16", "sunday_api_contradicted"],
-      "notes": "Own print ends Aug 16; the API claims Sep 6 (restaurant wins). Sunday: the report verifies every-day service INCLUDING Sunday, but the listing API records no Sunday meal type at all for Zuma - a contradiction in the permissive direction, so confirm Sunday when booking."
-    },
-
-    "casa-lever": {
-      "rank": 5,
-      "meal": "dinner",
-      "rw_price": 60,
-      "comparable_usd": 107,
-      "end_date": "2026-09-06",
-      "end_date_source": "api_fallback",
-      "days": "Mon-Fri only",
-      "sunday_verified": false,
-      "gap_usd": 47,
-      "gap_pct": 44,
-      "grade": "A",
-      "verdict": "Identical dishes a la carte total $107 vs the $60 RW dinner. Lever House landmark room.",
-      "booking_url": "https://resy.com/cities/ny/casa-lever",
-      "flags": ["end_date_unprinted", "confirm_at_booking"],
-      "notes": "RW menu verified on their live menu embed, but the main site shows no RW section and self-contradicts on Saturday service - participation details are effectively listing-only. Assume nothing past your booking date."
-    },
-
-    "marks-off-madison": {
-      "rank": 6,
-      "meal": "dinner",
-      "rw_price": 45,
-      "comparable_usd": 57,
-      "comparable_usd_high": 68,
-      "end_date": "2026-08-31",
-      "end_date_source": "api_fallback",
-      "days": "Unprinted (API: Sundays)",
-      "sunday_verified": false,
-      "gap_usd": 27,
-      "gap_usd_high": 38,
-      "gap_pct": 38,
-      "gap_pct_high": 46,
-      "grade": "A",
-      "verdict": "Two a la carte courses alone run $57-68, so three for $45 clears comfortably. RW dinner PDF read in full: crab cake, latke-crusted orata, skate.",
-      "booking_url": "https://resy.com/cities/new-york-ny/venues/marks-off-madison",
-      "flags": ["end_date_unprinted", "no_sunday_dinner", "sunday_api_contradicted"],
-      "notes": "The RW dinner PDF prints NO dates or days. No Sunday DINNER service exists (Sunday brunch only) despite the API flagging Sunday - book a weekday."
-    },
-
-    "hawksmoor": {
-      "rank": 7,
-      "meal": "lunch",
-      "rw_price": 60,
-      "comparable_usd": 96,
-      "courses": 2,
-      "end_date": "2026-09-06",
-      "end_date_source": "printed",
-      "days": "Mon-Fri only",
-      "sunday_verified": false,
-      "gap_usd": 36,
-      "gap_pct": 38,
-      "grade": "A",
-      "verdict": "Scallops + 10oz strip + fries = $96 a la carte vs the $60 two-course RW lunch. \"Same menu we always cook.\" No urgency - runs past Labor Day.",
-      "booking_url": "https://www.opentable.com/booking/experiences-availability?rid=1052086&restref=1052086&experienceId=760864",
-      "flags": ["two_course_tier"],
-      "notes": "The $60 tier buys TWO courses here, not three."
-    },
-
-    "park-ave-kitchen-by-david-burke": {
-      "rank": 8,
-      "meal": "lunch",
-      "rw_price": 30,
-      "comparable_usd": 45,
-      "end_date": "2026-08-16",
-      "end_date_source": "printed",
-      "days": "Sunday dinner 3-8pm",
-      "sunday_verified": true,
-      "gap_usd": 15,
-      "gap_pct": 33,
-      "grade": "A",
-      "verdict": "Best $30-tier play in the program: the $30 RW lunch is 33% under the house's own $45 Express Lunch. Dinner tiers ($45-60) run 27-40% off.",
-      "booking_url": "https://www.opentable.com/booking/experiences-availability?rid=1266931&restref=1266931&experienceId=766288",
-      "flags": ["book_by_aug16"],
-      "notes": "Gap shown is the $30 lunch vs the house's own $45 Express Lunch - the cleanest like-for-like. Dinner and brunch tiers also participate."
-    },
-
-    "cafe-boulud": {
-      "rank": 9,
-      "meal": "dinner",
-      "rw_price": 60,
-      "comparable_usd": 94,
-      "end_date": "2026-08-31",
-      "end_date_source": "api_fallback",
-      "days": "Mon-Thu 6-9pm; Fri-Sat 5-9:30pm",
-      "sunday_verified": false,
-      "gap_usd": 34,
-      "gap_pct": 36,
-      "grade": "A",
-      "verdict": "A la carte ~$94 vs the $60 RW dinner at a Michelin-starred UES room. Supplements: +$12 daurade, +$18 seafood risotto.",
-      "booking_url": "https://resy.com/cities/new-york-ny/venues/cafe-boulud-at-maison-barnes",
-      "flags": ["end_date_unprinted", "saturday_service"],
-      "notes": "Contest RESOLVED by a rendered-page read: the RW menu IS posted (JS-rendered, which is why an earlier raw-HTML check saw nothing). Prints a SATURDAY RW service (Fri-Sat 5-9:30) - a documented exception to the program-wide Saturday exclusion. No Sunday service. No end date printed."
-    },
-
-    "lincoln-ristorante": {
-      "rank": 10,
-      "meal": "dinner",
-      "rw_price": 60,
-      "comparable_usd": 89,
-      "comparable_usd_high": 94,
-      "end_date": "2026-08-15",
-      "end_date_source": "conflict",
-      "days": "Tue-Sat; no Sunday",
-      "sunday_verified": false,
-      "gap_usd": 29,
-      "gap_usd_high": 34,
-      "gap_pct": 33,
-      "gap_pct_high": 36,
-      "grade": "A",
-      "verdict": "Typical 3-course runs $89-94 a la carte vs the $60 RW dinner. Lobster bucatini +$20 still clears the bar.",
-      "booking_url": "https://www.opentable.com/restref/client/?restref=50815&rid=50815",
-      "flags": ["book_by_aug16", "end_date_conflict", "sunday_api_contradicted", "saturday_service"],
-      "notes": "Two own-site checks disagree by one day (Aug 15 vs Aug 16) - the conservative Aug 15 is used. Tue-Sat only and NO Sunday, despite the API flagging Sunday participation. Saturday service is printed."
-    },
-
-    "four-twenty-five": {
-      "rank": 11,
-      "meal": "dinner",
-      "rw_price": 60,
-      "comparable_usd": 90,
-      "comparable_usd_high": 96,
-      "end_date": "2026-09-06",
-      "end_date_source": "printed",
-      "days": "Sun-Fri",
-      "sunday_verified": true,
-      "gap_usd": 30,
-      "gap_usd_high": 36,
-      "gap_pct": 33,
-      "gap_pct_high": 38,
-      "grade": "A",
-      "verdict": "Typical 3-course $90-96 a la carte vs $60 for RW lunch AND dinner. Jean-Georges-directed power room; zero urgency and a good Sunday dinner slot.",
-      "booking_url": "https://www.sevenrooms.com/explore/fourtwentyfive/reservations/create/search/",
-      "flags": [],
-      "notes": "Window extended to Sep 6 (the API snapshot ends Aug 31 - the restaurant's extension wins)."
-    },
-
-    "quality-meats": {
-      "rank": 12,
-      "meal": "lunch",
-      "rw_price": 60,
-      "comparable_usd": 104,
-      "courses": 2,
-      "end_date": "2026-08-16",
-      "end_date_source": "printed",
-      "days": "Weekday lunch",
-      "sunday_verified": false,
-      "gap_usd": 44,
-      "gap_pct": 42,
-      "grade": "A",
-      "verdict": "Tuna tartare + the full $72 NY strip = $104 a la carte vs the $60 two-course RW lunch. Steak or nothing - the chicken path saves $0.",
-      "booking_url": "https://www.opentable.com/r/quality-meats-reservations-new-york",
-      "flags": ["book_by_aug16", "two_course_tier"],
-      "notes": "Verified from their own menu on a prior check. The $60 tier buys TWO courses."
-    },
-
-    "frenchette": {
-      "rank": 13,
-      "meal": "dinner",
-      "rw_price": 60,
-      "comparable_usd": 76,
-      "comparable_usd_high": 92,
-      "end_date": "2026-08-31",
-      "end_date_source": "api_fallback",
-      "days": "Unprinted (API: Sundays)",
-      "sunday_verified": null,
-      "gap_usd": 16,
-      "gap_usd_high": 32,
-      "gap_pct": 21,
-      "gap_pct_high": 35,
-      "grade": "A",
-      "verdict": "A la carte $76-92 vs $60 for RW lunch and dinner, plus $60 wine bottles. One of the few quality dinner prix fixes. Skip the liver entree - it carries a +$30 supplement.",
-      "booking_url": "https://www.sevenrooms.com/explore/frenchette/reservations/create/search/",
-      "flags": ["end_date_unprinted"],
-      "notes": "Window and days are unprinted; API values shown. Time Out's \"$45 Frenchette lunch\" actually belongs to Le Rock (same owners) - Frenchette is $60 at both meals per their own site."
-    },
-
-    "victors-cafe": {
-      "rank": 14,
-      "meal": "dinner",
-      "rw_price": 45,
-      "comparable_usd": 63,
-      "end_date": "2026-09-06",
-      "end_date_source": "printed",
-      "days": "Sunday included",
-      "sunday_verified": true,
-      "gap_usd": 18,
-      "gap_pct": 29,
-      "grade": "A",
-      "verdict": "Same-dish 3-course runs ~$63 vs the $45 RW dinner. 1963 Cuban landmark in the Theatre District; no house deal undercuts it. Relaxed timeline.",
-      "booking_url": "https://victorscafe.com/reservations",
-      "flags": [],
-      "notes": "Also a $30 brunch tier. Booking is OpenTable via victorscafe.com/reservations."
-    },
-
-    "code-red-restaurant-and-lounge": {
-      "rank": 15,
-      "meal": "dinner",
-      "rw_price": 50,
-      "comparable_usd": 78,
-      "end_date": null,
-      "end_date_source": "api_fallback",
-      "days": "Open daily 11am-1/2am; RW days unprinted",
-      "sunday_verified": null,
-      "gap_usd": 28,
-      "gap_pct": 36,
-      "grade": "A",
-      "verdict": "Five items (app + entree + side + dessert + NA beverage) against a like-for-like $78 a la carte. The only Bronx entry on the list.",
-      "booking_url": "https://resy.com/cities/new-york-ny/venues/code-red-ny",
-      "flags": ["price_api_wrong", "confirm_at_booking"],
-      "notes": "PRICE SETTLED at $50 by a live page read - the listing API's $45 is WRONG and a $60 figure was stale metadata. Printed fine print: dine-in only, 18% gratuity + 120-minute limit under 10 guests (20% / 180 min for 10+), chip cards only. No dates or Sunday printed - a quick call is still wise: (718) 881-1808."
-    },
-
-    "the-russian-tea-room": {
-      "rank": null,
-      "meal": "dinner",
-      "rw_price": 60,
-      "end_date": "2026-08-16",
-      "end_date_source": "printed",
-      "days": "Dinner: Mon-Fri and Sunday. Lunch: Mon-Fri.",
-      "sunday_verified": true,
-      "grade": "A",
-      "flags": ["book_by_aug16", "sunday_api_contradicted"],
-      "notes": "Verified 2026-08-03 from their own Restaurant Week Dinner menu page: \"July 20-August 16, 2026. Available Monday-Friday and Sunday. $60.00 per person\". The listing API claims the window runs to Sep 6 - THREE WEEKS LONGER than the restaurant prints. Lunch is $45, Mon-Fri only. No Saturday."
-    },
-
-    "abcv": {
-      "rank": null,
-      "end_date": "2026-09-06",
-      "end_date_source": "printed",
-      "days": "Mon-Fri",
-      "sunday_verified": false,
-      "grade": "A",
-      "flags": ["sunday_api_contradicted"],
-      "notes": "Verified 2026-08-03 from their own menus page: the restaurant-week menu is labelled \"monday-friday\", and the page states abcV \"is participating in summer restaurant week from july 20th through september 6th\". The listing API claims Sunday service (wrong) and an Aug 31 end (a week short)."
-    },
-
-    "jojo": {
-      "rank": null,
-      "meal": "dinner",
-      "end_date": "2026-09-06",
-      "end_date_source": "printed",
-      "days": "Sunday-Friday",
-      "sunday_verified": true,
-      "grade": "A",
-      "flags": [],
-      "notes": "Verified 2026-08-03 from their own site: \"NYC Restaurant Week - July 20th - September 6th - Three-course dinner | Sunday - Friday\". Sunday confirmed, no Saturday. The listing API's Aug 31 end is a week short."
-    },
-
-    "kru": {
-      "rank": null,
-      "rw_price": 45,
-      "end_date": "2026-09-06",
-      "end_date_source": "printed",
-      "days": "Open 7 days",
-      "sunday_verified": true,
-      "grade": "A",
-      "flags": [],
-      "notes": "Verified 2026-08-03 from their own site: \"Summer Restaurant Week - Now through Sep 6 | Open 7 days | $45 Three-course & $30 two-course weekend lunch\". Open 7 days means Sunday is covered; note that also implies Saturday service, which the programme normally excludes - confirm at booking."
-    },
-
-    "maison-passerelle": {
-      "rank": null,
-      "end_date": "2026-08-16",
-      "end_date_source": "printed",
-      "sunday_verified": null,
-      "grade": "A",
-      "flags": ["book_by_aug16"],
-      "notes": "Window verified 2026-08-03 from the Printemps event page: \"From July 20 through August 16\". Matches the listing API. Days/Sunday are NOT printed - the listing's Sunday dinner claim is still unverified. NYT No. 75; the room is the old Red Room at 1 Wall St."
-    },
-
-    "tudor-city-steakhouse": {
-      "rank": null,
-      "sunday_verified": null,
-      "gap_usd": null,
-      "gap_pct": null,
-      "verdict": "DROPPED in final verification. Was ranked for a \"$30 lunch = 50% off\" that rests entirely on the listing API; their own site shows only STALE winter RW pages ($45 lunch, January dates) and no $30 lunch anywhere. Unverifiable. Their standing $59.95 3-course (12-5pm daily, petite filet) needs no RW at all.",
-      "flags": ["dropped_in_verification"],
-      "notes": "API advertises $30 lunch / $60 dinner / $60 Sunday dinner through Aug 31. None of it is corroborated by the restaurant."
-    },
-
-    "ai-fiori": {
-      "rank": null,
-      "days": "Mon-Fri",
-      "sunday_verified": false,
-      "flags": ["sunday_api_contradicted"],
-      "notes": "Own materials print Mon-Fri; the listing API claims a $60 Sunday Dinner Price. Restaurant wins - no Sunday."
-    },
-
-    "tao-uptown": {
-      "rank": null,
-      "days": "Mon-Fri",
-      "sunday_verified": false,
-      "flags": ["sunday_api_contradicted"],
-      "notes": "Own materials print Mon-Fri; the listing API claims a $60 Sunday Dinner Price. Restaurant wins - no Sunday."
-    },
-
-    "le-pavillon": {
-      "rank": null,
-      "meal": "lunch",
-      "rw_price": 60,
-      "courses": 2,
-      "sunday_verified": false,
-      "flags": ["two_course_tier"],
-      "notes": "LUNCH-ONLY, and the $60 tier buys TWO courses, not three. Verified against their own materials."
-    },
-
-    "chito-gvrito-nyc": {
-      "rank": null,
-      "sunday_verified": true,
-      "flags": ["saturday_service"],
-      "notes": "Prints SATURDAY RW service despite the program-wide Saturday exclusion."
-    },
-
-    "playa-bettys": {
-      "rank": null,
-      "sunday_verified": true,
-      "flags": ["saturday_service"],
-      "notes": "Prints SATURDAY RW service despite the program-wide Saturday exclusion."
-    },
-
-    "momofuku-noodle-bar-east-village": {
-      "rank": null,
-      "flags": ["ambiguous_entity"],
-      "notes": "README caveat: \"Momofuku Noodle Bar's $45 tier is a weekend lunch; ends Aug 30.\" TWO participants share that name (this East Village room and momofuku-noodle-bar-uptown) with byte-identical API rows, so the caveat cannot be attributed to one. Deliberately NO end_date override applied - a wrong end date on a booking dashboard is worse than none. Verify at booking."
-    },
-
-    "momofuku-noodle-bar-uptown": {
-      "rank": null,
-      "flags": ["ambiguous_entity"],
-      "notes": "README caveat: \"Momofuku Noodle Bar's $45 tier is a weekend lunch; ends Aug 30.\" TWO participants share that name (this Uptown room and momofuku-noodle-bar-east-village) with byte-identical API rows, so the caveat cannot be attributed to one. Deliberately NO end_date override applied - a wrong end date on a booking dashboard is worse than none. Verify at booking."
-    }
+  "53": {
+   "rank": 2,
+   "meal": "brunch",
+   "rw_price": 45,
+   "comparable_usd": 78,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "days": "Sunday dim sum brunch; also Mon-Fri lunch",
+   "sunday_verified": true,
+   "gap_usd": 33,
+   "gap_pct": 42,
+   "grade": "A",
+   "verdict": "Best single Sunday booking found. $45 RW dim sum brunch vs their standing $78 brunch prix fixe. Altamarea room.",
+   "booking_url": "https://www.sevenrooms.com/explore/53/reservations/create/search/",
+   "flags": [
+    "book_by_aug16",
+    "confirm_at_booking"
+   ],
+   "notes": "Their homepage currently advertises the $78 Sunday dim sum - confirm the $45 RW brunch is what's served on RW Sundays when booking. Avoid the black-cod +$12 route: it lands at ~their $59 lunch set."
+  },
+  "david-burke-tavern": {
+   "rank": 3,
+   "meal": "dinner",
+   "rw_price": 45,
+   "comparable_usd": 75,
+   "comparable_usd_high": 80,
+   "end_date": "2026-08-14",
+   "end_date_source": "printed",
+   "days": "Sunday open; Sunday DINNER unprinted",
+   "sunday_verified": null,
+   "gap_usd": 30,
+   "gap_usd_high": 35,
+   "gap_pct": 40,
+   "gap_pct_high": 44,
+   "grade": "A",
+   "verdict": "Best pure gap of the whole project. $45 RW dinner vs ~$75-80 for the same three courses a la carte. Also a $30 lunch/brunch tier.",
+   "booking_url": "https://www.opentable.com/booking/experiences-availability?rid=1028503&restref=1028503&experienceId=764859",
+   "flags": [
+    "book_by_aug16"
+   ],
+   "notes": "SETTLED 2026-08-03: their own site's Calendar prints \"7/20 - 8/14 Restaurant Week\", so Aug 14 is the printed end date, not a conflict. The listing API's Aug 31 is wrong by 17 days. Sunday DINNER service is still not printed; treat Sunday as unconfirmed."
+  },
+  "zuma": {
+   "rank": 4,
+   "meal": "dinner",
+   "rw_price": 60,
+   "comparable_usd": 100,
+   "comparable_usd_high": 116,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "days": "Every day, incl. Sunday",
+   "sunday_verified": true,
+   "gap_usd": 40,
+   "gap_usd_high": 56,
+   "gap_pct": 40,
+   "gap_pct_high": 48,
+   "grade": "A",
+   "verdict": "Same-item 5-part build runs $100-116 a la carte vs the $60 RW dinner. Easiest trip from the Bronx. Skip the $45 lunch - it is their everyday Ebisu menu.",
+   "booking_url": "https://www.zumarestaurant.com/en/new-york/book-a-table",
+   "flags": [
+    "book_by_aug16",
+    "sunday_api_contradicted"
+   ],
+   "notes": "Own print ends Aug 16; the API claims Sep 6 (restaurant wins). Sunday: the report verifies every-day service INCLUDING Sunday, but the listing API records no Sunday meal type at all for Zuma - a contradiction in the permissive direction, so confirm Sunday when booking."
+  },
+  "casa-lever": {
+   "rank": 5,
+   "meal": "dinner",
+   "rw_price": 60,
+   "comparable_usd": 107,
+   "end_date": "2026-09-06",
+   "end_date_source": "api_fallback",
+   "days": "Mon-Fri only",
+   "sunday_verified": false,
+   "gap_usd": 47,
+   "gap_pct": 44,
+   "grade": "A",
+   "verdict": "Identical dishes a la carte total $107 vs the $60 RW dinner. Lever House landmark room.",
+   "booking_url": "https://resy.com/cities/ny/casa-lever",
+   "flags": [
+    "end_date_unprinted",
+    "confirm_at_booking"
+   ],
+   "notes": "RW menu verified on their live menu embed, but the main site shows no RW section and self-contradicts on Saturday service - participation details are effectively listing-only. Assume nothing past your booking date."
+  },
+  "marks-off-madison": {
+   "rank": 6,
+   "meal": "dinner",
+   "rw_price": 45,
+   "comparable_usd": 57,
+   "comparable_usd_high": 68,
+   "end_date": "2026-08-31",
+   "end_date_source": "api_fallback",
+   "days": "Unprinted (API: Sundays)",
+   "sunday_verified": false,
+   "gap_usd": 27,
+   "gap_usd_high": 38,
+   "gap_pct": 38,
+   "gap_pct_high": 46,
+   "grade": "A",
+   "verdict": "Two a la carte courses alone run $57-68, so three for $45 clears comfortably. RW dinner PDF read in full: crab cake, latke-crusted orata, skate.",
+   "booking_url": "https://resy.com/cities/new-york-ny/venues/marks-off-madison",
+   "flags": [
+    "end_date_unprinted",
+    "no_sunday_dinner",
+    "sunday_api_contradicted"
+   ],
+   "notes": "The RW dinner PDF prints NO dates or days. No Sunday DINNER service exists (Sunday brunch only) despite the API flagging Sunday - book a weekday."
+  },
+  "hawksmoor": {
+   "rank": 7,
+   "meal": "lunch",
+   "rw_price": 60,
+   "comparable_usd": 96,
+   "courses": 2,
+   "end_date": "2026-09-06",
+   "end_date_source": "printed",
+   "days": "Mon-Fri only",
+   "sunday_verified": false,
+   "gap_usd": 36,
+   "gap_pct": 38,
+   "grade": "A",
+   "verdict": "Scallops + 10oz strip + fries = $96 a la carte vs the $60 two-course RW lunch. \"Same menu we always cook.\" No urgency - runs past Labor Day.",
+   "booking_url": "https://www.opentable.com/booking/experiences-availability?rid=1052086&restref=1052086&experienceId=760864",
+   "flags": [
+    "two_course_tier"
+   ],
+   "notes": "The $60 tier buys TWO courses here, not three."
+  },
+  "park-ave-kitchen-by-david-burke": {
+   "rank": 8,
+   "meal": "lunch",
+   "rw_price": 30,
+   "comparable_usd": 45,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "days": "Sunday dinner 3-8pm",
+   "sunday_verified": true,
+   "gap_usd": 15,
+   "gap_pct": 33,
+   "grade": "A",
+   "verdict": "Best $30-tier play in the program: the $30 RW lunch is 33% under the house's own $45 Express Lunch. Dinner tiers ($45-60) run 27-40% off.",
+   "booking_url": "https://www.opentable.com/booking/experiences-availability?rid=1266931&restref=1266931&experienceId=766288",
+   "flags": [
+    "book_by_aug16"
+   ],
+   "notes": "Gap shown is the $30 lunch vs the house's own $45 Express Lunch - the cleanest like-for-like. Dinner and brunch tiers also participate."
+  },
+  "cafe-boulud": {
+   "rank": 9,
+   "meal": "dinner",
+   "rw_price": 60,
+   "comparable_usd": 94,
+   "end_date": "2026-08-31",
+   "end_date_source": "api_fallback",
+   "days": "Mon-Thu 6-9pm; Fri-Sat 5-9:30pm",
+   "sunday_verified": false,
+   "gap_usd": 34,
+   "gap_pct": 36,
+   "grade": "A",
+   "verdict": "A la carte ~$94 vs the $60 RW dinner at a Michelin-starred UES room. Supplements: +$12 daurade, +$18 seafood risotto.",
+   "booking_url": "https://resy.com/cities/new-york-ny/venues/cafe-boulud-at-maison-barnes",
+   "flags": [
+    "end_date_unprinted",
+    "saturday_service"
+   ],
+   "notes": "Contest RESOLVED by a rendered-page read: the RW menu IS posted (JS-rendered, which is why an earlier raw-HTML check saw nothing). Prints a SATURDAY RW service (Fri-Sat 5-9:30) - a documented exception to the program-wide Saturday exclusion. No Sunday service. No end date printed."
+  },
+  "lincoln-ristorante": {
+   "rank": 10,
+   "meal": "dinner",
+   "rw_price": 60,
+   "comparable_usd": 89,
+   "comparable_usd_high": 94,
+   "end_date": "2026-08-15",
+   "end_date_source": "conflict",
+   "days": "Tue-Sat; no Sunday",
+   "sunday_verified": false,
+   "gap_usd": 29,
+   "gap_usd_high": 34,
+   "gap_pct": 33,
+   "gap_pct_high": 36,
+   "grade": "A",
+   "verdict": "Typical 3-course runs $89-94 a la carte vs the $60 RW dinner. Lobster bucatini +$20 still clears the bar.",
+   "booking_url": "https://www.opentable.com/restref/client/?restref=50815&rid=50815",
+   "flags": [
+    "book_by_aug16",
+    "end_date_conflict",
+    "sunday_api_contradicted",
+    "saturday_service"
+   ],
+   "notes": "Two own-site checks disagree by one day (Aug 15 vs Aug 16) - the conservative Aug 15 is used. Tue-Sat only and NO Sunday, despite the API flagging Sunday participation. Saturday service is printed."
+  },
+  "four-twenty-five": {
+   "rank": 11,
+   "meal": "dinner",
+   "rw_price": 60,
+   "comparable_usd": 90,
+   "comparable_usd_high": 96,
+   "end_date": "2026-09-06",
+   "end_date_source": "printed",
+   "days": "Sun-Fri",
+   "sunday_verified": true,
+   "gap_usd": 30,
+   "gap_usd_high": 36,
+   "gap_pct": 33,
+   "gap_pct_high": 38,
+   "grade": "A",
+   "verdict": "Typical 3-course $90-96 a la carte vs $60 for RW lunch AND dinner. Jean-Georges-directed power room; zero urgency and a good Sunday dinner slot.",
+   "booking_url": "https://www.sevenrooms.com/explore/fourtwentyfive/reservations/create/search/",
+   "flags": [],
+   "notes": "Window extended to Sep 6 (the API snapshot ends Aug 31 - the restaurant's extension wins)."
+  },
+  "quality-meats": {
+   "rank": 12,
+   "meal": "lunch",
+   "rw_price": 60,
+   "comparable_usd": 104,
+   "courses": 2,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "days": "Weekday lunch",
+   "sunday_verified": false,
+   "gap_usd": 44,
+   "gap_pct": 42,
+   "grade": "A",
+   "verdict": "Tuna tartare + the full $72 NY strip = $104 a la carte vs the $60 two-course RW lunch. Steak or nothing - the chicken path saves $0.",
+   "booking_url": "https://www.opentable.com/r/quality-meats-reservations-new-york",
+   "flags": [
+    "book_by_aug16",
+    "two_course_tier"
+   ],
+   "notes": "Verified from their own menu on a prior check. The $60 tier buys TWO courses."
+  },
+  "frenchette": {
+   "rank": 13,
+   "meal": "dinner",
+   "rw_price": 60,
+   "comparable_usd": 76,
+   "comparable_usd_high": 92,
+   "end_date": "2026-08-31",
+   "end_date_source": "api_fallback",
+   "days": "Unprinted (API: Sundays)",
+   "sunday_verified": null,
+   "gap_usd": 16,
+   "gap_usd_high": 32,
+   "gap_pct": 21,
+   "gap_pct_high": 35,
+   "grade": "A",
+   "verdict": "A la carte $76-92 vs $60 for RW lunch and dinner, plus $60 wine bottles. One of the few quality dinner prix fixes. Skip the liver entree - it carries a +$30 supplement.",
+   "booking_url": "https://www.sevenrooms.com/explore/frenchette/reservations/create/search/",
+   "flags": [
+    "end_date_unprinted"
+   ],
+   "notes": "Window and days are unprinted; API values shown. Time Out's \"$45 Frenchette lunch\" actually belongs to Le Rock (same owners) - Frenchette is $60 at both meals per their own site."
+  },
+  "victors-cafe": {
+   "rank": 14,
+   "meal": "dinner",
+   "rw_price": 45,
+   "comparable_usd": 63,
+   "end_date": "2026-09-06",
+   "end_date_source": "printed",
+   "days": "Sunday included",
+   "sunday_verified": true,
+   "gap_usd": 18,
+   "gap_pct": 29,
+   "grade": "A",
+   "verdict": "Same-dish 3-course runs ~$63 vs the $45 RW dinner. 1963 Cuban landmark in the Theatre District; no house deal undercuts it. Relaxed timeline.",
+   "booking_url": "https://victorscafe.com/reservations",
+   "flags": [],
+   "notes": "Also a $30 brunch tier. Booking is OpenTable via victorscafe.com/reservations."
+  },
+  "code-red-restaurant-and-lounge": {
+   "rank": 15,
+   "meal": "dinner",
+   "rw_price": 50,
+   "comparable_usd": 78,
+   "end_date": null,
+   "end_date_source": "api_fallback",
+   "days": "Open daily 11am-1/2am; RW days unprinted",
+   "sunday_verified": null,
+   "gap_usd": 28,
+   "gap_pct": 36,
+   "grade": "A",
+   "verdict": "Five items (app + entree + side + dessert + NA beverage) against a like-for-like $78 a la carte. The only Bronx entry on the list.",
+   "booking_url": "https://resy.com/cities/new-york-ny/venues/code-red-ny",
+   "flags": [
+    "price_api_wrong",
+    "confirm_at_booking"
+   ],
+   "notes": "PRICE SETTLED at $50 by a live page read - the listing API's $45 is WRONG and a $60 figure was stale metadata. Printed fine print: dine-in only, 18% gratuity + 120-minute limit under 10 guests (20% / 180 min for 10+), chip cards only. No dates or Sunday printed - a quick call is still wise: (718) 881-1808."
+  },
+  "the-russian-tea-room": {
+   "rank": null,
+   "meal": "dinner",
+   "rw_price": 60,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "days": "Dinner: Mon-Fri and Sunday. Lunch: Mon-Fri.",
+   "sunday_verified": true,
+   "grade": "A",
+   "flags": [
+    "book_by_aug16",
+    "sunday_api_contradicted"
+   ],
+   "notes": "Verified 2026-08-03 from their own Restaurant Week Dinner menu page: \"July 20-August 16, 2026. Available Monday-Friday and Sunday. $60.00 per person\". The listing API claims the window runs to Sep 6 - THREE WEEKS LONGER than the restaurant prints. Lunch is $45, Mon-Fri only. No Saturday."
+  },
+  "abcv": {
+   "rank": null,
+   "end_date": "2026-09-06",
+   "end_date_source": "printed",
+   "days": "Mon-Fri",
+   "sunday_verified": false,
+   "grade": "A",
+   "flags": [
+    "sunday_api_contradicted"
+   ],
+   "notes": "Verified 2026-08-03 from their own menus page: the restaurant-week menu is labelled \"monday-friday\", and the page states abcV \"is participating in summer restaurant week from july 20th through september 6th\". The listing API claims Sunday service (wrong) and an Aug 31 end (a week short)."
+  },
+  "jojo": {
+   "rank": null,
+   "meal": "dinner",
+   "end_date": "2026-09-06",
+   "end_date_source": "printed",
+   "days": "Sunday-Friday",
+   "sunday_verified": true,
+   "grade": "A",
+   "flags": [],
+   "notes": "Verified 2026-08-03 from their own site: \"NYC Restaurant Week - July 20th - September 6th - Three-course dinner | Sunday - Friday\". Sunday confirmed, no Saturday. The listing API's Aug 31 end is a week short."
+  },
+  "kru": {
+   "rank": null,
+   "rw_price": 45,
+   "end_date": "2026-09-06",
+   "end_date_source": "printed",
+   "days": "Open 7 days",
+   "sunday_verified": true,
+   "grade": "A",
+   "flags": [],
+   "notes": "Verified 2026-08-03 from their own site: \"Summer Restaurant Week - Now through Sep 6 | Open 7 days | $45 Three-course & $30 two-course weekend lunch\". Open 7 days means Sunday is covered; note that also implies Saturday service, which the programme normally excludes - confirm at booking."
+  },
+  "maison-passerelle": {
+   "rank": null,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "sunday_verified": null,
+   "grade": "A",
+   "flags": [
+    "book_by_aug16"
+   ],
+   "notes": "Window verified 2026-08-03 from the Printemps event page: \"From July 20 through August 16\". Matches the listing API. Days/Sunday are NOT printed - the listing's Sunday dinner claim is still unverified. NYT No. 75; the room is the old Red Room at 1 Wall St."
+  },
+  "tudor-city-steakhouse": {
+   "rank": null,
+   "sunday_verified": null,
+   "gap_usd": null,
+   "gap_pct": null,
+   "verdict": "DROPPED in final verification. Was ranked for a \"$30 lunch = 50% off\" that rests entirely on the listing API; their own site shows only STALE winter RW pages ($45 lunch, January dates) and no $30 lunch anywhere. Unverifiable. Their standing $59.95 3-course (12-5pm daily, petite filet) needs no RW at all.",
+   "flags": [
+    "dropped_in_verification"
+   ],
+   "notes": "API advertises $30 lunch / $60 dinner / $60 Sunday dinner through Aug 31. None of it is corroborated by the restaurant."
+  },
+  "ai-fiori": {
+   "rank": null,
+   "days": "Mon-Fri",
+   "sunday_verified": false,
+   "flags": [
+    "sunday_api_contradicted"
+   ],
+   "notes": "Own materials print Mon-Fri; the listing API claims a $60 Sunday Dinner Price. Restaurant wins - no Sunday."
+  },
+  "tao-uptown": {
+   "rank": null,
+   "days": "Mon-Fri",
+   "sunday_verified": false,
+   "flags": [
+    "sunday_api_contradicted"
+   ],
+   "notes": "Own materials print Mon-Fri; the listing API claims a $60 Sunday Dinner Price. Restaurant wins - no Sunday."
+  },
+  "le-pavillon": {
+   "rank": null,
+   "meal": "lunch",
+   "rw_price": 60,
+   "courses": 2,
+   "sunday_verified": false,
+   "flags": [
+    "two_course_tier"
+   ],
+   "notes": "LUNCH-ONLY, and the $60 tier buys TWO courses, not three. Verified against their own materials."
+  },
+  "chito-gvrito-nyc": {
+   "rank": null,
+   "sunday_verified": true,
+   "flags": [
+    "saturday_service"
+   ],
+   "notes": "Prints SATURDAY RW service despite the program-wide Saturday exclusion."
+  },
+  "playa-bettys": {
+   "rank": null,
+   "sunday_verified": true,
+   "flags": [
+    "saturday_service"
+   ],
+   "notes": "Prints SATURDAY RW service despite the program-wide Saturday exclusion."
+  },
+  "momofuku-noodle-bar-east-village": {
+   "rank": null,
+   "flags": [
+    "ambiguous_entity"
+   ],
+   "notes": "README caveat: \"Momofuku Noodle Bar's $45 tier is a weekend lunch; ends Aug 30.\" TWO participants share that name (this East Village room and momofuku-noodle-bar-uptown) with byte-identical API rows, so the caveat cannot be attributed to one. Deliberately NO end_date override applied - a wrong end date on a booking dashboard is worse than none. Verify at booking."
+  },
+  "momofuku-noodle-bar-uptown": {
+   "rank": null,
+   "flags": [
+    "ambiguous_entity"
+   ],
+   "notes": "README caveat: \"Momofuku Noodle Bar's $45 tier is a weekend lunch; ends Aug 30.\" TWO participants share that name (this Uptown room and momofuku-noodle-bar-east-village) with byte-identical API rows, so the caveat cannot be attributed to one. Deliberately NO end_date override applied - a wrong end date on a booking dashboard is worse than none. Verify at booking."
+  },
+  "gargiulos-restaurant": {
+   "rank": null,
+   "end_date": "2026-09-06",
+   "end_date_source": "printed",
+   "days": "Sunday to Friday",
+   "sunday_verified": true,
+   "grade": "A",
+   "flags": [],
+   "notes": "Verified 2026-08-03, own site: \"NYC Summer Restaurant Week 2026 Available Sunday to Friday July 20 to September 6\". Sunday confirmed; no Saturday. The listing API's Aug 31 end is a week short."
+  },
+  "la-voglia": {
+   "rank": null,
+   "end_date": "2026-09-06",
+   "end_date_source": "printed",
+   "days": "Lunch Mon-Fri; Brunch Sun; dinner",
+   "sunday_verified": true,
+   "grade": "A",
+   "flags": [],
+   "notes": "Verified 2026-08-03, own site: \"Join us for NYC Restaurant Week July 20th-September 6th ... $30 Lunch Mon-Fri 11AM-3:40PM, $45 Brunch Sun 11AM-3:40PM, $60...\". Sunday is served as BRUNCH. End date matches the listing."
+  },
+  "arvine": {
+   "rank": null,
+   "end_date": "2026-08-14",
+   "end_date_source": "printed",
+   "grade": "A",
+   "flags": [
+    "book_by_aug16"
+   ],
+   "notes": "Verified 2026-08-03, own site: \"Restaurant Week at Arvine July 20 to August 14 3 Course Prix-Fixe Menu\". Two days earlier than the listing's Aug 16. Days are not printed, so Sunday stays unverified."
+  },
+  "little-thai-kitchen": {
+   "rank": null,
+   "end_date": "2026-08-03",
+   "end_date_source": "printed",
+   "days": "Mon-Fri, dinner",
+   "sunday_verified": false,
+   "grade": "A",
+   "flags": [
+    "sunday_api_contradicted"
+   ],
+   "notes": "Verified 2026-08-03, own site: \"a $60 three course prix-fixe meal during dinner service starting from July 21st to August 3rd on Monday through Friday\". Their run ENDED Aug 3 - the listing claims Aug 31, four weeks too long - and it is weekdays only, not Sunday as the listing says."
+  },
+  "parklife": {
+   "rank": null,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "grade": "A",
+   "flags": [
+    "book_by_aug16"
+   ],
+   "notes": "Verified 2026-08-03, own site: \"Available for dining in or online ordering now thru August 16, 2026\". The listing claims Sep 6, three weeks longer. Days are not printed in that sentence, so Sunday stays unverified."
+  },
+  "wallse": {
+   "rank": null,
+   "end_date": "2026-09-05",
+   "end_date_source": "printed",
+   "rw_price": 60,
+   "grade": "A",
+   "flags": [],
+   "notes": "Verified 2026-08-03, own site: \"NYC RESTAURANT WEEK 2026 JULY 20th - SEPTEMBER 5th 3 COURSES $60\". One day earlier than the listing's Sep 6."
+  },
+  "mastros-steakhouse-nyc": {
+   "rank": null,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "rw_price": 60,
+   "grade": "A",
+   "flags": [
+    "book_by_aug16"
+   ],
+   "notes": "Verified 2026-08-03, own site: \"NYC Restaurant Week Menu JULY 20 - AUGUST 16 $60 PER GUEST\". Confirms the listing. NOTE: the \"Sunday - Saturday 6:00 PM - 10:00 PM\" on that page is the restaurant's OPENING HOURS, not its Restaurant Week days - Sunday deliberately left unverified."
+  },
+  "dowlings-at-the-carlyle": {
+   "rank": null,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "grade": "A",
+   "flags": [
+    "book_by_aug16"
+   ],
+   "notes": "End date verified 2026-08-03 from their own Restaurant Week page (July 20 to August 16). Confirms the listing. Days not printed."
+  },
+  "ilili-restaurant": {
+   "rank": null,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "grade": "A",
+   "flags": [
+    "book_by_aug16"
+   ],
+   "notes": "End date verified 2026-08-03 from their own site (July 20 to August 16). Confirms the listing. Days not printed."
+  },
+  "ilili-midtown": {
+   "rank": null,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "grade": "A",
+   "flags": [
+    "book_by_aug16"
+   ],
+   "notes": "End date verified 2026-08-03 from their own site (July 20 to August 16). Confirms the listing. Days not printed."
+  },
+  "the-bar-room-at-the-modern": {
+   "rank": null,
+   "end_date": "2026-09-06",
+   "end_date_source": "printed",
+   "grade": "A",
+   "flags": [],
+   "notes": "End date verified 2026-08-03 from their own site (through September 6). Confirms the listing. NYT No. 32. Days not printed, so its Sunday claim stays unverified."
+  },
+  "the-dining-room-at-gramercy-tavern": {
+   "rank": null,
+   "end_date": "2026-09-06",
+   "end_date_source": "printed",
+   "grade": "A",
+   "flags": [],
+   "notes": "End date verified 2026-08-03 from their own site (through September 6). Confirms the listing. Days not printed."
   }
+ }
 }

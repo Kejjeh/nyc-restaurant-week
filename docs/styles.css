@@ -673,6 +673,51 @@ a:hover { text-decoration-thickness: 2px; }
 }
 .tipBox[hidden] { display: none; }
 
+/* ---------- plan --------------------------------------------------------- */
+
+.plan[hidden] { display: none; }
+.planSec { margin-bottom: 22px; }
+.planSec h2 {
+  margin: 0 0 4px;
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3);
+}
+.planSec h2 .n { color: var(--accent); }
+.planNote { margin: 0 0 10px; font-size: 12.5px; color: var(--ink-2); max-width: 64ch; }
+
+.planRow {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
+  padding: 11px 13px; margin-bottom: 7px;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r);
+}
+.planMain { flex: 1 1 240px; min-width: 0; }
+.planName { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.planMeta {
+  margin-top: 2px; font-size: 12.5px; color: var(--ink-2);
+}
+.planMeta .sep { color: var(--ink-3); }
+.planMeta .mono { font-family: var(--mono); font-size: 11.5px; }
+.planWarn {
+  margin-top: 5px; font-family: var(--mono); font-size: 11px;
+  color: var(--warn); font-weight: 600;
+}
+.planPick { display: flex; flex-direction: column; gap: 2px; }
+.planSel {
+  font: inherit; font-size: 13.5px; padding: 7px 9px;
+  color: var(--ink); background: var(--paper);
+  border: 1px solid var(--rule-strong); border-radius: var(--r);
+  max-width: 190px;
+}
+.planSel:disabled { color: var(--ink-3); }
+.planCount {
+  font-family: var(--mono); font-size: 10px; color: var(--ink-3);
+}
+
+@media (max-width: 640px) {
+  .planSel { font-size: 16px; max-width: none; flex: 1 1 auto; }
+  .planPick { flex: 1 1 100%; }
+}
+
 /* ---------- map ---------------------------------------------------------- */
 
 .mapWrap[hidden] { display: none; }

@@ -173,6 +173,26 @@ collapse to the 12 most populated with a `Show N more`. `/` focuses search,
 `Esc` clears it or closes the panel. Filter state lives in the URL hash, so any
 view can be bookmarked.
 
+**Four views.** `List` · `Map` · `Stats` (headline tiles + four click-to-filter
+SVG charts, no charting library, describing the whole programme) · `Plan`.
+
+**Plan** turns the ★ shortlist into dated bookings. Each restaurant's date
+picker offers ONLY days it can actually serve you: inside its window, never a
+Saturday unless it carries the `saturday_service` flag, and a Sunday only where
+Sunday service is established (so Mark's Off Madison offers none despite the
+API's Sunday claim, while Café Boulud is the only one of the shortlist offering
+Saturdays). Assignments live in `localStorage`, and an assignment that becomes
+impossible is dropped on the next render.
+
+**Subway proximity.** `python src/fetch_subway.py` pulls MTA station locations
+once from NY Open Data (public domain, dataset `39hk-dx4f`) into
+`data/raw/subway/stations.json` — committed, and deliberately NOT re-fetched by
+`refresh.py`. The exporter attaches, per restaurant, every route within a
+12-minute walk plus the nearest station. Drives a `Subway line` facet, a
+`4/5/6` quick view (340 restaurants), and a `Subway walk` sort that measures to
+whichever lines you've selected. Distances are straight-line × 1.3 at 80 m/min
+— an approximation, labelled `~` in the UI, not a routing engine.
+
 **Map view** (the `Map` button) plots the current filtered set, colour-coded by
 gap basis with closing-soon in red; markers follow the filters, popups link
 straight to booking, and `Details` jumps back to that row in the list.

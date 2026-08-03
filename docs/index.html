@@ -36,6 +36,7 @@
         <button type="button" class="segBtn" data-view="list" aria-pressed="true">List</button>
         <button type="button" class="segBtn" data-view="map" aria-pressed="false">Map</button>
         <button type="button" class="segBtn" data-view="stats" aria-pressed="false">Stats</button>
+        <button type="button" class="segBtn" data-view="plan" aria-pressed="false">Plan</button>
       </div>
       <label class="sr-only" for="sort">Sort by</label>
       <select class="sortSel" id="sort" aria-label="Sort by">
@@ -45,6 +46,7 @@
         <option value="price_desc">RW price — high to low</option>
         <option value="end_asc">End date — soonest first</option>
         <option value="end_desc">End date — latest first</option>
+        <option value="walk_asc">Subway walk — shortest first</option>
         <option value="name_asc">Name — A to Z</option>
         <option value="rank_asc">Final-list rank</option>
       </select>
@@ -125,6 +127,12 @@
         <div class="plot"></div>
       </figure>
     </div>
+  </section>
+
+  <!-- The date picker for each restaurant offers ONLY dates it can actually
+       serve you — inside its window, and on a weekday it actually opens. -->
+  <section class="plan" id="plan" hidden aria-label="Plan">
+    <div id="planBody"></div>
   </section>
 
   <div id="rows"></div>

@@ -79,6 +79,48 @@ def sane_coords(lat, lng):
     return None, None
 
 
+# Subway proximity. Straight-line distance times a 1.3 grid factor, at 80 m/min
+# -- an approximation, labelled as one in the UI. Good enough to answer "can I
+# get there on the 6?", not a routing engine.
+SUBWAY = ROOT / "data" / "raw" / "subway" / "stations.json"
+WALK_M_PER_MIN = 80.0
+GRID_FACTOR = 1.3
+MAX_WALK_MIN = 12
+
+
+def _haversine_m(a_lat, a_lng, b_lat, b_lng):
+    from math import radians, sin, cos, asin, sqrt
+    dlat = radians(b_lat - a_lat)
+    dlng = radians(b_lng - a_lng)
+    h = (sin(dlat / 2) ** 2
+         + cos(radians(a_lat)) * cos(radians(b_lat)) * sin(dlng / 2) ** 2)
+    return 2 * 6371000 * asin(sqrt(h))
+
+
+def load_stations():
+    if not SUBWAY.exists():
+        return []
+    return json.loads(SUBWAY.read_text(encoding="utf-8"))
+
+
+def subway_for(lat, lng, stations):
+    """-> ({route: walk_minutes}, nearest_station_dict) within MAX_WALK_MIN."""
+    if lat is None or lng is None or not stations:
+        return {}, None
+    by_route, nearest = {}, None
+    for s in stations:
+        d = _haversine_m(lat, lng, s["lat"], s["lng"]) * GRID_FACTOR
+        mins = int(round(d / WALK_M_PER_MIN))
+        if mins > MAX_WALK_MIN:
+            continue
+        if nearest is None or mins < nearest["min"]:
+            nearest = {"name": s["name"], "min": mins, "routes": s["routes"]}
+        for r in s["routes"]:
+            if r not in by_route or mins < by_route[r]:
+                by_route[r] = mins
+    return by_route, nearest
+
+
 MONTHS = {m: i for i, ms in enumerate(
     [("jan", "january"), ("feb", "february"), ("mar", "march"), ("apr", "april"),
      ("may",), ("jun", "june"), ("jul", "july"), ("aug", "august"),
@@ -422,6 +464,7 @@ def build_payload():
         con, load_suppression(), load_jb_awards())
     price_by_slug = build_price(con)
 
+    stations = load_stations()
     verified = json.loads(VERIFIED.read_text(encoding="utf-8"))["restaurants"]
     menus = {r[0]: r[1] for r in con.execute(
         "SELECT restaurant_slug, parse_quality FROM menus")}
@@ -523,6 +566,7 @@ def build_payload():
             stats["urgent"] += 1
 
         glat, glng = sane_coords(lat, lng)
+        subway, sub_near = subway_for(glat, glng, stations)
         if lat is not None and glat is None:
             stats["bad_geo"] = stats.get("bad_geo", 0) + 1
 
@@ -533,6 +577,8 @@ def build_payload():
             "neighborhood": hood,
             "address": clean(address),
             "lat": glat, "lng": glng,
+            "subway": subway,
+            "subway_nearest": sub_near,
             "cuisines": jload(cuisines, []),
             "price_tiers": tiers,
             "meal_periods": jload(periods, []),
@@ -668,6 +714,11 @@ def main():
         mapped = sum(1 for r in payload["restaurants"] if r["lat"] and r["lng"])
         print(f"mappable      {mapped}/{n} ({n - mapped} without usable coordinates,"
               f" incl. {stats.get('bad_geo', 0)} geocoded outside NYC)")
+        near = sum(1 for r in payload["restaurants"] if r["subway"])
+        lex = sum(1 for r in payload["restaurants"]
+                  if any(k in r["subway"] for k in ("4", "5", "6")))
+        print(f"subway        {near} within {MAX_WALK_MIN} min of a station"
+              f" · {lex} near the 4/5/6")
         print(f"tags          {tagged} restaurants ({tags_dropped} snippets pruned)")
         print(f"recognition   {badged} restaurants ({recog_dropped} rows suppressed)")
         where = ("  (not written: --check)" if check

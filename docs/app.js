@@ -66,6 +66,7 @@ const FILTERS = {
   sunday: new Set(),      // 'yes' | 'no'
   basis: new Set(),       // 'verified' | 'estimate' | 'none'
   menu: new Set(),        // 'pdf' | 'image_only' | 'none'
+  subway: new Set(),      // route ids: '4', '6', 'N', 'L' …
   bookableBy: null,       // ISO date — keep rows still open ON this date
   endingBy: null,         // ISO date — keep rows that CLOSE on/before this date
   savedOnly: false,       // your own shortlist
@@ -115,6 +116,10 @@ const FACETS = [
   // a missing chip reads as a broken pipeline rather than as the real answer.
   { key: 'tag',         title: 'Dish tags',     values: (r) => [...new Set((r.tags || []).map((t) => t.tag))],
                                                 seed: () => (DATA && DATA.tag_vocabulary) || [] },
+  // Routes within a 12-minute walk. Values come straight from the data, so a
+  // new line or station shows up without touching the UI.
+  { key: 'subway',      title: 'Subway line',   values: (r) => Object.keys(r.subway || {}),
+                                                scroll: true },
   { key: 'menu',        title: 'Menu PDF',      values: (r) => [r.menu_state || 'none'],
                                                 labels: { pdf: 'Readable PDF', image_only: 'Image-only PDF', none: 'No menu published' } },
 ];
@@ -171,6 +176,17 @@ function relevance(r) {
   return 4;
 }
 
+/** Walk minutes to the SELECTED lines, or to the nearest station if none are
+ *  selected. Picking "6" then sorting by walk answers "closest on the 6". */
+function walkMin(r) {
+  const sel = [...FILTERS.subway];
+  if (sel.length) {
+    const v = sel.map((k) => r.subway && r.subway[k]).filter((x) => x != null);
+    return v.length ? Math.min(...v) : null;
+  }
+  return r.subway_nearest ? r.subway_nearest.min : null;
+}
+
 /* nulls always sort last, in every direction */
 const cmpNullLast = (a, b, dir) => {
   const an = a == null, bn = b == null;
@@ -187,6 +203,7 @@ const SORTS = {
   price_desc:   (a, b) => cmpNullLast(a.rw_price, b.rw_price, -1) || a._name.localeCompare(b._name),
   end_asc:      (a, b) => cmpNullLast(a.end_date, b.end_date, 1) || a._name.localeCompare(b._name),
   end_desc:     (a, b) => cmpNullLast(a.end_date, b.end_date, -1) || a._name.localeCompare(b._name),
+  walk_asc:     (a, b) => cmpNullLast(walkMin(a), walkMin(b), 1) || a._name.localeCompare(b._name),
   name_asc:     (a, b) => a._name.localeCompare(b._name),
   rank_asc:     (a, b) => cmpNullLast(a.rank, b.rank, 1) || a._name.localeCompare(b._name),
 };
@@ -422,6 +439,12 @@ function renderDetail(r) {
   field(dl, 'Meal periods', (r.meal_periods || []).join(', ') || null);
   field(dl, 'Price tiers', (r.price_tiers || []).join(' / ') || null, true);
   field(dl, 'Cuisines', (r.cuisines || []).join(', ') || null);
+  if (r.subway_nearest) {
+    field(dl, 'Nearest subway',
+      `${r.subway_nearest.name} — ${r.subway_nearest.routes.join(' ')} · ~${r.subway_nearest.min} min walk`);
+  }
+  const lex = ['4', '5', '6'].map((k) => r.subway && r.subway[k]).filter((v) => v != null);
+  if (lex.length) field(dl, 'Walk to 4/5/6', `~${Math.min(...lex)} min`, true);
   field(dl, 'Address', r.address || (r.borough ? `${r.borough} — address unavailable` : null));
   field(dl, 'Final-list rank', r.rank != null ? `#${r.rank} of 15` : null, true);
   field(dl, 'Menu', r.menu_state === 'pdf' ? 'Official PDF published'
@@ -503,6 +526,7 @@ function renderDetail(r) {
   save.addEventListener('click', () => {
     SAVED.has(r.slug) ? SAVED.delete(r.slug) : SAVED.add(r.slug);
     persistSaved();
+    if (!SAVED.has(r.slug)) { PLAN.delete(r.slug); persistPlan(); }
     paint();
     // Repaint the row's pills and the Saved preset count without collapsing
     // the panel the user is reading.
@@ -681,6 +705,12 @@ const PRESETS = [
     set() { FILTERS.basis.add('verified'); SORT = 'gap_usd_desc'; },
   },
   {
+    key: 'lex', label: '4/5/6',
+    count: () => ROWS.filter((r) => ['4', '5', '6'].some((k) => r.subway && r.subway[k] != null)).length,
+    is: () => ['4', '5', '6'].every((k) => FILTERS.subway.has(k)),
+    set() { ['4', '5', '6'].forEach((k) => FILTERS.subway.add(k)); SORT = 'walk_asc'; },
+  },
+  {
     key: 'sunday', label: 'Sunday',
     count: () => ROWS.filter((r) => r.sunday === true).length,
     is: () => FILTERS.sunday.has('yes'),
@@ -839,6 +869,7 @@ function apply() {
 
   if (VIEW === 'map') drawMarkers();
   if (VIEW === 'stats') renderStats();
+  if (VIEW === 'plan') renderPlan();
 
   buildPresets();
   buildActiveFilters();
@@ -1112,6 +1143,161 @@ function renderStats() {
     (d) => jump(() => FILTERS.cuisine.add(d.key)));
 }
 
+/* ---------- plan --------------------------------------------------------- */
+
+/* Turns the shortlist into dated bookings. The point is that the app knows
+   which dates are actually possible: inside the restaurant's window, and on a
+   weekday it genuinely serves. Restaurant Week excludes Saturdays except where
+   a restaurant prints otherwise, and a Sunday is only offered where Sunday
+   service is established. */
+
+const PLAN = new Map(Object.entries(JSON.parse(localStorage.getItem('rw-plan') || '{}')));
+const persistPlan = () =>
+  localStorage.setItem('rw-plan', JSON.stringify(Object.fromEntries(PLAN)));
+
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const dowOf = (iso) => new Date(`${iso}T12:00:00Z`).getUTCDay();
+const addDays = (iso, n) => {
+  const d = new Date(`${iso}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+
+/** Why a given date is or isn't bookable — the reason is shown, not just the
+ *  verdict, because several of these come from contested source data. */
+function dateIssue(r, iso) {
+  if (iso < todayISO()) return 'in the past';
+  if (r.end_date && iso > r.end_date) return `after it closes (${fmtDate(r.end_date)})`;
+  const dow = dowOf(iso);
+  if (dow === 6 && !(r.flags || []).includes('saturday_service')) {
+    return 'Saturdays are excluded from the programme';
+  }
+  if (dow === 0) {
+    if (r.sunday !== true) return 'no Sunday service';
+    if ((r.flags || []).includes('no_sunday_dinner')) return 'Sunday brunch only, no dinner';
+  }
+  return null;
+}
+
+function validDates(r) {
+  const out = [];
+  const last = r.end_date && r.end_date < (DATA.program_end || '2026-09-06')
+    ? r.end_date : (DATA.program_end || '2026-09-06');
+  for (let d = todayISO(); d <= last; d = addDays(d, 1)) {
+    if (!dateIssue(r, d)) out.push(d);
+  }
+  return out;
+}
+
+function renderPlan() {
+  const host = $('#planBody');
+  host.textContent = '';
+  const bySlug = new Map(ROWS.map((r) => [r.slug, r]));
+  const saved = [...SAVED].map((s) => bySlug.get(s)).filter(Boolean);
+
+  if (!saved.length) {
+    const e = el('div', 'empty');
+    e.append(el('p', null, 'Nothing saved yet.'));
+    e.append(el('p', null, 'Open a restaurant and press ★ Save, then come back here to give it a date.'));
+    host.append(e);
+    return;
+  }
+
+  // drop stale assignments (a date that has since become impossible)
+  saved.forEach((r) => {
+    const d = PLAN.get(r.slug);
+    if (d && dateIssue(r, d)) PLAN.delete(r.slug);
+  });
+  persistPlan();
+
+  const dated = saved.filter((r) => PLAN.get(r.slug))
+    .sort((a, b) => PLAN.get(a.slug).localeCompare(PLAN.get(b.slug)));
+  const undated = saved.filter((r) => !PLAN.get(r.slug))
+    .sort((a, b) => (a.end_date || 'z').localeCompare(b.end_date || 'z'));
+
+  const section = (title, list, note) => {
+    if (!list.length) return;
+    const s = el('section', 'planSec');
+    const h = el('h2', null, title);
+    h.append(el('span', 'n', ` ${list.length}`));
+    s.append(h);
+    if (note) s.append(el('p', 'planNote', note));
+
+    // conflict = two bookings on one date
+    const counts = {};
+    list.forEach((r) => { const d = PLAN.get(r.slug); if (d) counts[d] = (counts[d] || 0) + 1; });
+
+    list.forEach((r) => {
+      const row = el('div', 'planRow');
+      const when = PLAN.get(r.slug);
+
+      const main = el('div', 'planMain');
+      const nm = el('div', 'planName');
+      if (r.rank != null) nm.append(el('span', 'rankBadge', `#${r.rank}`));
+      nm.append(el('span', 'rname', r.name));
+      main.append(nm);
+
+      const meta = [r.neighborhood, (r.price_tiers || []).join('/')].filter(Boolean).join(' · ');
+      const sub = el('div', 'planMeta', meta);
+      if (r.end_date) {
+        sub.append(el('span', 'sep', ' · '));
+        sub.append(el('span', null, `closes ${fmtDate(r.end_date)}`));
+      }
+      const lex = ['4', '5', '6'].map((k) => r.subway && r.subway[k]).filter((v) => v != null);
+      if (lex.length) {
+        sub.append(el('span', 'sep', ' · '));
+        sub.append(el('span', 'mono', `~${Math.min(...lex)} min to 4/5/6`));
+      }
+      main.append(sub);
+
+      if (when && counts[when] > 1) {
+        main.append(el('div', 'planWarn', `Two bookings on ${fmtDate(when)}`));
+      }
+      row.append(main);
+
+      const pick = el('div', 'planPick');
+      const sel = el('select', 'planSel');
+      sel.setAttribute('aria-label', `Date for ${r.name}`);
+      const none = el('option', null, when ? 'Unschedule' : 'Pick a date…');
+      none.value = '';
+      sel.append(none);
+      const options = validDates(r);
+      options.forEach((d) => {
+        const o = el('option', null, `${DAYS[dowOf(d)]} ${fmtDate(d)}`);
+        o.value = d;
+        if (d === when) o.selected = true;
+        sel.append(o);
+      });
+      if (!options.length) {
+        sel.disabled = true;
+        none.textContent = 'No dates left';
+      }
+      sel.addEventListener('change', () => {
+        if (sel.value) PLAN.set(r.slug, sel.value); else PLAN.delete(r.slug);
+        persistPlan();
+        renderPlan();
+      });
+      pick.append(sel);
+      if (options.length) {
+        pick.append(el('span', 'planCount', `${options.length} possible`));
+      }
+      row.append(pick);
+
+      if (r.links && r.links.reservation) {
+        const a = el('a', 'linkBtn primary', 'Book');
+        a.href = r.links.reservation; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        row.append(a);
+      }
+      s.append(row);
+    });
+    host.append(s);
+  };
+
+  section('Scheduled', dated);
+  section('Not yet scheduled', undated,
+    'The date list for each is limited to days it is actually open — inside its window, and not a Saturday or a Sunday it does not serve.');
+}
+
 /* ---------- map ---------------------------------------------------------- */
 
 /* Leaflet and its tiles are the only third-party assets this page uses, and
@@ -1268,15 +1454,18 @@ function setView(v) {
   VIEW = v;
   const onMap = v === 'map';
   const onStats = v === 'stats';
+  const onPlan = v === 'plan';
   $('#mapWrap').hidden = !onMap;
   $('#stats').hidden = !onStats;
-  $('#rows').hidden = onMap || onStats;
-  $('#showMore').hidden = onMap || onStats || RENDERED >= RESULTS.length;
+  $('#plan').hidden = !onPlan;
+  $('#rows').hidden = onMap || onStats || onPlan;
+  $('#showMore').hidden = onMap || onStats || onPlan || RENDERED >= RESULTS.length;
   document.querySelectorAll('.segBtn').forEach((b) =>
     b.setAttribute('aria-pressed', b.dataset.view === v ? 'true' : 'false'));
   BANNER();
   if (onMap) openMap();
   if (onStats) renderStats();
+  if (onPlan) renderPlan();
 }
 
 /* ---------- theme ------------------------------------------------------- */
@@ -1421,7 +1610,7 @@ async function boot() {
    *  writeHash(), which serialises the CURRENT view and would erase a
    *  requested `view=map` before anything had a chance to act on it. */
   const wantedView = () =>
-    ['map', 'stats'].includes(
+    ['map', 'stats', 'plan'].includes(
       new URLSearchParams(location.hash.replace(/^#/, '')).get('view'))
       ? new URLSearchParams(location.hash.replace(/^#/, '')).get('view') : 'list';
 

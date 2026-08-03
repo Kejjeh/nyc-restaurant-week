@@ -1,7 +1,7 @@
 {
   "_doc": {
     "purpose": "Hand-verified facts transcribed from reports/rw-final-bookings.md (the decision doc) and the README 'Data caveats' contradiction list. The exporter (src/export_site_data.py) MERGES THESE OVER API-derived fields. The restaurant's own printed materials always win over the listing API.",
-    "provenance": "Transcribed 2026-08-01 from reports/rw-final-bookings.md (15 ranked bookings, verified against restaurants' own printed materials on Aug 1 via two independent own-site passes) + README 'Data caveats'. NOTHING here comes from price_sweep -- price_sweep is heuristic triage and may never populate a verified field.",
+    "provenance": "Transcribed 2026-08-01 from reports/rw-final-bookings.md (15 ranked bookings, verified against restaurants' own printed materials via two independent own-site passes) + README 'Data caveats'. EXTENDED 2026-08-03 by a further own-site pass over the highest-value Sunday-dinner candidates; those entries carry a dated note naming the exact sentence relied on. NOTHING here comes from price_sweep -- price_sweep is heuristic triage and may never populate a verified field.",
     "gap_convention": "gap_usd / gap_pct are the CONSERVATIVE (low) end where the report states a range; gap_usd_high / gap_pct_high carry the top of that range. Sorting uses the conservative value. Where the report states no numeric gap, both are null.",
     "end_date_source": "'printed' = the restaurant's own materials state the window. 'api_fallback' = the restaurant prints no end date; value copied from the listing API and flagged unprinted. 'conflict' = two verified sources disagree; the conservative (earlier) date is used.",
     "sunday_verified": "true/false = established from the restaurant's own materials. null = not established (fall back to the API value, rendered as unverified).",
@@ -53,7 +53,7 @@
       "comparable_usd": 75,
       "comparable_usd_high": 80,
       "end_date": "2026-08-14",
-      "end_date_source": "conflict",
+      "end_date_source": "printed",
       "days": "Sunday open; Sunday DINNER unprinted",
       "sunday_verified": null,
       "gap_usd": 30,
@@ -63,8 +63,8 @@
       "grade": "A",
       "verdict": "Best pure gap of the whole project. $45 RW dinner vs ~$75-80 for the same three courses a la carte. Also a $30 lunch/brunch tier.",
       "booking_url": "https://www.opentable.com/booking/experiences-availability?rid=1028503&restref=1028503&experienceId=764859",
-      "flags": ["book_by_aug16", "end_date_conflict"],
-      "notes": "Report headline says BOOK-BY Aug 16, but their own nav says possibly Aug 14 - the conservative Aug 14 is used here. README records the window as Jul 21-Aug 16. Sunday dinner service is not printed; treat Sunday as unconfirmed."
+      "flags": ["book_by_aug16"],
+      "notes": "SETTLED 2026-08-03: their own site's Calendar prints \"7/20 - 8/14 Restaurant Week\", so Aug 14 is the printed end date, not a conflict. The listing API's Aug 31 is wrong by 17 days. Sunday DINNER service is still not printed; treat Sunday as unconfirmed."
     },
 
     "zuma": {
@@ -298,6 +298,64 @@
       "booking_url": "https://resy.com/cities/new-york-ny/venues/code-red-ny",
       "flags": ["price_api_wrong", "confirm_at_booking"],
       "notes": "PRICE SETTLED at $50 by a live page read - the listing API's $45 is WRONG and a $60 figure was stale metadata. Printed fine print: dine-in only, 18% gratuity + 120-minute limit under 10 guests (20% / 180 min for 10+), chip cards only. No dates or Sunday printed - a quick call is still wise: (718) 881-1808."
+    },
+
+    "the-russian-tea-room": {
+      "rank": null,
+      "meal": "dinner",
+      "rw_price": 60,
+      "end_date": "2026-08-16",
+      "end_date_source": "printed",
+      "days": "Dinner: Mon-Fri and Sunday. Lunch: Mon-Fri.",
+      "sunday_verified": true,
+      "grade": "A",
+      "flags": ["book_by_aug16", "sunday_api_contradicted"],
+      "notes": "Verified 2026-08-03 from their own Restaurant Week Dinner menu page: \"July 20-August 16, 2026. Available Monday-Friday and Sunday. $60.00 per person\". The listing API claims the window runs to Sep 6 - THREE WEEKS LONGER than the restaurant prints. Lunch is $45, Mon-Fri only. No Saturday."
+    },
+
+    "abcv": {
+      "rank": null,
+      "end_date": "2026-09-06",
+      "end_date_source": "printed",
+      "days": "Mon-Fri",
+      "sunday_verified": false,
+      "grade": "A",
+      "flags": ["sunday_api_contradicted"],
+      "notes": "Verified 2026-08-03 from their own menus page: the restaurant-week menu is labelled \"monday-friday\", and the page states abcV \"is participating in summer restaurant week from july 20th through september 6th\". The listing API claims Sunday service (wrong) and an Aug 31 end (a week short)."
+    },
+
+    "jojo": {
+      "rank": null,
+      "meal": "dinner",
+      "end_date": "2026-09-06",
+      "end_date_source": "printed",
+      "days": "Sunday-Friday",
+      "sunday_verified": true,
+      "grade": "A",
+      "flags": [],
+      "notes": "Verified 2026-08-03 from their own site: \"NYC Restaurant Week - July 20th - September 6th - Three-course dinner | Sunday - Friday\". Sunday confirmed, no Saturday. The listing API's Aug 31 end is a week short."
+    },
+
+    "kru": {
+      "rank": null,
+      "rw_price": 45,
+      "end_date": "2026-09-06",
+      "end_date_source": "printed",
+      "days": "Open 7 days",
+      "sunday_verified": true,
+      "grade": "A",
+      "flags": [],
+      "notes": "Verified 2026-08-03 from their own site: \"Summer Restaurant Week - Now through Sep 6 | Open 7 days | $45 Three-course & $30 two-course weekend lunch\". Open 7 days means Sunday is covered; note that also implies Saturday service, which the programme normally excludes - confirm at booking."
+    },
+
+    "maison-passerelle": {
+      "rank": null,
+      "end_date": "2026-08-16",
+      "end_date_source": "printed",
+      "sunday_verified": null,
+      "grade": "A",
+      "flags": ["book_by_aug16"],
+      "notes": "Window verified 2026-08-03 from the Printemps event page: \"From July 20 through August 16\". Matches the listing API. Days/Sunday are NOT printed - the listing's Sunday dinner claim is still unverified. NYT No. 75; the room is the old Red Room at 1 Wall St."
     },
 
     "tudor-city-steakhouse": {

@@ -569,6 +569,80 @@
    "grade": "A",
    "flags": [],
    "notes": "End date verified 2026-08-03 from their own site (through September 6). Confirms the listing. Days not printed."
+  },
+  "socarrat-paella-bar-chelsea": {
+   "rank": null,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "rw_price": 45,
+   "days": "Sunday-Friday; not Saturdays",
+   "sunday_verified": true,
+   "grade": "A",
+   "flags": [
+    "book_by_aug16"
+   ],
+   "notes": "Verified 2026-08-03 via a real browser (the plain fetcher got 403). Own site: \"FROM JULY 20TH TO AUGUST 16TH ... $45 per person Available Sunday-Friday at all Socarrat locations *Not available on Saturdays*\". The page states it covers all Socarrat locations. Max 6 diners per the same page."
+  },
+  "socarrat-paella-bar-midtown-east": {
+   "rank": null,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "rw_price": 45,
+   "days": "Sunday-Friday; not Saturdays",
+   "sunday_verified": true,
+   "grade": "A",
+   "flags": [
+    "book_by_aug16"
+   ],
+   "notes": "Verified 2026-08-03 via a real browser (the plain fetcher got 403). Own site: \"FROM JULY 20TH TO AUGUST 16TH ... $45 per person Available Sunday-Friday at all Socarrat locations *Not available on Saturdays*\". The page states it covers all Socarrat locations. Max 6 diners per the same page."
+  },
+  "socarrat-paella-bar-nolita": {
+   "rank": null,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "rw_price": 45,
+   "days": "Sunday-Friday; not Saturdays",
+   "sunday_verified": true,
+   "grade": "A",
+   "flags": [
+    "book_by_aug16"
+   ],
+   "notes": "Verified 2026-08-03 via a real browser (the plain fetcher got 403). Own site: \"FROM JULY 20TH TO AUGUST 16TH ... $45 per person Available Sunday-Friday at all Socarrat locations *Not available on Saturdays*\". The page states it covers all Socarrat locations. Max 6 diners per the same page."
+  },
+  "morgans-brooklyn-barbecue-prospect-heights": {
+   "rank": null,
+   "end_date": "2026-08-16",
+   "end_date_source": "printed",
+   "rw_price": 30,
+   "grade": "A",
+   "flags": [
+    "book_by_aug16",
+    "confirm_at_booking"
+   ],
+   "notes": "Verified 2026-08-03 via a real browser (403 to the plain fetcher). Own site: \"NYC Restaurant Week, July 20-August 16, featuring an all-day, three-course menu for $30\" and \"*Not Offered Saturday All Day and Sunday Brunch*\". Two weeks shorter than the listing's Aug 31. That day note is ambiguous about whether Sunday DINNER is served, so Sunday is deliberately left unverified - confirm when booking."
+  },
+  "nonna-doras": {
+   "rank": null,
+   "end_date": "2026-09-06",
+   "end_date_source": "printed",
+   "grade": "A",
+   "flags": [],
+   "notes": "Verified 2026-08-03 via a real browser (403 to the plain fetcher). Own site: \"Join us for NYC Restaurant Week, July 20th through September 6th\". A week longer than the listing's Aug 31. Days not printed."
+  },
+  "nonna-doras-tribeca": {
+   "rank": null,
+   "end_date": "2026-09-06",
+   "end_date_source": "printed",
+   "grade": "A",
+   "flags": [],
+   "notes": "Verified 2026-08-03 via a real browser (403 to the plain fetcher). Own site: \"Join us for NYC Restaurant Week, July 20th through September 6th\". A week longer than the listing's Aug 31. Days not printed."
+  },
+  "balade": {
+   "rank": null,
+   "rw_price": 45,
+   "grade": "A",
+   "flags": [],
+   "notes": "Price verified 2026-08-03 via a real browser (403 to the plain fetcher): \"Starting Monday, July 20th ... a 3-course meal for $45 per person (plus tax and gratuity)\". No end date and no days printed, so both stay listing-derived."
   }
  }
 }

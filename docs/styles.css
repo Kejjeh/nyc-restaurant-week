@@ -577,6 +577,102 @@ a:hover { text-decoration-thickness: 2px; }
 .toTop[hidden] { display: none; }
 .toTop:hover { filter: brightness(1.08); }
 
+/* ---------- view switch -------------------------------------------------- */
+
+.viewSeg {
+  display: inline-flex; flex: 0 0 auto;
+  border: 1px solid var(--rule-strong); border-radius: var(--r); overflow: hidden;
+}
+.segBtn {
+  font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap;
+  padding: 8px 11px; border: 0; border-right: 1px solid var(--rule-strong);
+  background: var(--paper); color: var(--ink-2);
+}
+.segBtn:last-child { border-right: 0; }
+.segBtn:hover { color: var(--ink); }
+.segBtn[aria-pressed="true"] {
+  background: var(--accent); color: var(--accent-ink); font-weight: 600;
+}
+
+/* ---------- overview ----------------------------------------------------- */
+
+.stats[hidden] { display: none; }
+
+.statsNote {
+  margin: 0 0 12px; font-size: 12.5px; color: var(--ink-2);
+}
+
+.tiles {
+  display: grid; gap: 8px; margin-bottom: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+}
+.tile {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--r); padding: 11px 13px;
+}
+.tile .n {
+  font-family: var(--mono); font-size: 25px; font-weight: 600; line-height: 1.1;
+  color: var(--ink); font-variant-numeric: tabular-nums; display: block;
+}
+.tile .k {
+  font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--ink-3); margin-top: 3px; display: block;
+}
+.tile.crit .n { color: var(--crit); }
+.tile.value .n { color: var(--value); }
+
+.chartGrid {
+  display: grid; gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+.chart {
+  margin: 0; padding: 13px 14px 10px;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r);
+}
+.chart figcaption {
+  font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 12px;
+}
+.chart figcaption span {
+  display: block; font-weight: 400; font-size: 11.5px; color: var(--ink-3);
+  margin-top: 2px; font-family: var(--mono);
+}
+.chart .plot { position: relative; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+
+/* recessive axes, thin marks */
+.ax        { stroke: var(--rule); stroke-width: 1; }
+.axLabel   { fill: var(--ink-3); font-family: var(--mono); font-size: 10px; }
+.barLabel  { fill: var(--ink-2); font-family: var(--mono); font-size: 10.5px; font-variant-numeric: tabular-nums; }
+.bar       { fill: var(--accent); cursor: pointer; }
+.bar.urgent{ fill: var(--crit); }
+.bar:hover { filter: brightness(1.15); }
+.barHit    { fill: transparent; cursor: pointer; }
+.barHit:hover + .bar, .barHit:focus-visible + .bar { filter: brightness(1.15); }
+.seg       { cursor: pointer; }
+.seg.verified { fill: var(--value); }
+.seg.estimate { fill: var(--warn); }
+.seg.none     { fill: var(--ink-3); }
+.seg:hover    { filter: brightness(1.12); }
+
+.chartLegend {
+  display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 9px;
+  font-family: var(--mono); font-size: 10.5px; color: var(--ink-2);
+}
+.chartLegend b { font-weight: 600; color: var(--ink); }
+.chartLegend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; margin-right: 4px; }
+.chartLegend i.verified { background: var(--value); }
+.chartLegend i.estimate { background: var(--warn); }
+.chartLegend i.none     { background: var(--ink-3); }
+
+.tipBox {
+  position: absolute; pointer-events: none; z-index: 5;
+  background: var(--ink); color: var(--paper);
+  font-family: var(--mono); font-size: 11px; line-height: 1.4;
+  padding: 5px 8px; border-radius: 4px; white-space: nowrap;
+  transform: translate(-50%, -125%);
+}
+.tipBox[hidden] { display: none; }
+
 /* ---------- map ---------------------------------------------------------- */
 
 .mapWrap[hidden] { display: none; }
@@ -603,9 +699,10 @@ a:hover { text-decoration-thickness: 2px; }
   width: 9px; height: 9px; border-radius: 50%; display: inline-block;
   margin-right: 2px; vertical-align: -1px;
 }
+/* legend swatches mirror the marker SHAPES, not just their hues */
 .dot.verified  { background: var(--value); }
-.dot.estimate  { background: var(--warn); }
-.dot.none      { background: var(--ink-3); }
+.dot.estimate  { background: transparent; border: 2px solid var(--warn); }
+.dot.none      { background: var(--ink-3); width: 6px; height: 6px; opacity: .6; }
 .dot.urgentDot { background: var(--crit); }
 
 /* Leaflet popup, restyled to match the page rather than its own defaults */

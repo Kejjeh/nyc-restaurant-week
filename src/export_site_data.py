@@ -37,6 +37,7 @@ OUT = ROOT / "docs" / "data" / "restaurants.json"
 SEASON_LABEL = "Summer 2026"
 SEASON_YEAR = 2026
 BOOK_BY = "2026-08-16"      # the program's headline deadline; drives the badge
+PROGRAM_END = "2026-09-06"  # last extension week; drives the countdown
 
 # ToS guards. matched_text is stored with 60 chars of context each side (up to
 # 143 chars) and 97 of 101 item-snippets are an entire dish + description. That
@@ -570,6 +571,7 @@ def build_payload():
         "verified_asof": json.loads(VERIFIED.read_text(encoding="utf-8"))
             ["_doc"]["provenance"].split()[1],
         "book_by": BOOK_BY,
+        "program_end": PROGRAM_END,
         "tag_vocabulary": sorted(rules),
         "restaurants": out,
     }

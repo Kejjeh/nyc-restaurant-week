@@ -32,7 +32,11 @@
       <button type="button" class="btn" id="filterBtn" aria-expanded="false" aria-controls="panel">
         Filters<span class="n" id="filterCount" hidden>0</span>
       </button>
-      <button type="button" class="btn viewBtn" id="viewBtn" aria-pressed="false">Map</button>
+      <div class="viewSeg" id="viewSeg" role="group" aria-label="View">
+        <button type="button" class="segBtn" data-view="list" aria-pressed="true">List</button>
+        <button type="button" class="segBtn" data-view="map" aria-pressed="false">Map</button>
+        <button type="button" class="segBtn" data-view="stats" aria-pressed="false">Stats</button>
+      </div>
       <label class="sr-only" for="sort">Sort by</label>
       <select class="sortSel" id="sort" aria-label="Sort by">
         <option value="gap_usd_desc">Gap $ — high to low</option>
@@ -87,13 +91,39 @@
   <section class="mapWrap" id="mapWrap" hidden aria-label="Map of results">
     <div id="map"></div>
     <div class="mapFoot">
+      <!-- shape carries the meaning as well as colour: solid / ring / small dot -->
       <span class="mapLegend">
-        <span class="dot verified"></span> verified gap
-        <span class="dot estimate"></span> estimate
-        <span class="dot none"></span> no comparable
-        <span class="dot urgentDot"></span> closing by Aug 16
+        <span class="dot verified"></span> solid = verified gap
+        <span class="dot estimate"></span> ring = estimate
+        <span class="dot none"></span> small = no comparable
+        <span class="dot urgentDot"></span> red = closing by Aug 16
       </span>
       <span id="mapNote"></span>
+    </div>
+  </section>
+
+  <!-- Every chart here is a filter control: clicking a bar narrows the list. -->
+  <section class="stats" id="stats" hidden aria-label="Overview">
+    <p class="statsNote">The whole programme — the filters above don't apply here.
+       Click any bar to filter the list by it.</p>
+    <div class="tiles" id="tiles"></div>
+    <div class="chartGrid">
+      <figure class="chart" id="chartClose">
+        <figcaption>When restaurants stop serving<span>click a bar to see that day</span></figcaption>
+        <div class="plot"></div>
+      </figure>
+      <figure class="chart" id="chartBasis">
+        <figcaption>What the value figures rest on<span>only 1 in 45 is hand-verified</span></figcaption>
+        <div class="plot"></div>
+      </figure>
+      <figure class="chart" id="chartBorough">
+        <figcaption>Where they are<span>click to filter by borough</span></figcaption>
+        <div class="plot"></div>
+      </figure>
+      <figure class="chart" id="chartCuisine">
+        <figcaption>Most common cuisines<span>click to filter</span></figcaption>
+        <div class="plot"></div>
+      </figure>
     </div>
   </section>
 

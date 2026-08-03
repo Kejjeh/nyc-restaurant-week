@@ -838,6 +838,7 @@ function apply() {
   $('#clearBtn').hidden = n === 0;
 
   if (VIEW === 'map') drawMarkers();
+  if (VIEW === 'stats') renderStats();
 
   buildPresets();
   buildActiveFilters();
@@ -870,7 +871,7 @@ function writeHash() {
   p.set('by', FILTERS.bookableBy || 'any');
   if (FILTERS.endingBy) p.set('to', FILTERS.endingBy);
   if (FILTERS.savedOnly) p.set('saved', '1');
-  if (VIEW === 'map') p.set('view', 'map');
+  if (VIEW !== 'list') p.set('view', VIEW);
   if (QUERY) p.set('q', QUERY);
   if (SORT !== 'gap_usd_desc') p.set('sort', SORT);
   const s = p.toString();
@@ -894,6 +895,221 @@ function readHash() {
   // Object.prototype, would pass a truthy check and then be used as a comparator.
   const s = p.get('sort');
   if (s && Object.hasOwn(SORTS, s)) { SORT = s; $('#sort').value = SORT; }
+}
+
+/* ---------- overview ----------------------------------------------------- */
+
+/* Charts are hand-built SVG — no library. Marks carry CSS CLASSES rather than
+   inline fills, so a theme switch restyles them with no redraw.
+   Every chart is also a control: clicking a mark applies the matching filter
+   and drops you into the list. The overview always describes the WHOLE
+   programme, never the filtered subset — otherwise drilling in would be
+   circular. */
+
+const NS = 'http://www.w3.org/2000/svg';
+const svgEl = (tag, attrs = {}) => {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  return n;
+};
+
+function tip(host) {
+  let box = host.querySelector('.tipBox');
+  if (!box) {
+    box = el('div', 'tipBox');
+    box.hidden = true;
+    host.append(box);
+  }
+  return {
+    show(text, x, y) { box.textContent = text; box.style.left = `${x}px`; box.style.top = `${y}px`; box.hidden = false; },
+    hide() { box.hidden = true; },
+  };
+}
+
+/** Vertical bars — closings per date. Urgent dates take the status colour. */
+function barsVertical(host, data, onPick) {
+  host.textContent = '';
+  const W = 560, H = 190, padL = 26, padR = 8, padT = 16, padB = 30;
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img' });
+  const max = Math.max(...data.map((d) => d.n), 1);
+  const bw = (W - padL - padR) / data.length;
+  const t = tip(host);
+
+  svg.append(svgEl('line', { class: 'ax', x1: padL, y1: H - padB, x2: W - padR, y2: H - padB }));
+
+  data.forEach((d, i) => {
+    const h = Math.max(2, (H - padT - padB) * (d.n / max));
+    const x = padL + i * bw + bw * 0.18;
+    const w = bw * 0.64;
+    const y = H - padB - h;
+
+    const hit = svgEl('rect', { class: 'barHit', x: padL + i * bw, y: padT, width: bw, height: H - padT - padB });
+    // 4px rounded data-end, anchored to the baseline
+    const bar = svgEl('rect', { class: `bar${d.urgent ? ' urgent' : ''}`, x, y, width: w, height: h, rx: 4 });
+    svg.append(hit, bar);
+    if (h > 8) svg.append(svgEl('rect', { class: `bar${d.urgent ? ' urgent' : ''}`, x, y: y + h - 6, width: w, height: 6 }));
+
+    const lbl = svgEl('text', { class: 'barLabel', x: x + w / 2, y: y - 5, 'text-anchor': 'middle' });
+    lbl.textContent = d.n;
+    svg.append(lbl);
+
+    const ax = svgEl('text', { class: 'axLabel', x: x + w / 2, y: H - padB + 14, 'text-anchor': 'middle' });
+    ax.textContent = d.label;
+    svg.append(ax);
+
+    const over = (e) => {
+      const r = host.getBoundingClientRect();
+      t.show(`${d.n} close ${d.label}${d.urgent ? ' · book first' : ''}`,
+        e.clientX - r.left, e.clientY - r.top);
+    };
+    [hit, bar].forEach((n) => {
+      n.addEventListener('mousemove', over);
+      n.addEventListener('mouseleave', () => t.hide());
+      n.addEventListener('click', () => onPick(d));
+      n.style.cursor = 'pointer';
+    });
+  });
+  host.append(svg);
+}
+
+/** Horizontal bars — magnitude by category, single hue. */
+function barsHorizontal(host, data, onPick) {
+  host.textContent = '';
+  const rowH = 26, padL = 116, padR = 44;
+  const W = 560, H = data.length * rowH + 6;
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img' });
+  const max = Math.max(...data.map((d) => d.n), 1);
+  const t = tip(host);
+
+  data.forEach((d, i) => {
+    const y = i * rowH + 4;
+    const w = Math.max(3, (W - padL - padR) * (d.n / max));
+
+    const hit = svgEl('rect', { class: 'barHit', x: 0, y, width: W, height: rowH - 4 });
+    const bar = svgEl('rect', { class: 'bar', x: padL, y: y + 3, width: w, height: rowH - 12, rx: 4 });
+    // square off the baseline end so only the data-end is rounded
+    const cap = svgEl('rect', { class: 'bar', x: padL, y: y + 3, width: Math.min(5, w), height: rowH - 12 });
+    svg.append(hit, bar, cap);
+
+    const name = svgEl('text', { class: 'axLabel', x: padL - 8, y: y + rowH / 2, 'text-anchor': 'end', 'dominant-baseline': 'middle' });
+    name.textContent = d.label;
+    const val = svgEl('text', { class: 'barLabel', x: padL + w + 7, y: y + rowH / 2, 'dominant-baseline': 'middle' });
+    val.textContent = d.n;
+    svg.append(name, val);
+
+    const over = (e) => {
+      const r = host.getBoundingClientRect();
+      t.show(`${d.label} · ${d.n}`, e.clientX - r.left, e.clientY - r.top);
+    };
+    [hit, bar].forEach((n) => {
+      n.addEventListener('mousemove', over);
+      n.addEventListener('mouseleave', () => t.hide());
+      n.addEventListener('click', () => onPick(d));
+      n.style.cursor = 'pointer';
+    });
+  });
+  host.append(svg);
+}
+
+/** One stacked bar — part-to-whole, with direct labels so the segments never
+ *  depend on colour alone (verified green vs estimate amber are close under
+ *  protanopia). 2px surface gaps separate the fills. */
+function stackedBar(host, segs, onPick) {
+  host.textContent = '';
+  const W = 560, H = 46, GAP = 2;
+  const total = segs.reduce((a, s) => a + s.n, 0) || 1;
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img' });
+  let x = 0;
+  segs.forEach((s, i) => {
+    const w = Math.max(2, (W * s.n) / total - (i < segs.length - 1 ? GAP : 0));
+    const r = svgEl('rect', {
+      class: `seg ${s.key}`, x, y: 0, width: w, height: 26,
+      rx: i === 0 || i === segs.length - 1 ? 4 : 0,
+    });
+    r.addEventListener('click', () => onPick(s));
+    svg.append(r);
+
+    if (w > 42) {
+      const pct = svgEl('text', { class: 'barLabel', x: x + w / 2, y: 43, 'text-anchor': 'middle' });
+      pct.textContent = `${Math.round((s.n / total) * 100)}%`;
+      svg.append(pct);
+    }
+    x += w + GAP;
+  });
+  host.append(svg);
+
+  const leg = el('div', 'chartLegend');
+  segs.forEach((s) => {
+    const item = el('span');
+    item.append(Object.assign(el('i', s.key), {}));
+    item.append(el('b', null, String(s.n)));
+    item.append(document.createTextNode(` ${s.label}`));
+    leg.append(item);
+  });
+  host.append(leg);
+}
+
+function renderStats() {
+  if (!DATA) return;
+  const all = ROWS;
+  const today = todayISO();
+  const daysLeft = Math.max(0, Math.round(
+    (Date.parse(`${DATA.program_end || '2026-09-06'}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 864e5));
+  const soon = all.filter((r) => r.end_date && r.end_date <= DATA.book_by).length;
+  const stars = all.filter((r) => (r.recognition || [])
+    .some((x) => x.source === 'michelin' && /star/.test(x.level || ''))).length;
+
+  const tiles = [
+    { n: all.length, k: 'restaurants' },
+    { n: daysLeft, k: 'days left' },
+    { n: soon, k: `close by ${fmtDate(DATA.book_by)}`, cls: 'crit' },
+    { n: all.filter((r) => r.gap_basis === 'verified').length, k: 'verified gaps', cls: 'value' },
+    { n: stars, k: 'michelin stars' },
+    { n: SAVED.size, k: 'you saved' },
+  ];
+  const th = $('#tiles');
+  th.textContent = '';
+  tiles.forEach((t) => {
+    const d = el('div', `tile${t.cls ? ' ' + t.cls : ''}`);
+    d.append(el('span', 'n', String(t.n)));
+    d.append(el('span', 'k', t.k));
+    th.append(d);
+  });
+
+  const jump = (fn) => { clearAll(true); fn(); VIEW = 'list'; apply(); setView('list'); };
+
+  // closings by date
+  const byDate = {};
+  all.forEach((r) => { if (r.end_date) byDate[r.end_date] = (byDate[r.end_date] || 0) + 1; });
+  const dates = Object.keys(byDate).sort().map((d) => ({
+    key: d, label: fmtDate(d), n: byDate[d], urgent: d <= DATA.book_by,
+  }));
+  barsVertical($('#chartClose .plot'), dates, (d) => jump(() => {
+    // both bounds on the same day == "closes exactly then"
+    FILTERS.bookableBy = d.key; FILTERS.endingBy = d.key; SORT = 'gap_usd_desc';
+  }));
+
+  // value basis
+  const basis = [
+    { key: 'verified', label: 'verified', n: all.filter((r) => r.gap_basis === 'verified').length },
+    { key: 'estimate', label: 'estimated', n: all.filter((r) => r.gap_basis === 'estimate').length },
+    { key: 'none', label: 'no comparable', n: all.filter((r) => !r.gap_basis).length },
+  ];
+  stackedBar($('#chartBasis .plot'), basis, (s) => jump(() => FILTERS.basis.add(s.key)));
+
+  // borough
+  const byB = {};
+  all.forEach((r) => { if (r.borough) byB[r.borough] = (byB[r.borough] || 0) + 1; });
+  barsHorizontal($('#chartBorough .plot'),
+    Object.entries(byB).sort((a, b) => b[1] - a[1]).map(([k, n]) => ({ key: k, label: k, n })),
+    (d) => jump(() => FILTERS.borough.add(d.key)));
+
+  // cuisines
+  const byC = {};
+  all.forEach((r) => (r.cuisines || []).forEach((c) => { byC[c] = (byC[c] || 0) + 1; }));
+  barsHorizontal($('#chartCuisine .plot'),
+    Object.entries(byC).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([k, n]) => ({ key: k, label: k, n })),
+    (d) => jump(() => FILTERS.cuisine.add(d.key)));
 }
 
 /* ---------- map ---------------------------------------------------------- */
@@ -991,12 +1207,19 @@ function drawMarkers() {
   const pts = RESULTS.filter((r) => r.lat != null && r.lng != null);
   pts.forEach((r) => {
     const c = markerColour(r).trim();
+    // Verified green and estimate amber are ΔE 4.7 apart under protanopia —
+    // indistinguishable by colour alone. The list encodes basis in FORM too
+    // (dashed underline + "estimate"), so the map does the same: a solid disc
+    // is verified, a hollow ring is an estimate, a small faint dot is no
+    // comparable. Readable in greyscale and with any colour vision.
+    const solid = r.gap_basis === 'verified';
+    const hollow = r.gap_basis === 'estimate';
     L.circleMarker([r.lat, r.lng], {
-      radius: r.rank != null ? 8 : 6,
+      radius: r.rank != null ? 8 : solid ? 6 : hollow ? 6 : 4,
       color: c,
-      weight: r.rank != null ? 3 : 1.5,
+      weight: r.rank != null ? 3 : hollow ? 2.5 : 1.5,
       fillColor: c,
-      fillOpacity: SAVED.has(r.slug) ? 0.95 : 0.55,
+      fillOpacity: hollow ? 0.05 : SAVED.has(r.slug) ? 0.95 : solid ? 0.75 : 0.35,
     })
       .bindPopup(() => popupFor(r), { closeButton: true, maxWidth: 260 })
       .bindTooltip(r.name, { direction: 'top', offset: [0, -6] })
@@ -1044,13 +1267,16 @@ async function openMap() {
 function setView(v) {
   VIEW = v;
   const onMap = v === 'map';
+  const onStats = v === 'stats';
   $('#mapWrap').hidden = !onMap;
-  $('#rows').hidden = onMap;
-  $('#showMore').hidden = onMap || RENDERED >= RESULTS.length;
-  const b = $('#viewBtn');
-  b.textContent = onMap ? 'List' : 'Map';
-  b.setAttribute('aria-pressed', onMap ? 'true' : 'false');
+  $('#stats').hidden = !onStats;
+  $('#rows').hidden = onMap || onStats;
+  $('#showMore').hidden = onMap || onStats || RENDERED >= RESULTS.length;
+  document.querySelectorAll('.segBtn').forEach((b) =>
+    b.setAttribute('aria-pressed', b.dataset.view === v ? 'true' : 'false'));
+  BANNER();
   if (onMap) openMap();
+  if (onStats) renderStats();
 }
 
 /* ---------- theme ------------------------------------------------------- */
@@ -1139,6 +1365,7 @@ async function boot() {
   });
   BANNER = () => {
     banner.hidden = isDismissed()
+      || VIEW !== 'list'
       || SORT !== 'gap_usd_desc'
       || FILTERS.basis.size > 0;
   };
@@ -1150,8 +1377,10 @@ async function boot() {
     $('#panel').hidden = open;
   });
 
-  $('#viewBtn').addEventListener('click', () => {
-    setView(VIEW === 'map' ? 'list' : 'map');
+  $('#viewSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('.segBtn');
+    if (!b) return;
+    setView(b.dataset.view);
     writeHash();
   });
 
@@ -1192,8 +1421,9 @@ async function boot() {
    *  writeHash(), which serialises the CURRENT view and would erase a
    *  requested `view=map` before anything had a chance to act on it. */
   const wantedView = () =>
-    new URLSearchParams(location.hash.replace(/^#/, '')).get('view') === 'map'
-      ? 'map' : 'list';
+    ['map', 'stats'].includes(
+      new URLSearchParams(location.hash.replace(/^#/, '')).get('view'))
+      ? new URLSearchParams(location.hash.replace(/^#/, '')).get('view') : 'list';
 
   // Changing only the hash is a same-document navigation, so boot() does not
   // re-run. Without this, pasting or editing a filter URL on an already-open

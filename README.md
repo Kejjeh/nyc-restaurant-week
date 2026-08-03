@@ -173,6 +173,18 @@ collapse to the 12 most populated with a `Show N more`. `/` focuses search,
 `Esc` clears it or closes the panel. Filter state lives in the URL hash, so any
 view can be bookmarked.
 
+**Map view** (the `Map` button) plots the current filtered set, colour-coded by
+gap basis with closing-soon in red; markers follow the filters, popups link
+straight to booking, and `Details` jumps back to that row in the list.
+
+> **One architectural exception.** Everything else here is dependency-free, but
+> the map loads **Leaflet 1.9.4 from unpkg** and **CARTO basemap tiles** — the
+> only third-party assets on the site. They are fetched *lazily, on first map
+> open*, so the list view still makes **zero external requests**, and if either
+> is unreachable the map shows an explanatory message while the list keeps
+> working. A self-contained map would need committed borough geometry and would
+> still have no streets, which is most of what makes a map useful here.
+
 `src/export_site_data.py` builds the payload (`--check` validates and prints
 without writing). It merges, in this precedence order:
 
@@ -244,6 +256,13 @@ comparable (left blank — never backfilled) · 120 restaurants with dish tags �
   sum — confirm at booking · Chito Gvrito and Playa Betty's print SATURDAY
   service despite the program-wide Saturday exclusion.
 - Season windows vary by restaurant (Aug 15/16/30/31, Sep 1/6/7 all observed).
+- **3 restaurants geocode outside New York.** `dubuhaus` and `musaek` (both
+  6 E. 32nd St., Manhattan) resolve to Oakland CA, and `the-kunjip`
+  (32 W. 32nd St.) to San Angelo TX — bad lat/lng in the nyctourism detail
+  pages, not a parsing error. `sane_coords()` in `export_site_data.py` nulls
+  any point outside a five-borough bounding box, so the map neither misplaces
+  them nor lets one bad point wreck its auto-fit. With the 2 NULL-address rows
+  that leaves 640 of 645 mappable.
 
 ## ToS rules — HARD REQUIREMENTS for any output built from this repo
 

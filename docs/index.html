@@ -32,6 +32,7 @@
       <button type="button" class="btn" id="filterBtn" aria-expanded="false" aria-controls="panel">
         Filters<span class="n" id="filterCount" hidden>0</span>
       </button>
+      <button type="button" class="btn viewBtn" id="viewBtn" aria-pressed="false">Map</button>
       <label class="sr-only" for="sort">Sort by</label>
       <select class="sortSel" id="sort" aria-label="Sort by">
         <option value="gap_usd_desc">Gap $ — high to low</option>
@@ -81,6 +82,21 @@
       <button type="button" class="linkish" id="dismissBanner">Dismiss</button>
     </div>
   </div>
+  <!-- Map tiles and Leaflet load only when this is first opened, so the list
+       view stays instant and makes no third-party requests at all. -->
+  <section class="mapWrap" id="mapWrap" hidden aria-label="Map of results">
+    <div id="map"></div>
+    <div class="mapFoot">
+      <span class="mapLegend">
+        <span class="dot verified"></span> verified gap
+        <span class="dot estimate"></span> estimate
+        <span class="dot none"></span> no comparable
+        <span class="dot urgentDot"></span> closing by Aug 16
+      </span>
+      <span id="mapNote"></span>
+    </div>
+  </section>
+
   <div id="rows"></div>
   <button type="button" class="showMore" id="showMore" hidden></button>
   <div class="empty" id="empty" hidden>

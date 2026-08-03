@@ -61,6 +61,23 @@ COVERAGE_CAP = 0.045
 COVERAGE_FLOOR = 36
 MIN_PAD = 8
 
+# Generous bounding box over all five boroughs. Three participants with plainly
+# Manhattan addresses geocode to Oakland CA and San Angelo TX in the source
+# detail pages; plotting those is worse than plotting nothing, and a single bad
+# point also ruins any auto-fit of the map bounds.
+NYC_BOUNDS = (40.45, 41.02, -74.30, -73.65)   # lat_min, lat_max, lng_min, lng_max
+
+
+def sane_coords(lat, lng):
+    """Return (lat, lng) if the point is plausibly in NYC, else (None, None)."""
+    if lat is None or lng is None:
+        return None, None
+    lo_a, hi_a, lo_o, hi_o = NYC_BOUNDS
+    if lo_a <= lat <= hi_a and lo_o <= lng <= hi_o:
+        return lat, lng
+    return None, None
+
+
 MONTHS = {m: i for i, ms in enumerate(
     [("jan", "january"), ("feb", "february"), ("mar", "march"), ("apr", "april"),
      ("may",), ("jun", "june"), ("jul", "july"), ("aug", "august"),
@@ -504,13 +521,17 @@ def build_payload():
         if end_date and end_date <= BOOK_BY:
             stats["urgent"] += 1
 
+        glat, glng = sane_coords(lat, lng)
+        if lat is not None and glat is None:
+            stats["bad_geo"] = stats.get("bad_geo", 0) + 1
+
         out.append({
             "slug": slug,
             "name": clean(name),
             "borough": borough,
             "neighborhood": hood,
             "address": clean(address),
-            "lat": lat, "lng": lng,
+            "lat": glat, "lng": glng,
             "cuisines": jload(cuisines, []),
             "price_tiers": tiers,
             "meal_periods": jload(periods, []),
@@ -642,6 +663,9 @@ def main():
         print(f"  no comparable {stats['none']}")
         print(f"  ranked picks  {ranked}")
         print(f"  ending by {payload['book_by']}  {stats['urgent']}")
+        mapped = sum(1 for r in payload["restaurants"] if r["lat"] and r["lng"])
+        print(f"mappable      {mapped}/{n} ({n - mapped} without usable coordinates,"
+              f" incl. {stats.get('bad_geo', 0)} geocoded outside NYC)")
         print(f"tags          {tagged} restaurants ({tags_dropped} snippets pruned)")
         print(f"recognition   {badged} restaurants ({recog_dropped} rows suppressed)")
         where = ("  (not written: --check)" if check

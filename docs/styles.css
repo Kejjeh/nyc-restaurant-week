@@ -577,6 +577,67 @@ a:hover { text-decoration-thickness: 2px; }
 .toTop[hidden] { display: none; }
 .toTop:hover { filter: brightness(1.08); }
 
+/* ---------- map ---------------------------------------------------------- */
+
+.mapWrap[hidden] { display: none; }
+#map {
+  height: min(70vh, 620px);
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  z-index: 1;                 /* stay under the sticky controls */
+}
+.mapFail {
+  display: flex; align-items: center; justify-content: center;
+  height: 100%; padding: 24px; text-align: center;
+  font-size: 13.5px; color: var(--ink-2);
+}
+
+.mapFoot {
+  display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center;
+  padding: 8px 2px 0;
+  font-family: var(--mono); font-size: 11px; color: var(--ink-3);
+}
+.mapLegend { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
+.mapLegend .dot {
+  width: 9px; height: 9px; border-radius: 50%; display: inline-block;
+  margin-right: 2px; vertical-align: -1px;
+}
+.dot.verified  { background: var(--value); }
+.dot.estimate  { background: var(--warn); }
+.dot.none      { background: var(--ink-3); }
+.dot.urgentDot { background: var(--crit); }
+
+/* Leaflet popup, restyled to match the page rather than its own defaults */
+.leaflet-popup-content-wrapper {
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--rule); border-radius: var(--r);
+  box-shadow: var(--shadow);
+}
+.leaflet-popup-tip { background: var(--surface); border: 1px solid var(--rule); }
+.leaflet-popup-content { margin: 10px 12px; font-family: var(--sans); font-size: 13px; }
+.leaflet-container { font-family: var(--sans); background: var(--surface-2); }
+.leaflet-container a { color: var(--accent); }
+.leaflet-control-attribution {
+  background: color-mix(in srgb, var(--surface) 85%, transparent) !important;
+  color: var(--ink-3) !important; font-size: 10px !important;
+}
+.mapPop h3 { margin: 0 0 3px; font-size: 14px; font-weight: 600; }
+.mapPop .meta { color: var(--ink-2); font-size: 12px; margin-bottom: 6px; }
+.mapPop .gap {
+  font-family: var(--mono); font-weight: 600; font-size: 14px; color: var(--value);
+}
+.mapPop .gap.est { color: var(--ink-2); border-bottom: 1.5px dashed var(--warn); }
+.mapPop .acts { display: flex; gap: 6px; margin-top: 8px; }
+.mapPop .acts a, .mapPop .acts button {
+  font: inherit; font-size: 12px; cursor: pointer; text-decoration: none;
+  padding: 4px 9px; border-radius: var(--r);
+  border: 1px solid var(--rule-strong); background: var(--surface); color: var(--ink);
+}
+.mapPop .acts a.primary {
+  background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
+}
+
 .empty {
   padding: 46px 14px; text-align: center; color: var(--ink-2);
 }

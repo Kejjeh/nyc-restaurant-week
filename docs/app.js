@@ -837,6 +837,8 @@ function apply() {
   badge.hidden = n === 0;
   $('#clearBtn').hidden = n === 0;
 
+  if (VIEW === 'map') drawMarkers();
+
   buildPresets();
   buildActiveFilters();
 
@@ -868,6 +870,7 @@ function writeHash() {
   p.set('by', FILTERS.bookableBy || 'any');
   if (FILTERS.endingBy) p.set('to', FILTERS.endingBy);
   if (FILTERS.savedOnly) p.set('saved', '1');
+  if (VIEW === 'map') p.set('view', 'map');
   if (QUERY) p.set('q', QUERY);
   if (SORT !== 'gap_usd_desc') p.set('sort', SORT);
   const s = p.toString();
@@ -893,6 +896,163 @@ function readHash() {
   if (s && Object.hasOwn(SORTS, s)) { SORT = s; $('#sort').value = SORT; }
 }
 
+/* ---------- map ---------------------------------------------------------- */
+
+/* Leaflet and its tiles are the only third-party assets this page uses, and
+   they are fetched ONLY when the map is first opened — the list view stays
+   entirely self-contained. */
+const LEAFLET_CSS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+const LEAFLET_JS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+const TILES = {
+  light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+};
+const TILE_ATTR =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
+  '&copy; <a href="https://carto.com/attributions">CARTO</a>';
+
+let MAP = null;
+let MAP_LAYER = null;
+let MAP_TILES = null;
+let MAP_LOADING = null;
+let VIEW = 'list';
+
+const isDark = () =>
+  (document.documentElement.dataset.theme
+    || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';
+
+function loadLeaflet() {
+  if (window.L) return Promise.resolve();
+  if (MAP_LOADING) return MAP_LOADING;
+  MAP_LOADING = new Promise((resolve, reject) => {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = LEAFLET_CSS;
+    document.head.append(css);
+    const js = document.createElement('script');
+    js.src = LEAFLET_JS;
+    js.onload = resolve;
+    js.onerror = () => reject(new Error('could not load the map library'));
+    document.head.append(js);
+  });
+  return MAP_LOADING;
+}
+
+const markerColour = (r) =>
+  isUrgent(r) ? getComputedStyle(document.documentElement).getPropertyValue('--crit')
+    : r.gap_basis === 'verified' ? getComputedStyle(document.documentElement).getPropertyValue('--value')
+    : r.gap_basis === 'estimate' ? getComputedStyle(document.documentElement).getPropertyValue('--warn')
+    : getComputedStyle(document.documentElement).getPropertyValue('--ink-3');
+
+function popupFor(r) {
+  const box = el('div', 'mapPop');
+  box.append(el('h3', null, (r.rank != null ? `#${r.rank}  ` : '') + r.name));
+  const bits = [r.neighborhood, (r.cuisines || [])[0], (r.price_tiers || []).join('/')]
+    .filter(Boolean).join(' · ');
+  box.append(el('div', 'meta', bits));
+
+  if (r.gap_usd != null) {
+    const g = el('div', `gap${r.gap_basis === 'estimate' ? ' est' : ''}`);
+    const over = r.gap_usd < 0;
+    g.textContent = `${over ? '+' : ''}${money(Math.abs(r.gap_usd))}`
+      + (r.gap_pct != null ? ` · ${Math.abs(r.gap_pct)}% ${over ? 'MORE' : 'off'}` : '')
+      + (r.gap_basis === 'estimate' ? '  (est.)' : '');
+    box.append(g);
+  }
+  box.append(el('div', 'meta',
+    r.end_date ? `Runs through ${fmtDate(r.end_date)}` : 'No end date published'));
+
+  const acts = el('div', 'acts');
+  if (r.links && r.links.reservation) {
+    const a = el('a', 'primary', 'Book');
+    a.href = r.links.reservation; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    acts.append(a);
+  }
+  const det = el('button', null, 'Details');
+  det.type = 'button';
+  det.addEventListener('click', () => {
+    // Jump back to the list with this one open.
+    EXPANDED.add(r.slug);
+    setView('list');
+    const row = document.querySelector(`.row[data-slug="${CSS.escape(r.slug)}"]`);
+    if (row) row.scrollIntoView({ block: 'center' });
+    else { QUERY = fold(r.name); $('#q').value = r.name; apply(); }
+  });
+  acts.append(det);
+  box.append(acts);
+  return box;
+}
+
+function drawMarkers() {
+  if (!MAP || !window.L) return;
+  if (MAP_LAYER) MAP_LAYER.remove();
+  MAP_LAYER = L.layerGroup().addTo(MAP);
+
+  const pts = RESULTS.filter((r) => r.lat != null && r.lng != null);
+  pts.forEach((r) => {
+    const c = markerColour(r).trim();
+    L.circleMarker([r.lat, r.lng], {
+      radius: r.rank != null ? 8 : 6,
+      color: c,
+      weight: r.rank != null ? 3 : 1.5,
+      fillColor: c,
+      fillOpacity: SAVED.has(r.slug) ? 0.95 : 0.55,
+    })
+      .bindPopup(() => popupFor(r), { closeButton: true, maxWidth: 260 })
+      .bindTooltip(r.name, { direction: 'top', offset: [0, -6] })
+      .addTo(MAP_LAYER);
+  });
+
+  const missing = RESULTS.length - pts.length;
+  $('#mapNote').textContent =
+    `${pts.length} plotted${missing ? ` · ${missing} without usable coordinates` : ''}`;
+
+  if (pts.length) {
+    MAP.fitBounds(L.latLngBounds(pts.map((r) => [r.lat, r.lng])).pad(0.08),
+      { animate: false, maxZoom: 15 });
+  }
+}
+
+function paintTiles() {
+  if (!MAP || !window.L) return;
+  if (MAP_TILES) MAP_TILES.remove();
+  MAP_TILES = L.tileLayer(TILES[isDark() ? 'dark' : 'light'], {
+    attribution: TILE_ATTR, maxZoom: 19, detectRetina: true,
+  }).addTo(MAP);
+}
+
+async function openMap() {
+  const wrap = $('#mapWrap');
+  try {
+    await loadLeaflet();
+  } catch (err) {
+    $('#map').innerHTML = '';
+    $('#map').append(Object.assign(el('div', 'mapFail'), {
+      textContent: `The map needs to load Leaflet from unpkg.com and tiles from CARTO — ${err.message}. The list view works offline; everything here is also in it.`,
+    }));
+    return;
+  }
+  if (!MAP) {
+    MAP = L.map('map', { scrollWheelZoom: false, zoomControl: true });
+    MAP.setView([40.7549, -73.9840], 12);
+    paintTiles();
+  }
+  MAP.invalidateSize();
+  drawMarkers();
+}
+
+function setView(v) {
+  VIEW = v;
+  const onMap = v === 'map';
+  $('#mapWrap').hidden = !onMap;
+  $('#rows').hidden = onMap;
+  $('#showMore').hidden = onMap || RENDERED >= RESULTS.length;
+  const b = $('#viewBtn');
+  b.textContent = onMap ? 'List' : 'Map';
+  b.setAttribute('aria-pressed', onMap ? 'true' : 'false');
+  if (onMap) openMap();
+}
+
 /* ---------- theme ------------------------------------------------------- */
 
 function initTheme() {
@@ -904,6 +1064,7 @@ function initTheme() {
     const next = cur === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
     localStorage.setItem('rw-theme', next);
+    if (MAP) { paintTiles(); drawMarkers(); }   // tiles + marker colours are themed
   });
 }
 
@@ -989,6 +1150,11 @@ async function boot() {
     $('#panel').hidden = open;
   });
 
+  $('#viewBtn').addEventListener('click', () => {
+    setView(VIEW === 'map' ? 'list' : 'map');
+    writeHash();
+  });
+
   // --- progressive rendering -------------------------------------------
   $('#showMore').addEventListener('click', renderPage);
   // Auto-load as the button nears the viewport; the button stays as the
@@ -1022,8 +1188,29 @@ async function boot() {
     }
   });
 
+  /** The requested view must be read BEFORE apply(), because apply() calls
+   *  writeHash(), which serialises the CURRENT view and would erase a
+   *  requested `view=map` before anything had a chance to act on it. */
+  const wantedView = () =>
+    new URLSearchParams(location.hash.replace(/^#/, '')).get('view') === 'map'
+      ? 'map' : 'list';
+
+  // Changing only the hash is a same-document navigation, so boot() does not
+  // re-run. Without this, pasting or editing a filter URL on an already-open
+  // page silently does nothing.
+  addEventListener('hashchange', () => {
+    const want = wantedView();
+    clearAll(true);
+    readHash();
+    VIEW = want;          // so the writeHash() inside apply() preserves it
+    apply();
+    setView(want);        // sync the DOM and open the map if needed
+  });
+
+  VIEW = wantedView();
   apply();
   BOOTED = true;
+  setView(VIEW);
 }
 
 boot();

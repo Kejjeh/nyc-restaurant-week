@@ -67,6 +67,7 @@ const FILTERS = {
   basis: new Set(),       // 'verified' | 'estimate' | 'none'
   menu: new Set(),        // 'pdf' | 'image_only' | 'none'
   subway: new Set(),      // route ids: '4', '6', 'N', 'L' …
+  outdoor: new Set(),     // 'licensed' | 'sidewalk' | 'roadway' | 'described'
   bookableBy: null,       // ISO date — keep rows still open ON this date
   endingBy: null,         // ISO date — keep rows that CLOSE on/before this date
   savedOnly: false,       // your own shortlist
@@ -120,9 +121,34 @@ const FACETS = [
   // new line or station shows up without touching the UI.
   { key: 'subway',      title: 'Subway line',   values: (r) => Object.keys(r.subway || {}),
                                                 scroll: true },
+  // Two tiers kept apart on purpose. "Licensed" is the city's Dining Out
+  // register — authoritative, but it only ever covers the public pavement and
+  // roadway. Rooftops, backyards and the park venues are invisible to it, so
+  // the restaurant's own blurb is carried as a separate, weaker chip. There is
+  // deliberately NO "no outdoor seating" value: 495 of 645 are simply unknown.
+  { key: 'outdoor',     title: 'Outdoor seating', values: (r) => {
+                                                    const o = r.outdoor;
+                                                    if (!o) return [];
+                                                    const v = [];
+                                                    if (o.licensed) v.push('licensed');
+                                                    if (o.sidewalk) v.push('sidewalk');
+                                                    if (o.roadway) v.push('roadway');
+                                                    if (o.described && !o.licensed) v.push('described');
+                                                    return v;
+                                                  },
+                                                labels: { licensed: 'Licensed (any)', sidewalk: 'Sidewalk café',
+                                                          roadway: 'Street shed', described: 'Says so on its listing' },
+                                                note: 'From NYC’s Dining Out register, which covers only the '
+                                                    + 'pavement and roadway — rooftops and gardens don’t appear in it. '
+                                                    + 'No chip here means unknown, not “none”.' },
   { key: 'menu',        title: 'Menu PDF',      values: (r) => [r.menu_state || 'none'],
                                                 labels: { pdf: 'Readable PDF', image_only: 'Image-only PDF', none: 'No menu published' } },
 ];
+
+/* Make the promise above literally true: a facet declared without a matching
+   FILTERS entry used to throw inside buildFacets and silently render NO
+   filter panel at all — the failure looked like a data problem, not a typo. */
+for (const f of FACETS) if (!FILTERS[f.key]) FILTERS[f.key] = new Set();
 
 const RECOG_LABEL = { michelin: 'Michelin', james_beard: 'James Beard', nyt: 'NYT' };
 const labelFor = (facet, v) => (facet.labels && facet.labels[v]) || RECOG_LABEL[v] || v;
@@ -185,6 +211,23 @@ function walkMin(r) {
     return v.length ? Math.min(...v) : null;
   }
   return r.subway_nearest ? r.subway_nearest.min : null;
+}
+
+/* Outdoor seating, phrased so the two tiers never blur together — and so the
+   absent case reads as "we don't know", which is the truth for 495 of 645. */
+function outdoorText(r) {
+  const o = r.outdoor;
+  if (!o) return 'Not established';
+  const kinds = [];
+  if (o.sidewalk) kinds.push('sidewalk café');
+  if (o.roadway) kinds.push('street shed');
+  if (o.licensed) {
+    const where = kinds.join(' + ');
+    return `Yes — licensed ${where} (city register${
+      o.described ? ', and mentioned on its listing' : ''})`;
+  }
+  return 'Mentioned on its listing — not in the city register '
+       + '(which covers only pavement and roadway)';
 }
 
 /* nulls always sort last, in every direction */
@@ -458,6 +501,7 @@ function renderDetail(r) {
   }
   const lex = ['4', '5', '6'].map((k) => r.subway && r.subway[k]).filter((v) => v != null);
   if (lex.length) field(dl, 'Walk to 4/5/6', `~${Math.min(...lex)} min`, true);
+  field(dl, 'Outdoor seating', outdoorText(r));
   field(dl, 'Address', r.address || (r.borough ? `${r.borough} — address unavailable` : null));
   field(dl, 'Final-list rank', r.rank != null ? `#${r.rank} of 15` : null, true);
   field(dl, 'Menu', r.menu_state === 'pdf' ? 'Official PDF published'
@@ -655,6 +699,7 @@ function buildFacets() {
 
     const sec = el('div', 'facet');
     sec.append(el('h3', null, f.title));
+    if (f.note) sec.append(el('p', 'facetNote', f.note));
     const box = el('div', f.scroll ? 'scroller' : null);
     const chips = el('div', 'chips');
 
@@ -1401,6 +1446,14 @@ const CMP_ROWS = [
       ? `${r.subway_nearest.name} ${r.subway_nearest.min}m · ${(r.subway_nearest.routes || []).join('')}`
       : '—'),
     raw: (r) => (r.subway_nearest ? r.subway_nearest.min : null), bestRaw: 'min' },
+  { k: 'Outdoor', get: (r) => {
+      const o = r.outdoor;
+      if (!o) return 'Not established';
+      if (!o.licensed) return 'Says so on its listing';
+      return [o.sidewalk && 'Sidewalk', o.roadway && 'Street shed']
+        .filter(Boolean).join(' + ');
+    },
+    best: (v) => v !== 'Not established' && v !== 'Says so on its listing' },
   { k: 'Menu', get: (r) => (r.menu_state === 'pdf' ? 'PDF published'
     : r.menu_state === 'image_only' ? 'Image-only PDF' : 'None') },
 ];
@@ -1693,6 +1746,9 @@ function prepare(r) {
     (r.tags || []).map((t) => `${t.tag} ${t.keyword || ''}`).join(' '),
     (r.recognition || []).map((x) => `${RECOG_LABEL[x.source] || x.source} ${x.level || ''} ${x.matched_name || ''}`).join(' '),
     r.verdict, r.verdict_note, r.days,
+    // so "outdoor" / "patio" / "sidewalk" reach the rows that have it
+    r.outdoor ? `outdoor alfresco ${r.outdoor.sidewalk ? 'sidewalk patio cafe' : ''} `
+              + `${r.outdoor.roadway ? 'roadway street shed' : ''}` : '',
   ].filter(Boolean).join(' • '));
   return r;
 }

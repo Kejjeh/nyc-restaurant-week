@@ -121,6 +121,105 @@ def subway_for(lat, lng, stations):
     return by_route, nearest
 
 
+# --------------------------------------------------------------------------
+# Outdoor seating
+#
+# Two tiers, deliberately kept apart, because neither alone is honest:
+#
+#   licensed  -- the restaurant appears in NYC DOT's Dining Out register
+#                (data/raw/outdoor/licenses.json). Authoritative, but covers
+#                ONLY the public right of way: sidewalk and roadway sheds.
+#   described -- the restaurant's own listing blurb mentions outdoor seating.
+#                Weak, but it is the only signal that reaches the things the
+#                register structurally cannot see -- rooftops, backyards,
+#                courtyards, and the park venues (Tavern on the Green, Bryant
+#                Park Grill) which are licensed under a different regime.
+#
+# Absence of both means UNKNOWN, never "no outdoor seating". The UI must never
+# offer a "no outdoor seating" filter off this data.
+OUTDOOR = ROOT / "data" / "raw" / "outdoor" / "licenses.json"
+OUT_RADIUS_M = 80          # geocodes differ by a building width; 80m is generous
+OUT_NAME_MIN = 0.34        # below this a same-house-number match is still required
+
+# Corporate and generic words that must not be allowed to create a name match:
+# "PARK AVENUE KITCHEN LLC" and "KITCHEN GROUP LLC" share only noise.
+_OUT_NOISE = {"llc", "inc", "corp", "corporation", "ltd", "co", "the",
+              "restaurant", "restaurants", "nyc", "new", "york", "cafe", "bar",
+              "grill", "kitchen", "group", "holdings", "enterprises",
+              "of", "and", "at", "on", "by"}
+
+_OUTDOOR_RE = re.compile(
+    r"outdoor|patio|sidewalk|al ?fresco|terrace|rooftop|roof ?deck|backyard"
+    r"|courtyard|open-air|garden", re.I)
+
+
+def _out_norm(s):
+    s = unicodedata.normalize("NFKD", s or "")
+    s = "".join(c for c in s if not unicodedata.combining(c)).lower()
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]+", " ", s)).strip()
+
+
+def _out_toks(s):
+    return {t for t in _out_norm(s).split() if t not in _OUT_NOISE and len(t) > 1}
+
+
+def _out_sim(a, b):
+    """Jaccard over meaningful tokens; full credit when one name contains the other."""
+    A, B = _out_toks(a), _out_toks(b)
+    if not A or not B or not (A & B):
+        return 0.0
+    if A <= B or B <= A:
+        return 1.0
+    return len(A & B) / len(A | B)
+
+
+def _house_no(addr):
+    m = re.match(r"\s*(\d+)", addr or "")
+    return m.group(1) if m else None
+
+
+def load_outdoor():
+    if not OUTDOOR.exists():
+        return []
+    return json.loads(OUTDOOR.read_text(encoding="utf-8"))["rows"]
+
+
+def outdoor_for(name, address, lat, lng, licences):
+    """-> {sidewalk, roadway, licence_name, dist_m} or None.
+
+    A candidate qualifies on a good name similarity, OR on any name overlap at
+    all when the street number also agrees -- which is what rescues
+    "Empire Steak House" / "EMPIRE STEAKHOUSE" at 237 W 54th.
+
+    Sidewalk and roadway are separate rows in the register, so a place holding
+    both appears twice; every qualifying row is folded in rather than just the
+    closest one.
+    """
+    if lat is None or lng is None or not licences:
+        return None
+    hn = _house_no(address)
+    hits = []
+    for L in licences:
+        d = _haversine_m(lat, lng, L["lat"], L["lng"])
+        if d > OUT_RADIUS_M:
+            continue
+        s = max(_out_sim(name, L["name"]), _out_sim(name, L["legal"]))
+        addr_ok = bool(hn and hn == _house_no(L["street"]))
+        if s < OUT_NAME_MIN and not (addr_ok and s > 0):
+            continue
+        hits.append((s + (0.3 if addr_ok else 0), -d, L))
+    if not hits:
+        return None
+    hits.sort(key=lambda h: (-h[0], -h[1]))
+    best = hits[0][2]
+    return {
+        "sidewalk": any(h[2]["sidewalk"] for h in hits),
+        "roadway": any(h[2]["roadway"] for h in hits),
+        "licence_name": clean(best["name"] or best["legal"]),
+        "dist_m": int(round(-hits[0][1])),
+    }
+
+
 MONTHS = {m: i for i, ms in enumerate(
     [("jan", "january"), ("feb", "february"), ("mar", "march"), ("apr", "april"),
      ("may",), ("jun", "june"), ("jul", "july"), ("aug", "august"),
@@ -465,19 +564,22 @@ def build_payload():
     price_by_slug = build_price(con)
 
     stations = load_stations()
+    licences = load_outdoor()
     verified = json.loads(VERIFIED.read_text(encoding="utf-8"))["restaurants"]
     menus = {r[0]: r[1] for r in con.execute(
         "SELECT restaurant_slug, parse_quality FROM menus")}
 
-    out, stats = [], {"verified": 0, "estimate": 0, "none": 0, "urgent": 0}
+    out, stats = [], {"verified": 0, "estimate": 0, "none": 0, "urgent": 0,
+                      "outdoor_licensed": 0, "outdoor_described_only": 0}
 
     for row in con.execute(
             "SELECT slug, name, borough, neighborhood, address, lat, lng, cuisines,"
             " price_tiers, meal_periods, meal_types_raw, weeks, sunday_participation,"
-            " menu_url, website, reservation_link, listing_url"
+            " menu_url, website, reservation_link, listing_url, summary"
             " FROM restaurants ORDER BY name"):
         (slug, name, borough, hood, address, lat, lng, cuisines, tiers, periods,
-         raw_types, weeks, sunday_api, menu_url, website, res_link, listing) = row
+         raw_types, weeks, sunday_api, menu_url, website, res_link, listing,
+         summary) = row
 
         tiers = jload(tiers, [])
         v = verified.get(slug, {})
@@ -570,6 +672,25 @@ def build_payload():
         if lat is not None and glat is None:
             stats["bad_geo"] = stats.get("bad_geo", 0) + 1
 
+        # --- outdoor seating --------------------------------------------
+        # Only the boolean survives from the blurb; the sentence itself is
+        # listing copy and stays out of the payload (see assert_tos_clean).
+        outdoor = outdoor_for(clean(name), address, glat, glng, licences)
+        described = bool(_OUTDOOR_RE.search(summary or ""))
+        if outdoor or described:
+            outdoor = {
+                "sidewalk": bool(outdoor and outdoor["sidewalk"]),
+                "roadway": bool(outdoor and outdoor["roadway"]),
+                "licensed": bool(outdoor),
+                "described": described,
+                "licence_name": outdoor["licence_name"] if outdoor else None,
+                "dist_m": outdoor["dist_m"] if outdoor else None,
+            }
+            stats["outdoor_licensed"] += bool(outdoor["licensed"])
+            stats["outdoor_described_only"] += (described and not outdoor["licensed"])
+        else:
+            outdoor = None
+
         out.append({
             "slug": slug,
             "name": clean(name),
@@ -579,6 +700,7 @@ def build_payload():
             "lat": glat, "lng": glng,
             "subway": subway,
             "subway_nearest": sub_near,
+            "outdoor": outdoor,
             "cuisines": jload(cuisines, []),
             "price_tiers": tiers,
             "meal_periods": jload(periods, []),
@@ -719,6 +841,9 @@ def main():
                   if any(k in r["subway"] for k in ("4", "5", "6")))
         print(f"subway        {near} within {MAX_WALK_MIN} min of a station"
               f" · {lex} near the 4/5/6")
+        print(f"outdoor       {stats['outdoor_licensed']} in the city register"
+              f" · {stats['outdoor_described_only']} described only"
+              f" · {len(payload['restaurants']) - stats['outdoor_licensed'] - stats['outdoor_described_only']} unknown")
         print(f"tags          {tagged} restaurants ({tags_dropped} snippets pruned)")
         print(f"recognition   {badged} restaurants ({recog_dropped} rows suppressed)")
         where = ("  (not written: --check)" if check

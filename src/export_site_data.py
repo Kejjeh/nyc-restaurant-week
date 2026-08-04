@@ -371,9 +371,15 @@ def build_tags(con, rules):
                    for s, t in con.execute(
                        "SELECT restaurant_slug, raw_text FROM menus")}
     spans = {}      # slug -> [(start, end)] of already-published source spans
+    # Confidence leads the ordering: only MAX_SNIPPETS_PER_TAG hits survive per
+    # tag, so whichever sorts first *represents* the tag in the UI. Sorting by
+    # source alone let a low-confidence hit mask a high one on the same menu --
+    # Yakiniku Futago reads "low confidence" off a bare "Negi Toro" while its
+    # Ootoro and Maguro (both high) sit unused two lines away.
     rows = con.execute(
         "SELECT restaurant_slug, tag, confidence, matched_text, source "
         "FROM menu_item_tags ORDER BY restaurant_slug, tag, "
+        "CASE confidence WHEN 'high' THEN 0 ELSE 1 END, "
         "CASE source WHEN 'item' THEN 0 ELSE 1 END, length(matched_text)").fetchall()
     for slug, tag, conf, matched, source in rows:
         if tag not in rules or not matched:

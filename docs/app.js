@@ -549,9 +549,55 @@ function renderDetail(r) {
   addLink(r.links && r.links.menu, r.menu_state === 'image_only' ? 'Menu PDF (image-only)' : 'Menu PDF');
   addLink(r.links && r.links.listing, 'Official listing');
   addLink(r.links && r.links.website, 'Restaurant site');
+
+  // A link to THIS restaurant. Filter state is shareable but a single
+  // restaurant was not, which is the first thing you reach for when you want
+  // to send someone a recommendation.
+  const share = el('button', 'linkBtn', 'Copy link');
+  share.type = 'button';
+  share.addEventListener('click', async () => {
+    const url = `${location.origin}${location.pathname}#r=${encodeURIComponent(r.slug)}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      share.textContent = 'Link copied';
+    } catch {
+      // clipboard is blocked over http:// and in some embedded views
+      share.textContent = url;
+      share.style.userSelect = 'all';
+    }
+    setTimeout(() => { share.textContent = 'Copy link'; share.style.userSelect = ''; }, 2500);
+  });
+  links.append(share);
+
   if (links.childNodes.length) d.append(links);
 
   return d;
+}
+
+/** Open one restaurant from #r=slug, lifting any filter that would hide it. */
+function openRestaurant(slug) {
+  const r = ROWS.find((x) => x.slug === slug);   // slug "53" stays a string
+  if (!r) return false;
+  if (!RESULTS.some((x) => x.slug === slug)) {
+    clearAll(true);            // the link must win over whatever was filtered
+    FILTERS.bookableBy = null;
+  }
+  EXPANDED.add(slug);
+  VIEW = 'list';
+  apply();
+  // it may sit past the first page of 50 — keep rendering until it exists
+  let guard = 0;
+  while (!document.querySelector(`.row[data-slug="${CSS.escape(slug)}"]`)
+         && RENDERED < RESULTS.length && guard++ < 40) {
+    renderPage();
+  }
+  const row = document.querySelector(`.row[data-slug="${CSS.escape(slug)}"]`);
+  if (row) {
+    row.scrollIntoView({ block: 'center' });
+    row.classList.add('linked');
+    setTimeout(() => row.classList.remove('linked'), 2400);
+  }
+  return true;
 }
 
 /* ---------- facet panel ------------------------------------------------- */
@@ -894,6 +940,7 @@ function clearAll(silent) {
 /* ---------- URL state (so a filtered view survives a reload / bookmark) -- */
 
 function writeHash() {
+  if (new URLSearchParams(location.hash.replace(/^#/, '')).get('r')) return;
   const p = new URLSearchParams();
   FACETS.forEach((f) => { if (FILTERS[f.key].size) p.set(f.key, [...FILTERS[f.key]].join('~')); });
   // "any" is written explicitly: an absent `by` means "no state yet", which
@@ -1618,6 +1665,8 @@ async function boot() {
   // re-run. Without this, pasting or editing a filter URL on an already-open
   // page silently does nothing.
   addEventListener('hashchange', () => {
+    const one = new URLSearchParams(location.hash.replace(/^#/, '')).get('r');
+    if (one) { openRestaurant(one); return; }   // a single-restaurant link
     const want = wantedView();
     clearAll(true);
     readHash();
@@ -1626,10 +1675,14 @@ async function boot() {
     setView(want);        // sync the DOM and open the map if needed
   });
 
+  const wantedRestaurant = () =>
+    new URLSearchParams(location.hash.replace(/^#/, '')).get('r');
+
   VIEW = wantedView();
   apply();
   BOOTED = true;
   setView(VIEW);
+  if (wantedRestaurant()) openRestaurant(wantedRestaurant());
 }
 
 boot();

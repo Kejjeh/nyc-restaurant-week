@@ -833,3 +833,12 @@ a:hover { text-decoration-thickness: 2px; }
   .controls, .themeToggle { display: none; }
   .row { break-inside: avoid; }
 }
+
+/* a row arrived at from a #r= link — brief, non-flashing emphasis */
+.row.linked {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .row.linked { transition: box-shadow .35s ease, border-color .35s ease; }
+}

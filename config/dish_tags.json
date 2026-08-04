@@ -1,18 +1,106 @@
 {
   "_doc": "tag -> list of rules. Each rule: {pattern: regex (case-insensitive), confidence: high|low, note: optional}. Adding a tag = add an entry here and re-run `python src/tag_dishes.py`. No code edits needed.",
   "snails": [
-    {"pattern": "\\bsnails?\\b", "confidence": "high"},
-    {"pattern": "\\bescargots?\\b", "confidence": "high"},
-    {"pattern": "\\blumache\\b", "confidence": "low", "note": "usually the pasta shape, not the animal"}
+    {
+      "pattern": "\\bsnails?\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bescargots?\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\blumache\\b",
+      "confidence": "low",
+      "note": "usually the pasta shape, not the animal"
+    }
   ],
   "braised": [
-    {"pattern": "\\bbraise[ds]?\\b", "confidence": "high"},
-    {"pattern": "\\bbrasato\\b", "confidence": "high"},
-    {"pattern": "\\bosso\\s?buco\\b", "confidence": "high"},
-    {"pattern": "\\bbraised[^.\\n]{0,50}\\bshort\\s?ribs?\\b", "confidence": "high", "note": "short rib only when described as braised"},
-    {"pattern": "\\bshort\\s?ribs?\\b[^.\\n]{0,50}\\bbraised\\b", "confidence": "high", "note": "short rib only when described as braised"}
+    {
+      "pattern": "\\bbraise[ds]?\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bbrasato\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bosso\\s?buco\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bbraised[^.\\n]{0,50}\\bshort\\s?ribs?\\b",
+      "confidence": "high",
+      "note": "short rib only when described as braised"
+    },
+    {
+      "pattern": "\\bshort\\s?ribs?\\b[^.\\n]{0,50}\\bbraised\\b",
+      "confidence": "high",
+      "note": "short rib only when described as braised"
+    }
   ],
   "confit": [
-    {"pattern": "\\bconfit\\b", "confidence": "high"}
+    {
+      "pattern": "\\bconfit\\b",
+      "confidence": "high"
+    }
+  ],
+  "raw tuna": [
+    {
+      "pattern": "\\btuna\\b[^.\\n]{0,40}\\b(?:tartare\\b|tartar\\b(?!\\s+sauce)|crudo|carpaccio|sashimi|nigiri|temaki|poke|pok\\u00e9|ceviche|kinilaw|tataki|sushi\\b(?![\\s-]?grade)|hand\\s?roll|maki|donburi|don\\b)",
+      "confidence": "high",
+      "note": "tuna next to a preparation that is served raw"
+    },
+    {
+      "pattern": "\\b(?:tartare\\b|tartar\\b(?!\\s+sauce)|crudo|carpaccio|sashimi|nigiri|temaki|poke|pok\\u00e9|ceviche|kinilaw|tataki|sushi\\b(?![\\s-]?grade)|hand\\s?roll|maki|donburi|don\\b)[^.\\n]{0,40}\\btuna\\b",
+      "confidence": "high",
+      "note": "same, other word order"
+    },
+    {
+      "pattern": "\\braw\\s+tuna\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bmaguro\\b",
+      "confidence": "high",
+      "note": "raw tuna on Japanese menus"
+    },
+    {
+      "pattern": "\\b(?:o|chu)[\\s-]?toro\\b",
+      "confidence": "high",
+      "note": "fatty tuna belly, always raw"
+    },
+    {
+      "pattern": "\\bnegi[\\s-]?toro\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bakami\\b",
+      "confidence": "high",
+      "note": "lean tuna, raw"
+    },
+    {
+      "pattern": "\\btonno\\b[^.\\n]{0,40}\\bcrudo\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\btartare?\\b[^.\\n]{0,40}\\bdi\\s+tonno\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bsushi[\\s-]?grade\\b[^.\\n]{0,40}\\btuna\\b",
+      "confidence": "low",
+      "note": "grades the fish, not the preparation -- Pulperia pan-sears it"
+    },
+    {
+      "pattern": "\\btuna\\b[^.\\n]{0,40}\\bsushi[\\s-]?grade\\b",
+      "confidence": "low",
+      "note": "same, other word order"
+    },
+    {
+      "pattern": "(?<!wagyu\\s)\\btoro\\b",
+      "confidence": "low",
+      "note": "usually tuna belly, but 'wagyu toro' is beef -- excluded"
+    }
   ]
 }

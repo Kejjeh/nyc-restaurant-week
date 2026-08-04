@@ -140,6 +140,12 @@ def subway_for(lat, lng, stations):
 OUTDOOR = ROOT / "data" / "raw" / "outdoor" / "licenses.json"
 OUT_RADIUS_M = 80          # geocodes differ by a building width; 80m is generous
 OUT_NAME_MIN = 0.34        # below this a same-house-number match is still required
+# The two sources geocode independently and occasionally disagree badly: Little
+# Chef Little Cafe sits 118m from its own licence, Quality Italian 168m. When
+# the name matches EXACTLY and the street number agrees too, that pair is
+# conclusive on its own and the distance is just geocoder noise -- so allow a
+# wider radius in that one case. Measured: recovers exactly these 2, adds none.
+OUT_FAR_M = 250
 
 # Corporate and generic words that must not be allowed to create a name match:
 # "PARK AVENUE KITCHEN LLC" and "KITCHEN GROUP LLC" share only noise.
@@ -201,11 +207,13 @@ def outdoor_for(name, address, lat, lng, licences):
     hits = []
     for L in licences:
         d = _haversine_m(lat, lng, L["lat"], L["lng"])
-        if d > OUT_RADIUS_M:
-            continue
         s = max(_out_sim(name, L["name"]), _out_sim(name, L["legal"]))
         addr_ok = bool(hn and hn == _house_no(L["street"]))
-        if s < OUT_NAME_MIN and not (addr_ok and s > 0):
+        if d > OUT_RADIUS_M:
+            # only an exact name AND an agreeing street number reaches out here
+            if not (d <= OUT_FAR_M and addr_ok and s >= 1.0):
+                continue
+        elif s < OUT_NAME_MIN and not (addr_ok and s > 0):
             continue
         hits.append((s + (0.3 if addr_ok else 0), -d, L))
     if not hits:

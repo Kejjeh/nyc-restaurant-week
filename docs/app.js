@@ -89,7 +89,7 @@ const RESULTS_TOP = () => {
 const SAVED = new Set(JSON.parse(localStorage.getItem('rw-saved') || '[]'));
 const persistSaved = () =>
   localStorage.setItem('rw-saved', JSON.stringify([...SAVED]));
-let SORT = 'gap_usd_desc';
+let SORT = 'best';   // trust-weighted; see SORTS.best
 let QUERY = '';
 let BANNER = () => {};   // set during boot, once the banner nodes exist
 let FACET_FIND = '';                    // "find a filter" query
@@ -196,7 +196,20 @@ const cmpNullLast = (a, b, dir) => {
   return a < b ? -dir : a > b ? dir : 0;
 };
 
+/* How much the number can be trusted, not how big it is. A verified $18 is a
+   better thing to show first than a heuristic $79 computed off a scraped price
+   list at a restaurant's cheapest tier. */
+const BASIS_RANK = { verified: 0, estimate: 1 };
+const trust = (r) => (r.rank != null ? -1 : BASIS_RANK[r.gap_basis] ?? 2);
+
 const SORTS = {
+  // The default. Trust tier first, then size within the tier — so the ranked
+  // picks and hand-verified gaps lead, and the estimates keep their own
+  // ordering underneath instead of colonising the top of the page.
+  best: (a, b) => trust(a) - trust(b)
+    || (a.rank != null && b.rank != null ? a.rank - b.rank : 0)
+    || cmpNullLast(a.gap_usd, b.gap_usd, -1)
+    || a._name.localeCompare(b._name),
   gap_usd_desc: (a, b) => cmpNullLast(a.gap_usd, b.gap_usd, -1) || a._name.localeCompare(b._name),
   gap_pct_desc: (a, b) => cmpNullLast(a.gap_pct, b.gap_pct, -1) || a._name.localeCompare(b._name),
   price_asc:    (a, b) => cmpNullLast(a.rw_price, b.rw_price, 1) || a._name.localeCompare(b._name),
@@ -531,6 +544,7 @@ function renderDetail(r) {
     // Repaint the row's pills and the Saved preset count without collapsing
     // the panel the user is reading.
     buildPresets();
+    syncCompareBtn();
     const pills = document.querySelector(`.row[data-slug="${CSS.escape(r.slug)}"] .pills`);
     if (pills) {
       const star = pills.querySelector('.pill.saved');
@@ -879,7 +893,7 @@ function renderPage() {
 }
 
 function apply() {
-  const cmp = SORTS[SORT] || SORTS.gap_usd_desc;
+  const cmp = SORTS[SORT] || SORTS.best;
   // With a query active, match quality leads and the chosen sort orders within
   // each tier, so the sort control still does what it says.
   RESULTS = ROWS.filter(matches)
@@ -915,6 +929,8 @@ function apply() {
 
   if (VIEW === 'map') drawMarkers();
   if (VIEW === 'stats') renderStats();
+  if (VIEW === 'compare') renderCompare();
+  syncCompareBtn();
   if (VIEW === 'plan') renderPlan();
 
   buildPresets();
@@ -951,7 +967,7 @@ function writeHash() {
   if (FILTERS.savedOnly) p.set('saved', '1');
   if (VIEW !== 'list') p.set('view', VIEW);
   if (QUERY) p.set('q', QUERY);
-  if (SORT !== 'gap_usd_desc') p.set('sort', SORT);
+  if (SORT !== 'best') p.set('sort', SORT);
   const s = p.toString();
   history.replaceState(null, '', s ? `#${s}` : location.pathname + location.search);
 }
@@ -1345,6 +1361,135 @@ function renderPlan() {
     'The date list for each is limited to days it is actually open — inside its window, and not a Saturday or a Sunday it does not serve.');
 }
 
+/* ---------- compare ------------------------------------------------------ */
+
+/* Attributes down the side, restaurants across. The last decision is "which of
+   my saved four?", and that is a row-by-row comparison, not four separate
+   detail panels you have to hold in your head. `best` marks the winning cell
+   where a row HAS a winner -- and deliberately does not where it doesn't. */
+const CMP_ROWS = [
+  { k: 'Rank', get: (r) => (r.rank != null ? `#${r.rank}` : '—'), mono: true,
+    best: (v, all) => v !== '—' && v === all.filter((x) => x !== '—')
+      .sort((a, b) => +a.slice(1) - +b.slice(1))[0] },
+  { k: 'Gap', mono: true,
+    get: (r) => (r.gap_usd == null ? '—'
+      : `${r.gap_usd < 0 ? '+' : ''}${money(Math.abs(r.gap_usd))}`
+        + (r.gap_pct != null ? ` · ${Math.abs(r.gap_pct)}%` : '')),
+    raw: (r) => (r.gap_usd == null ? null : r.gap_usd),
+    bestRaw: 'max' },
+  { k: 'Basis', get: (r) => (r.gap_basis === 'verified' ? 'Verified'
+    : r.gap_basis === 'estimate' ? 'Estimate' : 'No comparable'),
+    best: (v) => v === 'Verified' },
+  { k: 'RW price', get: (r) => (r.rw_price != null ? money(r.rw_price) : '—'), mono: true,
+    raw: (r) => r.rw_price, bestRaw: 'min' },
+  { k: 'Comparable', get: (r) => (r.comparable_usd != null ? money(r.comparable_usd) : '—'), mono: true },
+  { k: 'Window ends', mono: true,
+    get: (r) => (r.end_date ? `${fmtDate(r.end_date)}${r.end_date_source === 'printed' ? '' : ' ?'}` : 'not stated'),
+    raw: (r) => (r.end_date ? Date.parse(r.end_date) : null), bestRaw: 'max' },
+  { k: 'Days', get: (r) => r.days || '—' },
+  { k: 'Sunday', get: (r) => (r.sunday === true
+    ? (r.sunday_source === 'verified' ? 'Yes — verified' : 'Yes — unverified')
+    : r.sunday === false
+      ? (r.sunday_source === 'verified' ? 'No — verified' : 'No — unverified')
+      : 'Not established'),
+    best: (v) => v === 'Yes — verified' },
+  { k: 'Recognition', get: (r) => (r.recognition || [])
+    .map((b) => `${b.source_label} ${b.level}`).slice(0, 2).join(', ') || '—' },
+  { k: 'Where', get: (r) => [r.neighborhood, r.borough].filter(Boolean).join(', ') },
+  { k: 'Nearest subway', mono: true,
+    get: (r) => (r.subway_nearest
+      ? `${r.subway_nearest.name} ${r.subway_nearest.min}m · ${(r.subway_nearest.routes || []).join('')}`
+      : '—'),
+    raw: (r) => (r.subway_nearest ? r.subway_nearest.min : null), bestRaw: 'min' },
+  { k: 'Menu', get: (r) => (r.menu_state === 'pdf' ? 'PDF published'
+    : r.menu_state === 'image_only' ? 'Image-only PDF' : 'None') },
+];
+
+function renderCompare() {
+  const picks = ROWS.filter((r) => SAVED.has(r.slug))
+    .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99) || a._name.localeCompare(b._name))
+    .slice(0, 6);
+
+  $('#cmpNote').textContent = picks.length
+    ? `Your ${picks.length} saved restaurant${picks.length === 1 ? '' : 's'}, side by side. `
+      + 'A dot marks the better value in rows where there is one. '
+      + '"?" on a date means the restaurant does not print it.'
+    : 'Nothing saved yet — open a restaurant and press ★ Save to compare it here.';
+
+  const t = $('#cmpTable');
+  t.textContent = '';
+  if (!picks.length) return;
+
+  const head = el('tr');
+  head.append(el('th', 'cmpCorner', ''));
+  picks.forEach((r) => {
+    const th = el('th');
+    const a = el('a', 'cmpName', r.name);
+    a.href = `#r=${encodeURIComponent(r.slug)}`;
+    th.append(a);
+    const rm = el('button', 'cmpRemove', '×');
+    rm.type = 'button';
+    rm.title = `Remove ${r.name}`;
+    rm.addEventListener('click', () => {
+      SAVED.delete(r.slug); persistSaved();
+      buildPresets(); renderCompare(); syncCompareBtn();
+    });
+    th.append(rm);
+    head.append(th);
+  });
+  t.append(head);
+
+  CMP_ROWS.forEach((row) => {
+    const tr = el('tr');
+    tr.append(el('th', 'cmpKey', row.k));
+    const vals = picks.map(row.get);
+    let winners = new Set();
+    if (row.bestRaw) {
+      const nums = picks.map(row.raw).filter((v) => v != null);
+      if (nums.length > 1) {
+        const target = row.bestRaw === 'max' ? Math.max(...nums) : Math.min(...nums);
+        // no dot when everything ties — a dot on every cell says nothing
+        if (new Set(nums).size > 1) {
+          picks.forEach((r, i) => { if (row.raw(r) === target) winners.add(i); });
+        }
+      }
+    }
+    if (row.best) vals.forEach((v, i) => { if (row.best(v, vals)) winners.add(i); });
+    // Marking every cell in a row marks nothing — if they all tie, drop it.
+    if (winners.size === picks.length) winners = new Set();
+
+    vals.forEach((v, i) => {
+      const td = el('td', row.mono ? 'mono' : null);
+      if (winners.has(i)) td.classList.add('cmpBest');
+      td.textContent = v;
+      tr.append(td);
+    });
+    t.append(tr);
+  });
+
+  const tr = el('tr');
+  tr.append(el('th', 'cmpKey', ''));
+  picks.forEach((r) => {
+    const td = el('td');
+    const href = r.links && r.links.reservation;
+    if (href) {
+      const a = el('a', 'linkBtn primary', 'Book');
+      a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      td.append(a);
+    } else td.textContent = '—';
+    tr.append(td);
+  });
+  t.append(tr);
+}
+
+/** The Compare tab only exists once there is something to compare. */
+function syncCompareBtn() {
+  const b = document.querySelector('.segBtn[data-view="compare"]');
+  if (!b) return;
+  b.hidden = SAVED.size < 2;
+  if (b.hidden && VIEW === 'compare') setView('list');
+}
+
 /* ---------- map ---------------------------------------------------------- */
 
 /* Leaflet and its tiles are the only third-party assets this page uses, and
@@ -1502,17 +1647,20 @@ function setView(v) {
   const onMap = v === 'map';
   const onStats = v === 'stats';
   const onPlan = v === 'plan';
+  const onCmp = v === 'compare';
   $('#mapWrap').hidden = !onMap;
   $('#stats').hidden = !onStats;
   $('#plan').hidden = !onPlan;
-  $('#rows').hidden = onMap || onStats || onPlan;
-  $('#showMore').hidden = onMap || onStats || onPlan || RENDERED >= RESULTS.length;
+  $('#compare').hidden = !onCmp;
+  $('#rows').hidden = onMap || onStats || onPlan || onCmp;
+  $('#showMore').hidden = onMap || onStats || onPlan || onCmp || RENDERED >= RESULTS.length;
   document.querySelectorAll('.segBtn').forEach((b) =>
     b.setAttribute('aria-pressed', b.dataset.view === v ? 'true' : 'false'));
   BANNER();
   if (onMap) openMap();
   if (onStats) renderStats();
   if (onPlan) renderPlan();
+  if (onCmp) renderCompare();
 }
 
 /* ---------- theme ------------------------------------------------------- */
@@ -1602,7 +1750,7 @@ async function boot() {
   BANNER = () => {
     banner.hidden = isDismissed()
       || VIEW !== 'list'
-      || SORT !== 'gap_usd_desc'
+      || SORT !== 'gap_usd_desc'   // only the raw-gap sort leads with estimates
       || FILTERS.basis.size > 0;
   };
 
@@ -1657,7 +1805,7 @@ async function boot() {
    *  writeHash(), which serialises the CURRENT view and would erase a
    *  requested `view=map` before anything had a chance to act on it. */
   const wantedView = () =>
-    ['map', 'stats', 'plan'].includes(
+    ['map', 'stats', 'plan', 'compare'].includes(
       new URLSearchParams(location.hash.replace(/^#/, '')).get('view'))
       ? new URLSearchParams(location.hash.replace(/^#/, '')).get('view') : 'list';
 

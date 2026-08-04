@@ -37,9 +37,12 @@
         <button type="button" class="segBtn" data-view="map" aria-pressed="false">Map</button>
         <button type="button" class="segBtn" data-view="stats" aria-pressed="false">Stats</button>
         <button type="button" class="segBtn" data-view="plan" aria-pressed="false">Plan</button>
+        <!-- only meaningful once there is more than one thing to weigh up -->
+        <button type="button" class="segBtn" data-view="compare" aria-pressed="false" hidden>Compare</button>
       </div>
       <label class="sr-only" for="sort">Sort by</label>
       <select class="sortSel" id="sort" aria-label="Sort by">
+        <option value="best">Best value — verified first</option>
         <option value="gap_usd_desc">Gap $ — high to low</option>
         <option value="gap_pct_desc">Gap % — high to low</option>
         <option value="price_asc">RW price — low to high</option>
@@ -133,6 +136,11 @@
        serve you — inside its window, and on a weekday it actually opens. -->
   <section class="plan" id="plan" hidden aria-label="Plan">
     <div id="planBody"></div>
+  </section>
+
+  <section class="compare" id="compare" hidden aria-label="Compare saved restaurants">
+    <p class="statsNote" id="cmpNote"></p>
+    <div class="cmpScroll"><table class="cmpTable" id="cmpTable"></table></div>
   </section>
 
   <div id="rows"></div>

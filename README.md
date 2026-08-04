@@ -156,6 +156,19 @@ step: `docs/index.html` + `docs/app.js` + `docs/styles.css` read
 `python -m http.server 8137 --directory docs` (a `file://` open will NOT work —
 the payload is fetched).
 
+The default sort is **Best value — verified first**: ranked picks, then
+hand-verified gaps, then estimates, with gap size ordering rows *within* each
+tier. The raw `Gap $ — high to low` sort is still there as an explicit choice,
+and the estimate caveat banner appears only on that one, because that is the
+sort where heuristics lead. Rationale: a verified $18 is a better thing to show
+first than a heuristic $79 computed from a scraped price list at a restaurant's
+cheapest tier.
+
+**Compare** (a tab that appears once you have saved two or more) puts your
+saved restaurants side by side — attributes down the side, restaurants across,
+with a dot on the better value in rows that have one. Ties share the dot, and a
+row where everything ties gets no dot at all.
+
 Navigating it: **quick views** (★ Saved / The 15 / Closing soon / Verified gaps
 / Sunday / Michelin) each set filters *and* sort in one tap and are toggles —
 tapping the active one returns you to everything. Applied filters show as

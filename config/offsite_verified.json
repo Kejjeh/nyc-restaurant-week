@@ -238,6 +238,264 @@
         "note": "raw bar mentioned in site copy; no tower on the posted menu",
         "checked": "2026-08-05"
       }
+    },
+    "american-cut-steakhouse-tribeca": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Hot & Cold Seafood Tower",
+        "price_usd": 185,
+        "detail": "oysters, chili lobster, ceviche, shrimp & crab cocktail, poached lobster, tuna tartare",
+        "source": "https://www.americancutsteakhouse.com",
+        "checked": "2026-08-05",
+        "note": "a cold-only tower is also listed"
+      }
+    },
+    "carversteak": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Grand Plateau / Petit Plateau",
+        "price_usd": null,
+        "detail": "grand: 1 Maine lobster, 12 oysters, 4 shrimp, 8 clams, 12 PEI mussels, crab cocktail, ceviche - serves 4-6",
+        "source": "https://carversteaknyc.com/menu/",
+        "checked": "2026-08-05"
+      }
+    },
+    "catch-nyc": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Seafood Tower",
+        "price_usd": null,
+        "detail": "chef's selection of lobster, shrimp, oysters, scallops, ceviche",
+        "source": "https://www.catchrestaurants.com/location/catch-nyc/",
+        "checked": "2026-08-05"
+      }
+    },
+    "crave-fishbar-turtle-bay": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Seafood Towers - Tier One / Tier Two",
+        "price_usd": null,
+        "detail": "tier one: 4 oysters, 2 clams, 2 shrimp cocktail, tuna",
+        "source": "https://cravefishbar.com/menu/",
+        "checked": "2026-08-05",
+        "note": "one menu is published for all three Crave locations"
+      }
+    },
+    "crave-fishbar-upper-east-side": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Seafood Towers - Tier One / Tier Two",
+        "price_usd": null,
+        "detail": "tier one: 4 oysters, 2 clams, 2 shrimp cocktail, tuna",
+        "source": "https://cravefishbar.com/menu/",
+        "checked": "2026-08-05",
+        "note": "one menu is published for all three Crave locations"
+      }
+    },
+    "crave-fishbar-upper-west-side": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Seafood Towers - Tier One / Tier Two",
+        "price_usd": null,
+        "detail": "tier one: 4 oysters, 2 clams, 2 shrimp cocktail, tuna",
+        "source": "https://cravefishbar.com/menu/",
+        "checked": "2026-08-05",
+        "note": "one menu is published for all three Crave locations"
+      }
+    },
+    "del-friscos-double-eagle-steakhouse-new-york": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Shellfish Tower",
+        "price_usd": null,
+        "detail": "built to order from the chilled shellfish selection, market price",
+        "source": "https://www.delfriscos.com/location/del-friscos-double-eagle-steakhouse-new-york-ny/#main-menu-dfny",
+        "checked": "2026-08-05",
+        "note": "listed among the starters on their Restaurant Week dinner menu page"
+      }
+    },
+    "docks-oyster-bar": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Royale Plateau / Grand Plateau",
+        "price_usd": 80,
+        "detail": "royale $80: 8 oysters, 3 littlenecks, 3 cherrystones, 4 jumbo shrimp, half lb lobster; grand $150",
+        "source": "https://www.docksoysterbar.com",
+        "checked": "2026-08-05"
+      }
+    },
+    "fogo-de-chao-brazilian-steakhouse-brooklyn": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Seafood Tower",
+        "price_usd": 112,
+        "detail": "lobster tails and claws, jumbo shrimp, snow crab legs",
+        "source": "https://winequest.com/z/fogo/169-BRO/dinner.pdf",
+        "checked": "2026-08-05"
+      }
+    },
+    "fogo-de-chao-brazilian-steakhouse-elmhurst": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Seafood Tower",
+        "price_usd": 112,
+        "detail": "lobster tails and claws, jumbo shrimp, snow crab legs",
+        "source": "https://winequest.com/z/fogo/153-QUE/dinner.pdf",
+        "checked": "2026-08-05"
+      }
+    },
+    "fogo-de-chao-brazilian-steakhouse-world-trade-center": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Seafood Tower",
+        "price_usd": 112,
+        "detail": "lobster tails and claws, jumbo shrimp, snow crab legs",
+        "source": "https://winequest.com/z/fogo/177-WTC/dinner.pdf",
+        "checked": "2026-08-05"
+      }
+    },
+    "fogo-de-chao-churrascaria-brazilian-steakhouse": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Seafood Tower",
+        "price_usd": 112,
+        "detail": "lobster tails and claws, jumbo shrimp, snow crab legs",
+        "source": "https://winequest.com/z/fogo/022-NYC/dinner.pdf",
+        "checked": "2026-08-05"
+      }
+    },
+    "industry-kitchen": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Classic Plateau / Grand Plateau",
+        "price_usd": 90,
+        "detail": "classic $90: half chilled lobster, 6 oysters, 6 clams, shrimp cocktail, salmon tartare; grand $160",
+        "source": "https://www.industry-kitchen.com",
+        "checked": "2026-08-05"
+      }
+    },
+    "marlow-east": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Seafood Tower",
+        "price_usd": 112,
+        "detail": "oysters, tiger prawns, fluke crudo, tuna sashimi, scallop",
+        "source": "https://www.marlmarloweast.com",
+        "checked": "2026-08-05"
+      }
+    },
+    "mezze-on-the-river": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Petite Seafood Tower / Royal Seafood Tower",
+        "price_usd": 75,
+        "detail": "petite $75: half chilled lobster, 6 oysters, tuna tartare; royal $350",
+        "source": "https://www.mezzeontheriver.com",
+        "checked": "2026-08-05",
+        "note": "the petite tower appears on their Restaurant Week dinner menu page"
+      }
+    },
+    "ocean-prime": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "'Smoking' Shellfish Tower",
+        "price_usd": null,
+        "detail": "custom built, market price",
+        "source": "https://www.ocean-prime.com",
+        "checked": "2026-08-05"
+      }
+    },
+    "oceans": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Oceans La Tour / Seafood Tower",
+        "price_usd": 195,
+        "detail": "la tour: signature three-tier; seafood tower $195: two tiers, oysters, mussels, clams, ceviche, sashimi",
+        "source": "https://www.oceansnyc.com",
+        "checked": "2026-08-05"
+      }
+    },
+    "quality-italian": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Our Shellfish Tower",
+        "price_usd": 165,
+        "detail": "cracked Maine lobster, dressed oysters, king crab, U7 shrimp",
+        "source": "https://www.qualityitalian.com/menus/#ny-dinner",
+        "checked": "2026-08-05"
+      }
+    },
+    "quality-meats": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Our Shellfish Tower",
+        "price_usd": 165,
+        "detail": "whole Maine lobster, U7 shrimp, dressed oysters, king crab",
+        "source": "https://www.qualitymeatsnyc.com/menus/dinner",
+        "checked": "2026-08-05"
+      }
+    },
+    "royal-35-steakhouse": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Royal 35 Seafood Tower",
+        "price_usd": 59,
+        "detail": "jumbo shrimp, blue point oysters, Maine lobster, clams - serves 2-3",
+        "source": "https://royal35steakhouse.com/menus/dinner.html",
+        "checked": "2026-08-05",
+        "note": "also sold as a Restaurant Week add-on at $59 per guest"
+      }
+    },
+    "stk-midtown": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Shellfish Platter",
+        "price_usd": null,
+        "detail": "oysters, ceviche, clams, mussels, dungeness crab, Maine lobster",
+        "source": "https://stksteakhouse.com/en-us/location/nyc-midtown/menu",
+        "checked": "2026-08-05",
+        "note": "the NYC menu calls it a Shellfish Platter; 'Seafood Tower for Two' is the Denver and Phoenix name"
+      }
+    },
+    "strange-delight": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Tower Service",
+        "price_usd": 39,
+        "detail": "$39/$78/$134: local oysters, steamed shrimp, mussels escabeche, fish dip, shrimp remoulade",
+        "source": "https://www.strangedelight.nyc/dinner-2025",
+        "checked": "2026-08-05"
+      }
+    },
+    "strip-house-downtown": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Seafood Plateau",
+        "price_usd": 79,
+        "detail": "oysters, crabmeat, shrimp, tuna tartare - half $79, full listed",
+        "source": "https://www.striphouse.com/location/striphouse-downtown/#dinner-shdt",
+        "checked": "2026-08-05"
+      }
+    },
+    "strip-house-midtown": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Seafood Plateau",
+        "price_usd": 79,
+        "detail": "oysters, crabmeat, shrimp, tuna tartare - half $79, full listed",
+        "source": "https://www.striphouse.com/location/striphouse-midtown/#dinner-shmt",
+        "checked": "2026-08-05"
+      }
+    },
+    "the-fulton": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Petite / Grand Seafood Plateau",
+        "price_usd": 36,
+        "detail": "petite $36: oysters, shrimp cocktail, sashimi; grand adds peekytoe crab",
+        "source": "https://www.thefulton.nyc/menus/#dinner/",
+        "checked": "2026-08-05"
+      }
     }
   }
 }

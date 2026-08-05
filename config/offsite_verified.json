@@ -1,0 +1,243 @@
+{
+  "_doc": "Hand-checked outcomes for config/offsite_tags.json terms, merged OVER the automated sweep by src/export_site_data.py. Checked 2026-08-05 by reading each restaurant's own posted menu. verdict 'yes' promotes the tag to confidence 'verified'; 'no' removes it entirely -- a raw bar is not a tower, and the sweep can only see that a raw bar exists.",
+  "restaurants": {
+    "bar-mercer": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Mercer Plateau",
+        "price_usd": 98,
+        "detail": "12 oysters, 6 shrimp cocktail, hamachi crudo",
+        "source": "https://www.barmercer.com/menus",
+        "checked": "2026-08-05"
+      }
+    },
+    "blue-fin": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Towers - Balcony / Mezzanine",
+        "price_usd": 79,
+        "detail": "cocktail shrimp, 1 doz oysters, mussels, king crab, seafood martini, tuna poke",
+        "source": "https://www.bluefinnyc.com/menus/",
+        "checked": "2026-08-05"
+      }
+    },
+    "catch-n-chop": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Small Catch / Big Catch",
+        "price_usd": 75,
+        "detail": "4 oysters, 4 clams, 4 shrimp, jumbo lump crab; Big Catch $165",
+        "source": "https://catchnchop.com/new-york-city-catch-n-chop-food-menu",
+        "checked": "2026-08-05"
+      }
+    },
+    "la-marchande": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Le Grand Tour",
+        "price_usd": 55,
+        "detail": "a taste of everything from the sea, per person",
+        "source": "https://www.lamarchandenyc.com",
+        "checked": "2026-08-05"
+      }
+    },
+    "la-tete-dor": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Plateau Classic for 2",
+        "price_usd": 130,
+        "detail": "oysters east/west, littleneck clams, half chilled lobster, shrimp cocktail, octopus",
+        "source": "https://www.latetedorbydaniel.com/our-menu/dinner",
+        "checked": "2026-08-05"
+      }
+    },
+    "raval-steakhouse": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Raval Royal Platter (for two)",
+        "price_usd": 85,
+        "detail": "oysters, poached lobster, jumbo shrimp, lump crab, halibut ceviche, tuna tartare",
+        "source": "https://ravalsteakhouse.com",
+        "checked": "2026-08-05"
+      }
+    },
+    "smith-wollensky": {
+      "seafood tower": {
+        "verdict": "yes",
+        "item": "Smith's Bouquet / Wollensky's Grand Bouquet",
+        "price_usd": 89,
+        "detail": "for two $89; Grand Bouquet for four $148",
+        "source": "https://www.smithandwollenskynyc.com/menu/",
+        "checked": "2026-08-05"
+      }
+    },
+    "estiatorio-milos": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "the only 'tower' on the menu is the Milos Special - fried zucchini and eggplant",
+        "checked": "2026-08-05"
+      }
+    },
+    "estiatorio-milos-hudson-yards": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "the only 'tower' on the menu is the Milos Special - fried zucchini and eggplant",
+        "checked": "2026-08-05"
+      }
+    },
+    "seahorse": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "'Smoked Salmon Tower' $24 is a plated brunch appetizer with bagel crisps, not a raw-bar tower",
+        "checked": "2026-08-05"
+      }
+    },
+    "lure-fishbar": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar and sushi are a la carte; no tower or plateau listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "benjamin-steakhouse": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar priced by the piece (oysters, shrimp cocktail); no tower or plateau listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "benjamin-prime": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar is a selection of oysters and shrimp; no tower or plateau listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "cull-pistol-oyster-bar": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "rotating daily raw bar; no tower or plateau on the posted menu",
+        "checked": "2026-08-05"
+      }
+    },
+    "union-square-cafe": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar is oysters and shrimp a la carte; no tower listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "nick-stefs-steakhouse": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "'Iced Shellfish & Raw Bar' is priced per item; no tower listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "the-shell-seafood-kitchen": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar priced per piece; no tower listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "siren-oyster-bar-and-restaurant": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "oysters and small plates; no tower listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "skinos": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar is seafood carpaccio and crudo; no tower listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "the-tusk-bar": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar is half-dozen oysters and shrimp cocktail; no tower listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "the-splendid": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar is crudo by the plate; no tower listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "the-flatiron-room-murray-hill": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar section is caviar service; no tower listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "the-parlour-room": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar is oysters on the half shell; no tower listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "central-park-boathouse": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar is oysters by the piece; no tower listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "maggies-place": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar is oysters by the half/full dozen; no tower listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "bar-rocco": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "'curated raw bar' is marketing copy; no raw-bar items or tower on the posted menu",
+        "checked": "2026-08-05"
+      }
+    },
+    "city-vineyard": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar described in marketing copy only; no menu items or tower posted",
+        "checked": "2026-08-05"
+      }
+    },
+    "marsanne": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar mentioned in marketing copy; no tower on the posted menus",
+        "checked": "2026-08-05"
+      }
+    },
+    "meduza-mediterrania": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar is crudo and caviar; no tower listed",
+        "checked": "2026-08-05"
+      }
+    },
+    "salt-charcoal": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar mentioned in site copy; no tower on the posted menu",
+        "checked": "2026-08-05"
+      }
+    },
+    "smyth-tavern": {
+      "seafood tower": {
+        "verdict": "no",
+        "note": "raw bar mentioned in site copy; no tower on the posted menu",
+        "checked": "2026-08-05"
+      }
+    }
+  }
+}

@@ -237,17 +237,32 @@ def outdoor_for(name, address, lat, lng, licences):
 # Week", and the UI has to keep saying so: these are a separate facet from the
 # RW dish tags, never merged into them.
 MENUSWEEP = ROOT / "data" / "raw" / "menusweep"
+OFFSITE_VERIFIED = ROOT / "config" / "offsite_verified.json"
 OFFSITE_SNIPPET_MAX = 90
 
 
 def build_offsite():
-    """slug -> [{tag, confidence, keyword, snippet, url}], best hit per tag."""
+    """slug -> [{tag, confidence, keyword, snippet, url}], best hit per tag.
+
+    Hand checks in config/offsite_verified.json beat the sweep, in both
+    directions -- same precedence rule the rest of the exporter follows:
+      verdict 'yes' -> confidence 'verified', with the actual item and price
+      verdict 'no'  -> the tag is REMOVED. This matters more than the promotion:
+                       the sweep can only see that a raw bar exists, and a raw
+                       bar is not a tower. 24 of the 31 low-confidence hits were
+                       oysters priced by the piece.
+    """
     if not MENUSWEEP.exists():
         return {}, 0
+    checked = {}
+    if OFFSITE_VERIFIED.exists():
+        checked = json.loads(OFFSITE_VERIFIED.read_text(encoding="utf-8"))["restaurants"]
+
     by_slug, swept = {}, 0
     for f in sorted(MENUSWEEP.glob("*.json")):
         rec = json.loads(f.read_text(encoding="utf-8"))
         swept += 1
+        slug, v = rec["slug"], checked.get(rec["slug"], {})
         best = {}
         for h in rec.get("hits", []):
             cur = best.get(h["tag"])
@@ -257,13 +272,26 @@ def build_offsite():
                     or (h["confidence"] == cur["confidence"]
                         and len(h["snippet"]) < len(cur["snippet"]))):
                 best[h["tag"]] = h
-        if best:
-            by_slug[rec["slug"]] = [
-                {"tag": t, "confidence": h["confidence"],
-                 "keyword": clean(h["keyword"]),
-                 "snippet": clean(h["snippet"])[:OFFSITE_SNIPPET_MAX],
-                 "url": h["url"]}
-                for t, h in sorted(best.items())]
+
+        out = []
+        for tag, h in sorted(best.items()):
+            ck = v.get(tag)
+            if ck and ck["verdict"] == "no":
+                continue
+            if ck and ck["verdict"] == "yes":
+                out.append({"tag": tag, "confidence": "verified",
+                            "keyword": clean(ck["item"]),
+                            "item": clean(ck["item"]),
+                            "price_usd": ck.get("price_usd"),
+                            "snippet": clean(ck.get("detail", ""))[:OFFSITE_SNIPPET_MAX],
+                            "url": ck.get("source") or h["url"]})
+            else:
+                out.append({"tag": tag, "confidence": h["confidence"],
+                            "keyword": clean(h["keyword"]),
+                            "snippet": clean(h["snippet"])[:OFFSITE_SNIPPET_MAX],
+                            "url": h["url"]})
+        if out:
+            by_slug[slug] = out
     return by_slug, swept
 
 

@@ -587,7 +587,14 @@ function renderDetail(r) {
     r.offsite_tags.forEach((t) => {
       const li = el('li', 'snip');
       li.append(pill('tag', t.tag));
-      if (t.confidence === 'low') li.append(pill('warn', 'low confidence'));
+      if (t.confidence === 'verified') li.append(pill('value', 'checked by hand'));
+      else if (t.confidence === 'low') li.append(pill('warn', 'low confidence'));
+      // A hand-checked row carries what it actually is and what it costs — the
+      // whole point of the check was to replace a keyword with the real item.
+      if (t.item) {
+        li.append(el('strong', 'offItem',
+          t.price_usd != null ? `${t.item} — $${t.price_usd}` : t.item));
+      }
       if (t.snippet) li.append(el('q', null, t.snippet));
       if (t.url) {
         const a = el('a', 'snipSrc', 'source');

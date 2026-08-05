@@ -537,6 +537,56 @@ def load_jb_awards():
 
 NYT_RANK_RE = re.compile(r"Ranked No\.\s*(\d+)", re.I)
 
+# --------------------------------------------------------------------------
+# Distinction: how strong an award is, and how old.
+#
+# The UI used to collapse both. Every badge rendered as its SOURCE -- so a
+# 1991 James Beard semifinalist and a 2026 winner were both "James Beard", and
+# 38 of the 42 Michelin-only restaurants carry nothing but The Plate, the
+# lowest rung, while reading identically to a starred kitchen.
+#
+# Strongest first. Ordering judgement, stated so it can be argued with: a James
+# Beard WIN outranks a Bib Gourmand (a national award for the kitchen beats a
+# value commendation), and a semifinalist nod -- a real longlist -- edges out
+# The Plate, which only means an inspector ate there and thought it was good.
+PRESTIGE = [
+    ("michelin",    r"\d+\s*stars?",  "Michelin star"),
+    ("nyt",         None,             "NYT 100 Best"),
+    ("james_beard", r"winner",        "James Beard winner"),
+    ("michelin",    r"bib gourmand",  "Michelin Bib Gourmand"),
+    ("james_beard", r"nominee",       "James Beard nominee"),
+    ("james_beard", r"semifinalist",  "James Beard semifinalist"),
+    ("michelin",    r"the plate",     "Michelin Plate"),
+]
+
+# Michelin and NYT are ANNUAL GUIDES: appearing in the 2025 edition is itself
+# the current judgement, so their era is always "current" for the edition we
+# hold. James Beard is an EVENT -- the honour never expires, but it ages, and
+# that is the distinction this whole block exists to make visible.
+ERA_CURRENT, ERA_RECENT, ERA_PAST = 1, 5, 15
+ERA_LABEL = {"current": "This year or last", "recent": "Last 5 years",
+             "past": "Past decade", "historic": "Over 15 years ago"}
+ERA_ORDER = {"current": 0, "recent": 1, "past": 2, "historic": 3, None: 4}
+
+
+def prestige_of(source, level_raw, level):
+    """-> (rank, label). Lower rank is a stronger distinction."""
+    hay = f"{level_raw or ''} {level or ''}".lower()
+    for i, (src, pat, label) in enumerate(PRESTIGE):
+        if src != source:
+            continue
+        if pat is None or re.search(pat, hay):
+            return i, label
+    return len(PRESTIGE), RECOG_SOURCE_LABEL.get(source, source)
+
+
+def era_of(year):
+    if year is None:
+        return None
+    age = SEASON_YEAR - year
+    return ("current" if age <= ERA_CURRENT else "recent" if age <= ERA_RECENT
+            else "past" if age <= ERA_PAST else "historic")
+
 
 def build_recognition(con, suppressed, jb_awards):
     """slug -> [badge]. Deduped on (source, level, year) so a restaurant with 21
@@ -587,9 +637,17 @@ def build_recognition(con, suppressed, jb_awards):
             if a not in badge["awards"]:
                 badge["awards"].append(a)
 
-    order = {"michelin": 0, "nyt": 1, "james_beard": 2}
+    for badges in by_slug.values():
+        for b in badges.values():
+            rank, label = prestige_of(b["source"], b["level_raw"], b["level"])
+            b["tier_rank"], b["tier"] = rank, label
+            b["era"] = "current" if b["source"] != "james_beard" else era_of(b["year"])
+
+    # Strongest first, then most recent -- so badges[0] is the headline and the
+    # row pill can show it without the UI re-deriving the ranking.
     return ({s: sorted(b.values(),
-                       key=lambda x: (order.get(x["source"], 9), -(x["year"] or 0)))
+                       key=lambda x: (x["tier_rank"], ERA_ORDER[x["era"]],
+                                      -(x["year"] or 0)))
              for s, b in by_slug.items()}, dropped)
 
 
@@ -749,6 +807,8 @@ def build_payload():
         if end_date and end_date <= BOOK_BY:
             stats["urgent"] += 1
 
+        recog = recog_by_slug.get(slug, [])
+
         glat, glng = sane_coords(lat, lng)
         subway, sub_near = subway_for(glat, glng, stations)
         if lat is not None and glat is None:
@@ -802,7 +862,15 @@ def build_payload():
             "notes": v.get("notes"),
             "flags": v.get("flags", []),
             "menu_state": menu_state,
-            "recognition": recog_by_slug.get(slug, []),
+            "recognition": recog,
+            # Headline distinction + the eras present, so the row pill, the
+            # facets and the sort all read the same ranking.
+            "recog_top": ({"tier": recog[0]["tier"], "tier_rank": recog[0]["tier_rank"],
+                           "year": recog[0]["year"], "era": recog[0]["era"],
+                           "source": recog[0]["source"]} if recog else None),
+            "recog_rank": recog[0]["tier_rank"] if recog else None,
+            "recog_eras": sorted({b["era"] for b in recog if b["era"]},
+                                 key=lambda e: ERA_ORDER[e]),
             "tags": tags_by_slug.get(slug, []),
             "offsite_tags": offsite.get(slug, []),
             "links": {

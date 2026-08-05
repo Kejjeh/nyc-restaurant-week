@@ -111,7 +111,18 @@ const FACETS = [
                                                 labels: { A: 'A — own menu' } },
   { key: 'basis',       title: 'Gap basis',     values: (r) => [r.gap_basis || 'none'],
                                                 labels: { verified: 'Verified', estimate: 'Estimate', none: 'No comparable' } },
-  { key: 'recognition', title: 'Recognition',   values: (r) => [...new Set((r.recognition || []).map((x) => x.source))] },
+  // By TIER, not by source. "Michelin" as one chip hid that 28 of the 42
+  // Michelin-only restaurants carry nothing but The Plate — the lowest rung —
+  // while reading identically to the 6 with a star.
+  { key: 'recognition', title: 'Recognition',   values: (r) => [...new Set((r.recognition || []).map((x) => x.tier))] },
+  // Michelin and NYT are annual guides, so they are always "current" for the
+  // edition held. This facet exists for James Beard, whose honours never
+  // expire but do age — a 1991 nod and a 2026 one are not the same claim.
+  { key: 'era',         title: 'Award recency', values: (r) => r.recog_eras || [],
+                                                labels: { current: 'This year or last', recent: 'Last 5 years',
+                                                          past: 'Past decade', historic: 'Over 15 years ago' },
+                                                note: 'Michelin and the NYT 100 are annual guides, so they always '
+                                                    + 'count as current. Only James Beard ages here.' },
   // Seeded from the exported tag_vocabulary (= config/dish_tags.json keys), so a
   // newly configured tag that matched nothing shows "0" instead of vanishing —
   // a missing chip reads as a broken pipeline rather than as the real answer.
@@ -160,6 +171,10 @@ const FACETS = [
 for (const f of FACETS) if (!FILTERS[f.key]) FILTERS[f.key] = new Set();
 
 const RECOG_LABEL = { michelin: 'Michelin', james_beard: 'James Beard', nyt: 'NYT' };
+const ERA_LABEL = { current: 'This year or last', recent: 'Last 5 years',
+                    past: 'Past decade', historic: 'Over 15 years ago' };
+const MICHELIN_TIERS = ['Michelin star', 'Michelin Bib Gourmand', 'Michelin Plate'];
+const TOP_TIERS = ['Michelin star', 'NYT 100 Best', 'James Beard winner'];
 const labelFor = (facet, v) => (facet.labels && facet.labels[v]) || RECOG_LABEL[v] || v;
 
 /* ---------- filtering --------------------------------------------------- */
@@ -258,6 +273,9 @@ const SORTS = {
   // The default. Trust tier first, then size within the tier — so the ranked
   // picks and hand-verified gaps lead, and the estimates keep their own
   // ordering underneath instead of colonising the top of the page.
+  distinction: (a, b) => cmpNullLast(a.recog_rank, b.recog_rank, 1)
+    || (b.recog_top?.year || 0) - (a.recog_top?.year || 0)
+    || a._name.localeCompare(b._name),
   best: (a, b) => trust(a) - trust(b)
     || (a.rank != null && b.rank != null ? a.rank - b.rank : 0)
     || cmpNullLast(a.gap_usd, b.gap_usd, -1)
@@ -393,10 +411,19 @@ function renderRow(r) {
     const key = `${x.source}|${x.level}`;
     if (seenRec.has(key)) return;
     seenRec.add(key);
-    const n = (r.recognition || []).filter((y) => `${y.source}|${y.level}` === key).length;
-    const lvl = x.level ? ` ${x.level}` : '';
-    pills.append(pill('rec', `${RECOG_LABEL[x.source] || x.source}${lvl}${n > 1 ? ` ×${n}` : ''}`,
-      `${x.matched_name || r.name}${x.year ? ` · ${x.year}` : ''}${x.name_match_only ? ' · name match only' : ''}`));
+    const grp = (r.recognition || []).filter((y) => `${y.source}|${y.level}` === key);
+    const n = grp.length;
+    // Badges arrive strongest-then-newest, so x is the freshest of its group.
+    // Michelin and NYT are annual guides — the edition year is implied by
+    // being in it at all. James Beard is an event, so it gets dated: a '99
+    // semifinalist and a '26 winner should never read the same.
+    const dated = x.source === 'james_beard' && x.year;
+    const aged = x.era === 'past' || x.era === 'historic';
+    pills.append(pill(`rec${aged ? ' aged' : ''}`,
+      `${x.tier || RECOG_LABEL[x.source] || x.source}${dated ? ` ’${String(x.year).slice(2)}` : ''}${n > 1 ? ` ×${n}` : ''}`,
+      `${x.matched_name || r.name}${x.year ? ` · ${x.year}` : ''}`
+      + `${x.era ? ` · ${ERA_LABEL[x.era]}` : ''}`
+      + `${x.name_match_only ? ' · name match only' : ''}`));
   });
   (r.tags || []).forEach((t, i, arr) => {
     if (arr.findIndex((z) => z.tag === t.tag) !== i) return; // dedupe by tag
@@ -524,7 +551,9 @@ function renderDetail(r) {
     const ul = el('ul', 'snips');
     r.recognition.forEach((x) => {
       const li = el('li', 'snip');
-      const label = `${RECOG_LABEL[x.source] || x.source}${x.level ? ` — ${x.level}` : ''}${x.year ? ` (${x.year})` : ''}`;
+      const label = `${x.tier || RECOG_LABEL[x.source] || x.source}`
+        + `${x.year ? ` (${x.year})` : ''}`
+        + `${x.era && x.era !== 'current' ? ` — ${ERA_LABEL[x.era].toLowerCase()}` : ''}`;
       if (x.url) {
         const a = el('a', null, label);
         a.href = x.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
@@ -862,10 +891,20 @@ const PRESETS = [
     set() { FILTERS.sunday.add('yes'); },
   },
   {
+    // The recognition facet holds TIERS now, so this preset has to name all
+    // three Michelin rungs — adding the bare source would match nothing.
     key: 'michelin', label: 'Michelin',
     count: () => ROWS.filter((r) => (r.recognition || []).some((x) => x.source === 'michelin')).length,
-    is: () => FILTERS.recognition.has('michelin'),
-    set() { FILTERS.recognition.add('michelin'); },
+    is: () => MICHELIN_TIERS.every((t) => FILTERS.recognition.has(t)),
+    set() { MICHELIN_TIERS.forEach((t) => FILTERS.recognition.add(t)); },
+  },
+  {
+    // The point of ranking distinctions: one click for the genuinely top ones,
+    // rather than a "Michelin" chip that is 28/42 the lowest rung.
+    key: 'toprec', label: 'Top awards',
+    count: () => ROWS.filter((r) => (r.recognition || []).some((x) => TOP_TIERS.includes(x.tier))).length,
+    is: () => TOP_TIERS.every((t) => FILTERS.recognition.has(t)),
+    set() { TOP_TIERS.forEach((t) => FILTERS.recognition.add(t)); SORT = 'distinction'; },
   },
 ];
 
@@ -1784,7 +1823,7 @@ function prepare(r) {
     (r.price_tiers || []).join(' '),
     (r.meal_periods || []).join(' '),
     (r.tags || []).map((t) => `${t.tag} ${t.keyword || ''}`).join(' '),
-    (r.recognition || []).map((x) => `${RECOG_LABEL[x.source] || x.source} ${x.level || ''} ${x.matched_name || ''}`).join(' '),
+    (r.recognition || []).map((x) => `${RECOG_LABEL[x.source] || x.source} ${x.tier || ''} ${x.level || ''} ${x.matched_name || ''}`).join(' '),
     r.verdict, r.verdict_note, r.days,
     // so "outdoor" / "patio" / "sidewalk" reach the rows that have it
     r.outdoor ? `outdoor alfresco ${r.outdoor.sidewalk ? 'sidewalk patio cafe' : ''} `

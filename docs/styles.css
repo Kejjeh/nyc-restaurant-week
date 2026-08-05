@@ -921,3 +921,10 @@ a:hover { text-decoration-thickness: 2px; }
   font-family: var(--mono); font-size: 12px; font-weight: 600;
   color: var(--ink); margin-left: 2px;
 }
+
+/* An award that has aged. Still shown — a 1999 James Beard nod is a real fact
+   — but it must not carry the same visual weight as a current one. */
+.pill.rec.aged {
+  background: var(--surface-2); color: var(--ink-3);
+  border-color: var(--rule);
+}

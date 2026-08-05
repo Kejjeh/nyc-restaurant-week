@@ -1,0 +1,22 @@
+{
+ "slug": "raval-steakhouse",
+ "website": "https://ravalsteakhouse.com",
+ "pages_fetched": 4,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "BAR START AT THE BAR. Handcrafted cocktails, raw bar, and a Happy Hour worth coming early for. Di",
+   "url": "https://ravalsteakhouse.com"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "WINE & BEER HAPPY HOUR DESSERTS PARTY MENUS RAW BAR OYSTERS ON HALF SHELL (6) Classic cocktail,",
+   "url": "https://ravalsteakhouse.com/menus"
+  }
+ ],
+ "error": null
+}

@@ -1,0 +1,29 @@
+{
+ "slug": "strip-house-downtown",
+ "website": "https://www.striphouse.com/location/striphouse-downtown",
+ "pages_fetched": 4,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SEAFOOD PLATEAU",
+   "snippet": "EAT COCKTAIL $ 29 JUMBO SHRIMP COCKTAIL $ 27 SEAFOOD PLATEAU OYSTERS*, CRABMEAT, SHRIMP, TUNA TARTARE* ha",
+   "url": "https://www.striphouse.com/location/striphouse-downtown"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "PLATEAU",
+   "snippet": "TAIL $ 29 JUMBO SHRIMP COCKTAIL $ 27 SEAFOOD PLATEAU OYSTERS*, CRABMEAT, SHRIMP, TUNA TARTARE* ha",
+   "url": "https://www.striphouse.com/location/striphouse-downtown"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "ic, Prosciutto, EVOO, Grilled Sourdough $ 27 RAW BAR OYSTERS 1/2 Dozen $ 25 CRABMEAT COCKTAIL $ 2",
+   "url": "https://www.striphouse.com/location/striphouse-downtown"
+  }
+ ],
+ "error": null
+}

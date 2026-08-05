@@ -1,0 +1,29 @@
+{
+ "slug": "stk-midtown",
+ "website": "https://stksteakhouse.com/venues/nyc-midtown",
+ "pages_fetched": 9,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SEAFOOD TOWER FOR TWO Seafood Tower",
+   "snippet": "Sauce - Lemon Ceviche* Chef's Daily Creation SEAFOOD TOWER FOR TWO Seafood Tower for Two East & West Coast Oysters* - Hamachi",
+   "url": "https://stksteakhouse.com/en-us/location/denver/menu"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "TOWER FOR TWO Seafood",
+   "snippet": "Lemon Ceviche* Chef's Daily Creation SEAFOOD TOWER FOR TWO Seafood Tower for Two East & West Coast Oysters* - H",
+   "url": "https://stksteakhouse.com/en-us/location/denver/menu"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SEAFOOD TOWER FOR TWO Seafood Tower",
+   "snippet": "Sauce - Coriander - Red Onion - Wonton Chips SEAFOOD TOWER FOR TWO Seafood Tower for Two East & West Coast Oysters* - Hamachi",
+   "url": "https://stksteakhouse.com/en-us/location/phoenix/menu"
+  }
+ ],
+ "error": null
+}

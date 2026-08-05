@@ -1,0 +1,15 @@
+{
+ "slug": "smyth-tavern",
+ "website": "https://www.smythtavern.com",
+ "pages_fetched": 2,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "ns Smyth Tavern Tribeca features fresh fish, raw bar, dry-aged steaks, and homemade pastas from C",
+   "url": "https://www.smythtavern.com"
+  }
+ ],
+ "error": null
+}

@@ -1,0 +1,22 @@
+{
+ "slug": "siren-oyster-bar-and-restaurant",
+ "website": "https://www.sirenbk.com",
+ "pages_fetched": 2,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "together the best of land and sea — from our raw bar and fresh seafood to thoughtfully crafted pa",
+   "url": "https://www.sirenbk.com"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "Raw Bar",
+   "snippet": "nu Tells A Story — From Fresh Oysters At The Raw Bar To Refined Small Plates, Handcrafted Cocktai",
+   "url": "https://www.sirenbk.com/menus"
+  }
+ ],
+ "error": null
+}

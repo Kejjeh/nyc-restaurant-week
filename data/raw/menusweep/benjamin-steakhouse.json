@@ -1,0 +1,15 @@
+{
+ "slug": "benjamin-steakhouse",
+ "website": "https://benjaminsteakhouse.com/nyc",
+ "pages_fetched": 4,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "RIMP (4) SIZZLING CANADIAN BACON extra thick RAW BAR *JUMBO SHRIMP COCKTAIL (by piece) *FRESH OYS",
+   "url": "https://benjaminsteakhouse.com/nyc/our-menus/?menu=4"
+  }
+ ],
+ "error": null
+}

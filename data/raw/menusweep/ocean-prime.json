@@ -1,0 +1,29 @@
+{
+ "slug": "ocean-prime",
+ "website": "https://ocean-prime.com/locations-menus/new-york-city",
+ "pages_fetched": 12,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SHELLFISH TOWER",
+   "snippet": "33 DUTCH HARBOR KING CRAB LEGS MKT “SMOKING\" SHELLFISH TOWER MKT Custom Built FIRST IMPRESSIONS WARM BREA",
+   "url": "https://ocean-prime.com/locations-menus/new-york-city"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SHELLFISH TOWER",
+   "snippet": "3 DUTCH HARBOR KING CRAB LEGS* MKT “SMOKING\" SHELLFISH TOWER MKT Custom Built FIRST IMPRESSIONS WARM BREA",
+   "url": "https://ocean-prime.com/locations-menus/tampa/"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SHELLFISH TOWER",
+   "snippet": "34 DUTCH HARBOR KING CRAB LEGS mkt “SMOKING\" SHELLFISH TOWER* mkt Custom Built FIRST IMPRESSIONS WARM BRE",
+   "url": "https://ocean-prime.com/locations-menus/boston/"
+  }
+ ],
+ "error": null
+}

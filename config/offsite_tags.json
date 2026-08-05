@@ -1,0 +1,42 @@
+{
+  "_doc": "Terms searched against the restaurant's OWN website, not the Restaurant Week menu (see src/menu_term_sweep.py). A hit means the restaurant serves it -- NOT that it is part of Restaurant Week. Same rule shape as config/dish_tags.json.",
+  "seafood tower": [
+    {
+      "pattern": "\\b(?:seafood|shell\\s?fish|oyster|crustacean|chilled|iced|cold)\\b[^.\\n]{0,25}\\btowers?\\b",
+      "confidence": "high",
+      "note": "seafood/shellfish/oyster tower, either word order"
+    },
+    {
+      "pattern": "\\btowers?\\b[^.\\n]{0,25}\\b(?:seafood|shell\\s?fish|oyster|crustacean|chilled|iced|cold)\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bplateau\\b[^.\\n]{0,25}\\bfruits?\\s+de\\s+mer\\b",
+      "confidence": "high",
+      "note": "the French seafood tower"
+    },
+    {
+      "pattern": "\\bfruits?\\s+de\\s+mer\\b[^.\\n]{0,25}\\bplateau\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\b(?:le\\s+)?grand\\s+plateau\\b|\\b(?:la\\s+)?petite?\\s+plateau\\b|\\bplateau\\s+royal\\b",
+      "confidence": "high",
+      "note": "menu names for the tiered plateau"
+    },
+    {
+      "pattern": "\\bseafood\\b[^.\\n]{0,25}\\bplateau\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bplateau\\b",
+      "confidence": "low",
+      "note": "bare plateau -- usually the tower, occasionally a cheese plateau"
+    },
+    {
+      "pattern": "\\braw\\s?bar\\b",
+      "confidence": "low",
+      "note": "a raw bar implies they can build one, but is not itself a tower"
+    }
+  ]
+}

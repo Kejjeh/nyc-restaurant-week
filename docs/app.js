@@ -121,6 +121,15 @@ const FACETS = [
   // new line or station shows up without touching the UI.
   { key: 'subway',      title: 'Subway line',   values: (r) => Object.keys(r.subway || {}),
                                                 scroll: true },
+  // Deliberately NOT merged into "Dish tags". Those come from the Restaurant
+  // Week PDF and mean "this is on the prix fixe". These come from the
+  // restaurant's own website and mean only "they serve it" — a seafood tower
+  // is a la carte and will be charged on top. Merging the two would quietly
+  // turn a $165 shellfish tower into something that reads as included.
+  { key: 'offsite',     title: 'On their regular menu', values: (r) =>
+                                                  [...new Set((r.offsite_tags || []).map((t) => t.tag))],
+                                                note: 'Found on the restaurant’s own site, NOT on the '
+                                                    + 'Restaurant Week menu — these are à la carte and cost extra.' },
   // Two tiers kept apart on purpose. "Licensed" is the city's Dining Out
   // register — authoritative, but it only ever covers the public pavement and
   // roadway. Rooftops, backyards and the park venues are invisible to it, so
@@ -560,6 +569,30 @@ function renderDetail(r) {
           q.textContent = t.snippet;
         }
         li.append(q);
+      }
+      ul.append(li);
+    });
+    s.append(ul);
+    d.append(s);
+  }
+
+  if ((r.offsite_tags || []).length) {
+    const s = el('div', 'dsec');
+    s.append(el('h4', null, 'On their regular menu'));
+    // Said once per restaurant, in the row itself: the facet note is easy to
+    // miss, and this is the difference between "included" and "$165 extra".
+    s.append(el('p', 'dnote', 'From the restaurant’s own site — not part of the '
+      + 'Restaurant Week menu, so it is charged separately.'));
+    const ul = el('ul', 'snips');
+    r.offsite_tags.forEach((t) => {
+      const li = el('li', 'snip');
+      li.append(pill('tag', t.tag));
+      if (t.confidence === 'low') li.append(pill('warn', 'low confidence'));
+      if (t.snippet) li.append(el('q', null, t.snippet));
+      if (t.url) {
+        const a = el('a', 'snipSrc', 'source');
+        a.href = t.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        li.append(a);
       }
       ul.append(li);
     });

@@ -1,0 +1,29 @@
+{
+ "slug": "royal-35-steakhouse",
+ "website": "https://royal35steakhouse.com",
+ "pages_fetched": 5,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SEAFOOD TOWER",
+   "snippet": ": Vinaigrette – Russian – Roquefort ROYAL 35 SEAFOOD TOWER JUMBO SHRIMP, BLUE POINT OYSTERS, MAINE LOBS",
+   "url": "https://royal35steakhouse.com/menus/dinner.html"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SEAFOOD TOWER",
+   "snippet": "PEEKYTOE CRAB SALAD LOBSTER SLIDER *ADD-ON: SEAFOOD TOWER Clams, Oysters and Jumbo Shrimp $59 per gues",
+   "url": "https://royal35steakhouse.com/menus/private-parties.html"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SEAFOOD TOWER",
+   "snippet": "NU #3 All menus include coffee & tea service SEAFOOD TOWER Clams, Oysters and Jumbo Shrimp APPETIZER Se",
+   "url": "https://royal35steakhouse.com/menus/private-parties.html"
+  }
+ ],
+ "error": null
+}

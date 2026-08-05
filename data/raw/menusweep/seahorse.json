@@ -1,0 +1,15 @@
+{
+ "slug": "seahorse",
+ "website": "https://www.seahorsenyc.com",
+ "pages_fetched": 2,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "Raw Bar",
+   "snippet": "ns Seahorse, A Modern Seafood Restaurant And Raw Bar Driven By Global Influences And Greenmarket",
+   "url": "https://www.seahorsenyc.com"
+  }
+ ],
+ "error": null
+}

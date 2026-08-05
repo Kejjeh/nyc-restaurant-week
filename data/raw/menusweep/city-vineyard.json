@@ -1,0 +1,22 @@
+{
+ "slug": "city-vineyard",
+ "website": "https://citywinery.com/city-vineyard-nyc",
+ "pages_fetched": 2,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "Raw Bar",
+   "snippet": "our, stay for “just one more.” Wine Garden & Raw Bar You’ve heard of a beer garden, now meet the",
+   "url": "https://citywinery.com/city-vineyard-nyc"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "nny seat, and settle in. Feeling snacky? Our raw bar features locally sourced seafood and rotatin",
+   "url": "https://citywinery.com/city-vineyard-nyc"
+  }
+ ],
+ "error": null
+}

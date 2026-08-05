@@ -1,0 +1,15 @@
+{
+ "slug": "bar-rocco",
+ "website": "https://www.barroccony.com",
+ "pages_fetched": 2,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "American dishes, fresh pastas, and a curated raw bar. Bar Rocco is open for Breakfast, Lunch and",
+   "url": "https://www.barroccony.com/menus/"
+  }
+ ],
+ "error": null
+}

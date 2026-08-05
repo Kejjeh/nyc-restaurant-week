@@ -1,0 +1,15 @@
+{
+ "slug": "union-square-cafe",
+ "website": "https://www.unionsquarecafe.com",
+ "pages_fetched": 2,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "6 Potato and Fish Croquettes Ramp Aioli $ 16 RAW BAR Island Creek Oysters* Fennel Mignonette, Coc",
+   "url": "https://www.unionsquarecafe.com/menus/"
+  }
+ ],
+ "error": null
+}

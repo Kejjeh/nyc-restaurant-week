@@ -1,0 +1,22 @@
+{
+ "slug": "smith-wollensky",
+ "website": "https://www.smithandwollenskynyc.com",
+ "pages_fetched": 3,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "NSKY’S GRILL WEEKEND WINE DINNER WINE Dinner RAW BAR Smith’s Bouquet (for two) 89 Wollensky’s Gra",
+   "url": "https://www.smithandwollenskynyc.com/menu"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "orf DOWNLOAD RESTAURANT WEEK LUNCH PDF Lunch RAW BAR Smith's Bouquet (for two) 89 Wollensky’s Gra",
+   "url": "https://www.smithandwollenskynyc.com/menu"
+  }
+ ],
+ "error": null
+}

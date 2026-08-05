@@ -1,0 +1,15 @@
+{
+ "slug": "the-splendid",
+ "website": "https://www.thesplendid.nyc",
+ "pages_fetched": 2,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "nu is available daily from 3:30 pm to 10 pm. RAW BAR $22 ORA KING SALMON CRUDO pickled grapes, ho",
+   "url": "https://www.thesplendid.nyc/menu"
+  }
+ ],
+ "error": null
+}

@@ -1,0 +1,22 @@
+{
+ "slug": "bar-mercer",
+ "website": "https://www.barmercer.com",
+ "pages_fetched": 2,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "tional dishes, including an expertly curated raw bar, skillfully prepared small plates, and heart",
+   "url": "https://www.barmercer.com"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "Plateau",
+   "snippet": "tail sauce, horseradish, crudité. $98 Mercer Plateau 12 oysters, 6 shrimp cocktail, hamachi crudo",
+   "url": "https://www.barmercer.com/menus"
+  }
+ ],
+ "error": null
+}

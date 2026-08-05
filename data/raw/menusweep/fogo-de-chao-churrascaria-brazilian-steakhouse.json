@@ -1,0 +1,15 @@
+{
+ "slug": "fogo-de-chao-churrascaria-brazilian-steakhouse",
+ "website": "https://fogodechao.com/location/new-york",
+ "pages_fetched": 9,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SEAFOOD TOWER",
+   "snippet": "IMP COCKTAIL Six jumbo shrimp. 230 cal 29.50 SEAFOOD TOWER Lobster tails and claws, jumbo shrimp, snow",
+   "url": "https://fogodechao.com/menu-detail/?location=108&type=menu-lunch&id=4646"
+  }
+ ],
+ "error": null
+}

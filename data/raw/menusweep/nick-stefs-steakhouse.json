@@ -1,0 +1,22 @@
+{
+ "slug": "nick-stefs-steakhouse",
+ "website": "https://www.nickandstefsnyc.com",
+ "pages_fetched": 8,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "T MENUS SELECT A MENU LUNCH ICED SHELLFISH & RAW BAR* JUMBO LUMP CRAB MEAT COCKTAIL 33. LITTLENEC",
+   "url": "https://www.nickandstefsnyc.com/menu#Lunch"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "MENUS SELECT A MENU DINNER ICED SHELLFISH & RAW BAR* JUMBO LUMP CRAB MEAT COCKTAIL 35. LITTLENEC",
+   "url": "https://www.nickandstefsnyc.com/menu#Dinner"
+  }
+ ],
+ "error": null
+}

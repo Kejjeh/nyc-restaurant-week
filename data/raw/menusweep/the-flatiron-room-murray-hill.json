@@ -1,0 +1,22 @@
+{
+ "slug": "the-flatiron-room-murray-hill",
+ "website": "https://theflatironroom.com/murray-hill-home",
+ "pages_fetched": 3,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "Flan soy caramel, candied orange Positions: RAW BAR & CAVIAR CAVIAR $110 (1OZ) / $220 (2OZ) / $2",
+   "url": "https://theflatironroom.com/menu"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "pink peppercorn, maldon salt (vg) Positions: RAW BAR & CAVIAR CAVIAR $110 (1 OZ) / $210 (2 OZ) /",
+   "url": "https://theflatironroom.com/menu"
+  }
+ ],
+ "error": null
+}

@@ -1,0 +1,29 @@
+{
+ "slug": "marsanne",
+ "website": "https://marsannenyc.com",
+ "pages_fetched": 3,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "n a bright, greenery-filled setting. Enjoy a raw bar, artisanal cheese platters, house-made pasta",
+   "url": "https://marsannenyc.com"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "prix fixe menus featuring family-style dips, raw bar selections, appetizers, entrees, and dessert",
+   "url": "https://marsannenyc.com"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "s feature house-made pastas, vibrant salads, raw bar selections, and flavorful entrees crafted wi",
+   "url": "https://marsannenyc.com"
+  }
+ ],
+ "error": null
+}

@@ -1,0 +1,15 @@
+{
+ "slug": "blue-fin",
+ "website": "https://www.bluefinnyc.com",
+ "pages_fetched": 4,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "1 doz oysters*, mussels, king crab, lobster, raw bar jars*, caviar Raw HAMACHI CRUDO ponzu glaze",
+   "url": "https://www.bluefinnyc.com/menus"
+  }
+ ],
+ "error": null
+}

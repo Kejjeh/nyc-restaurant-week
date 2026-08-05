@@ -1,0 +1,7 @@
+{
+ "slug": "chatti-by-regi-mathew",
+ "website": "https://www.chattinewyork.com",
+ "pages_fetched": 0,
+ "hits": [],
+ "error": "TimeoutError: Page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to \"https://www.chattinewyork.com/\", waiting until \"domcon"
+}

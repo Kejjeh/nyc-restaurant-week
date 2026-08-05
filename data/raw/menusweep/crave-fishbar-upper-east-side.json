@@ -1,0 +1,29 @@
+{
+ "slug": "crave-fishbar-upper-east-side",
+ "website": "https://cravefishbar.com",
+ "pages_fetched": 4,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SEAFOOD TOWERS",
+   "snippet": "may increase your risk of foodborne illness SEAFOOD TOWERS TIER ONE (GF)* 4 oysters, 2 clams, 2 shrimp",
+   "url": "https://cravefishbar.com/menu/"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "rporate events, off-premise catering, mobile raw bar for weddings and special events, or private",
+   "url": "https://cravefishbar.com/oyster-somm-socials/"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "swapping blue crab meat for red crab on our raw bar—we had connected our local values with a gre",
+   "url": "https://cravefishbar.com/blog/the-crave-fishbar-guide-to-sustainable-seafood/"
+  }
+ ],
+ "error": null
+}

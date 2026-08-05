@@ -1,0 +1,29 @@
+{
+ "slug": "the-fulton",
+ "website": "https://www.thefulton.nyc",
+ "pages_fetched": 8,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "Seafood Plateau",
+   "snippet": "s* Cocktail Sauce and Mignonette $ 26 Petite Seafood Plateau* Oysters, Shrimp Cocktail and Sashimi $ 36 S",
+   "url": "https://www.thefulton.nyc/menus/#lunch/"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "Seafood Plateau",
+   "snippet": "rab Lettuce Cups Avocado and Yuzu $ 24 Grand Seafood Plateau* Oysters, Shrimp Cocktail, Sashimi and Peeky",
+   "url": "https://www.thefulton.nyc/menus/#lunch/"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "Seafood Plateau",
+   "snippet": "u Mustard Sauce and Shaved Fennel $ 27 Grand Seafood Plateau* Oysters, Shrimp Cocktail, Sashimi and Peeky",
+   "url": "https://www.thefulton.nyc/menus/#dinner/"
+  }
+ ],
+ "error": null
+}

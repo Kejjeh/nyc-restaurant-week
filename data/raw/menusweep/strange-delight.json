@@ -1,0 +1,15 @@
+{
+ "slug": "strange-delight",
+ "website": "https://www.strangedelight.nyc",
+ "pages_fetched": 4,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "TOWER SERVICE Cold",
+   "snippet": "t Good Morning Bun Doughnut Cornbread Muffin TOWER SERVICE Cold Local Oysters, Shrimp Cocktail, Shrimp Remou",
+   "url": "https://www.strangedelight.nyc/brunch"
+  }
+ ],
+ "error": null
+}

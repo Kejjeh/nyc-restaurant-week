@@ -1,0 +1,22 @@
+{
+ "slug": "marlow-east",
+ "website": "https://www.marloweast.com",
+ "pages_fetched": 2,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "Seafood Tower",
+   "snippet": "eme Fraîche, egg white, red onion ) $ 112.00 Seafood Tower Oysters, Tiger prawns, Fluke crudo, Tuna sas",
+   "url": "https://www.marloweast.com"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "LUNCH PRE FIX BEVERAGE MENU WINE LIST DINNER RAW BAR Chilled Oyster Champagne mignonette 1/2doz $",
+   "url": "https://www.marloweast.com"
+  }
+ ],
+ "error": null
+}

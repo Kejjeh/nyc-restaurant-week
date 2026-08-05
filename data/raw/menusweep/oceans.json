@@ -1,0 +1,29 @@
+{
+ "slug": "oceans",
+ "website": "https://oceansnewyork.com",
+ "pages_fetched": 3,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SEAFOOD TOWER",
+   "snippet": "toe crab, alaskan king crab, and lobster 195 SEAFOOD TOWER two tiers with oysters, mussels, clams, cevi",
+   "url": "https://oceansnewyork.com/menus/"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "OCALLY & GLOBALLY SOURCED SEAFOOD, SUSHI AND RAW BAR RESERVATIONS SUMMER RESTAURANT WEEK RETURNS",
+   "url": "https://oceansnewyork.com"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "PLATEAU",
+   "snippet": "ekytoe crab 125 – add lobster mp – SHELLFISH PLATEAU single tier with oysters, ceviche, jumbo shr",
+   "url": "https://oceansnewyork.com/menus/"
+  }
+ ],
+ "error": null
+}

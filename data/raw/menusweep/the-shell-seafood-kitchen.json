@@ -1,0 +1,22 @@
+{
+ "slug": "the-shell-seafood-kitchen",
+ "website": "https://theshellrestaurant.com",
+ "pages_fetched": 7,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "Raw Bar",
+   "snippet": "SERT MENU THE SHELL RESTAURANT WEEK MENU $45 Raw Bar The Shell Oysters $18.00/+ East: 6 pcs $18.0",
+   "url": "https://theshellrestaurant.com/new-york-the-shell-seafood-kitchen-and-bar-food-menu"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "ishes, including lobster, shrimp scampi, and raw bar options. Enjoy a glass of wine or signature",
+   "url": "https://theshellrestaurant.com/new-york-the-shell-seafood-kitchen-and-bar-about"
+  }
+ ],
+ "error": null
+}

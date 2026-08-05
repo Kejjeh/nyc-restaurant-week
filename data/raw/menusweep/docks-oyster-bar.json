@@ -1,0 +1,29 @@
+{
+ "slug": "docks-oyster-bar",
+ "website": "https://www.docksoysterbar.com",
+ "pages_fetched": 9,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "grand plateau",
+   "snippet": "mbo shrimp, 1/2 lb cold poached lobster $ 80 grand plateau 18 oysters, 6 littlenecks, 6 cherrystones, 6",
+   "url": "https://www.docksoysterbar.com/menus"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "seafood salad $ 30 royale plateau",
+   "snippet": "cocktail cocktail sauce, lemon $ 26 chilled seafood salad $ 30 royale plateau 8 oysters, 3 littlenecks, 3 cherrystones, 4",
+   "url": "https://www.docksoysterbar.com/menus"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "t place for an unforgettable meal. MENUS Our raw bar is stocked daily with the freshest oysters,",
+   "url": "https://www.docksoysterbar.com"
+  }
+ ],
+ "error": null
+}

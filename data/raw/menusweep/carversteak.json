@@ -1,0 +1,29 @@
+{
+ "slug": "carversteak",
+ "website": "https://carversteaknyc.com",
+ "pages_fetched": 3,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "Grand Plateau",
+   "snippet": "& Uni Toast Spicy Mayo, Chives, Sesame Seeds Grand Plateau 1 Maine Lobster, 12 Oysters, 4 Shrimp, 8 Cla",
+   "url": "https://carversteaknyc.com/menu/"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "Petit Plateau",
+   "snippet": "cy Salmon, Tobiko, Avocado, Yuzu Vinaigrette Petit Plateau 1 /2 Maine Lobster, 6 Oysters, 2 Shrimp, 4 C",
+   "url": "https://carversteaknyc.com/menu/"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "Plateau",
+   "snippet": "Toast Spicy Mayo, Chives, Sesame Seeds Grand Plateau 1 Maine Lobster, 12 Oysters, 4 Shrimp, 8 Cla",
+   "url": "https://carversteaknyc.com/menu/"
+  }
+ ],
+ "error": null
+}

@@ -228,6 +228,45 @@ def outdoor_for(name, address, lat, lng, licences):
     }
 
 
+# --------------------------------------------------------------------------
+# Off-menu terms (src/menu_term_sweep.py)
+#
+# These come from the restaurant's OWN website, not the Restaurant Week PDF,
+# because some dishes are never on a prix fixe -- a seafood tower is an a la
+# carte raw-bar item. A hit means "they serve it", NOT "it's in Restaurant
+# Week", and the UI has to keep saying so: these are a separate facet from the
+# RW dish tags, never merged into them.
+MENUSWEEP = ROOT / "data" / "raw" / "menusweep"
+OFFSITE_SNIPPET_MAX = 90
+
+
+def build_offsite():
+    """slug -> [{tag, confidence, keyword, snippet, url}], best hit per tag."""
+    if not MENUSWEEP.exists():
+        return {}, 0
+    by_slug, swept = {}, 0
+    for f in sorted(MENUSWEEP.glob("*.json")):
+        rec = json.loads(f.read_text(encoding="utf-8"))
+        swept += 1
+        best = {}
+        for h in rec.get("hits", []):
+            cur = best.get(h["tag"])
+            # high beats low; among equals prefer the shorter, tighter snippet
+            if cur is None or (
+                    (h["confidence"] == "high") > (cur["confidence"] == "high")
+                    or (h["confidence"] == cur["confidence"]
+                        and len(h["snippet"]) < len(cur["snippet"]))):
+                best[h["tag"]] = h
+        if best:
+            by_slug[rec["slug"]] = [
+                {"tag": t, "confidence": h["confidence"],
+                 "keyword": clean(h["keyword"]),
+                 "snippet": clean(h["snippet"])[:OFFSITE_SNIPPET_MAX],
+                 "url": h["url"]}
+                for t, h in sorted(best.items())]
+    return by_slug, swept
+
+
 MONTHS = {m: i for i, ms in enumerate(
     [("jan", "january"), ("feb", "february"), ("mar", "march"), ("apr", "april"),
      ("may",), ("jun", "june"), ("jul", "july"), ("aug", "august"),
@@ -579,6 +618,7 @@ def build_payload():
 
     stations = load_stations()
     licences = load_outdoor()
+    offsite, _ = build_offsite()
     verified = json.loads(VERIFIED.read_text(encoding="utf-8"))["restaurants"]
     menus = {r[0]: r[1] for r in con.execute(
         "SELECT restaurant_slug, parse_quality FROM menus")}
@@ -736,6 +776,7 @@ def build_payload():
             "menu_state": menu_state,
             "recognition": recog_by_slug.get(slug, []),
             "tags": tags_by_slug.get(slug, []),
+            "offsite_tags": offsite.get(slug, []),
             "links": {
                 "listing": listing or None,
                 "menu": (menu_url or "").strip() or None,
@@ -858,6 +899,9 @@ def main():
         print(f"outdoor       {stats['outdoor_licensed']} in the city register"
               f" · {stats['outdoor_described_only']} described only"
               f" · {len(payload['restaurants']) - stats['outdoor_licensed'] - stats['outdoor_described_only']} unknown")
+        off = sum(1 for r in payload["restaurants"] if r["offsite_tags"])
+        swept = len(list(MENUSWEEP.glob("*.json"))) if MENUSWEEP.exists() else 0
+        print(f"offsite tags  {off} restaurants (own websites; {swept} swept)")
         print(f"tags          {tagged} restaurants ({tags_dropped} snippets pruned)")
         print(f"recognition   {badged} restaurants ({recog_dropped} rows suppressed)")
         where = ("  (not written: --check)" if check

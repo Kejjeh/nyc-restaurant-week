@@ -1,0 +1,22 @@
+{
+ "slug": "catch-nyc",
+ "website": "https://www.catchrestaurants.com/location/catch-nyc",
+ "pages_fetched": 12,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SEAFOOD TOWER",
+   "snippet": "47 JUMBO SHRIMP COCKTAIL Cocktail Sauce $ 24 SEAFOOD TOWER Chef’s Selection of Lobster, Shrimp, Oysters",
+   "url": "https://www.catchrestaurants.com/location/catch-las-vegas/#menus/"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "RS Yuzu Chili Garlic, Amazu Ponzu $ 14 vegan RAW BAR EAST COAST OYSTERS Ask Your Server for Daily",
+   "url": "https://www.catchrestaurants.com/location/catch-las-vegas/#menus/"
+  }
+ ],
+ "error": null
+}

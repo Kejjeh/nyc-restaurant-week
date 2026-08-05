@@ -1,0 +1,22 @@
+{
+ "slug": "catch-n-chop",
+ "website": "https://catchnchop.com",
+ "pages_fetched": 4,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "raw bar",
+   "snippet": "th a focus on sustainable, fresh seafood and raw bar. Catch n Chop exudes warmth and welcomes gue",
+   "url": "https://catchnchop.com"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "TAURANT WEEK MENUS Executive Chef Jose Perez RAW BAR Small Catch $75.00 4 oysters, 4 clams, 4 shr",
+   "url": "https://catchnchop.com/new-york-city-catch-n-chop-food-menu"
+  }
+ ],
+ "error": null
+}

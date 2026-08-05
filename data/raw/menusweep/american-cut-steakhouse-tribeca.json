@@ -1,0 +1,29 @@
+{
+ "slug": "american-cut-steakhouse-tribeca",
+ "website": "https://www.americancutsteakhouse.com/location/american-cut-tribeca",
+ "pages_fetched": 2,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "COLD SEAFOOD TOWER",
+   "snippet": "ES DESSERT HAPPY HOUR BAR MENU RAW BAR HOT & COLD SEAFOOD TOWER JB Oysters, Chili Lobster, Ceviche, Raw Oyst",
+   "url": "https://www.americancutsteakhouse.com/location/american-cut-tribeca"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "COLD SEAFOOD TOWER",
+   "snippet": "ocktail, Poached Lobster, Tuna Tartare $ 185 COLD SEAFOOD TOWER Raw Oysters, Ceviche, Shrimp Cocktail, Crab",
+   "url": "https://www.americancutsteakhouse.com/location/american-cut-tribeca"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "low",
+   "keyword": "RAW BAR",
+   "snippet": "ENTRÈES & SIDES DESSERT HAPPY HOUR BAR MENU RAW BAR HOT & COLD SEAFOOD TOWER JB Oysters, Chili L",
+   "url": "https://www.americancutsteakhouse.com/location/american-cut-tribeca"
+  }
+ ],
+ "error": null
+}

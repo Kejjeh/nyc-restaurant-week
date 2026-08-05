@@ -1,0 +1,29 @@
+{
+ "slug": "industry-kitchen",
+ "website": "https://www.industry-kitchen.com",
+ "pages_fetched": 5,
+ "hits": [
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "SEAFOOD TOWERS",
+   "snippet": "DINNER Lunch and Dinner Menu Items SIGNATURE SEAFOOD TOWERS Classic Plateau 90 half chilled lobster, 6 o",
+   "url": "https://www.industry-kitchen.com/menus/"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "TOWERS Classic Plateau 90 half chilled",
+   "snippet": "unch and Dinner Menu Items SIGNATURE SEAFOOD TOWERS Classic Plateau 90 half chilled lobster, 6 oysters, 6 clams, 4 jumbo shrimp",
+   "url": "https://www.industry-kitchen.com/menus/"
+  },
+  {
+   "tag": "seafood tower",
+   "confidence": "high",
+   "keyword": "Grand Plateau",
+   "snippet": "tartare, served with classic accompaniments Grand Plateau 160 whole chilled lobster, 12 oysters, 12 cl",
+   "url": "https://www.industry-kitchen.com/menus/"
+  }
+ ],
+ "error": null
+}

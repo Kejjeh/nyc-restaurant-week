@@ -11,16 +11,18 @@
       "source": "james_beard",
       "matched_name": "Brasserie",
       "rows": 8,
-      "active": true,
-      "reason": "norm_name() strips the stopwords 'osteria', 'brooklyn' AND 'brasserie', so both 'Osteria Brooklyn' and 'Brasserie' normalise to the EMPTY STRING. osteria-brooklyn is the only one of the 648 participants that normalises to '', so it absorbed all 8 James Beard awards belonging to the Seagram Building's Brasserie (winner, 2000). None of these awards belong to Osteria Brooklyn."
+      "active": false,
+      "reason": "norm_name() strips the stopwords 'osteria', 'brooklyn' AND 'brasserie', so both 'Osteria Brooklyn' and 'Brasserie' normalise to the EMPTY STRING. osteria-brooklyn is the only one of the 648 participants that normalises to '', so it absorbed all 8 James Beard awards belonging to the Seagram Building's Brasserie (winner, 2000). None of these awards belong to Osteria Brooklyn. Fixed at source: norm_name no longer strips venue types, so this row is never produced. Kept inactive as the record of why, and enrich_recognition.check_norm_name() now fails the run if the collapse ever returns.",
+      "retired": "2026-08-05"
     },
     {
       "slug": "cafe-boulud",
       "source": "james_beard",
       "matched_name": "Bar Boulud",
       "rows": 2,
-      "active": true,
-      "reason": "norm_name() strips both 'bar' and 'cafe', collapsing 'Bar Boulud' and 'Cafe Boulud' onto 'boulud'. These two nominations (2009, 2014) belong to Bar Boulud, a different Dinex room. Cafe Boulud's own six James Beard rows (matched_name 'Cafe Boulud') are genuine and are NOT suppressed, nor is its Michelin 1 star."
+      "active": false,
+      "reason": "norm_name() strips both 'bar' and 'cafe', collapsing 'Bar Boulud' and 'Cafe Boulud' onto 'boulud'. These two nominations (2009, 2014) belong to Bar Boulud, a different Dinex room. Cafe Boulud's own six James Beard rows (matched_name 'Cafe Boulud') are genuine and are NOT suppressed, nor is its Michelin 1 star. Fixed at source: norm_name no longer strips venue types, so this row is never produced. Kept inactive as the record of why, and enrich_recognition.check_norm_name() now fails the run if the collapse ever returns.",
+      "retired": "2026-08-05"
     },
     {
       "slug": "recette",

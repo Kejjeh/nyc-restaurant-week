@@ -54,32 +54,6 @@
  ],
  "james_beard": [
   {
-   "name": "Suzanne Cupps",
-   "restaurant": "Lola's",
-   "award": "Best Chef: New York",
-   "level": "semifinalist",
-   "year": 2025,
-   "url": "https://www.jamesbeard.org/awards/search-past-awards?keyword=Suzanne%20Cupps&year=2025",
-   "city": "New York",
-   "reason": "fuzzy 0.89 below threshold",
-   "candidates": [
-    "bar-lola"
-   ]
-  },
-  {
-   "name": "Mariana Gonzalez-Trasvina",
-   "restaurant": "Bar 'Cino",
-   "award": "Rising Star Chef of the Year",
-   "level": "semifinalist",
-   "year": 2020,
-   "url": "https://www.jamesbeard.org/awards/search-past-awards?keyword=Mariana%20Gonzalez-Trasvina&year=2020",
-   "city": "New York",
-   "reason": "fuzzy 0.86 below threshold",
-   "candidates": [
-    "ino"
-   ]
-  },
-  {
    "name": "Carlo Mirarchi",
    "restaurant": "Roberta's",
    "award": "Best Chef: New York City",
@@ -178,7 +152,7 @@
  ],
  "nyt": [
   {
-   "name": "M\u1eafm",
+   "name": "Mắm",
    "address": null,
    "level": "nyt_100_best",
    "year": 2026,
@@ -188,19 +162,6 @@
    "reason": "fuzzy 0.86 below threshold",
    "candidates": [
     "mamo-restaurant"
-   ]
-  },
-  {
-   "name": "Lola's",
-   "address": null,
-   "level": "nyt_100_best",
-   "year": 2026,
-   "url": "https://secretnyc.co/new-york-times-top-100-nyc-restaurants-2026/",
-   "verified": true,
-   "notes": "Ranked No. 71 on the NYT 2026 list as reproduced in full by Secret NYC (published May 11-15, 2026; top 10 unveiled May 12).",
-   "reason": "fuzzy 0.89 below threshold",
-   "candidates": [
-    "bar-lola"
    ]
   }
  ]

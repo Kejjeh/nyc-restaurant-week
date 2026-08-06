@@ -46,10 +46,19 @@ CREATE TABLE IF NOT EXISTS recognition (
 CREATE INDEX IF NOT EXISTS idx_recog_rest ON recognition(restaurant_slug);
 """
 
-STOP = re.compile(
-    r"\b(the|restaurant|ristorante|nyc|new york(?: city)?|manhattan|brooklyn"
-    r"|cafe|café|bar|bistro|brasserie|trattoria|osteria)\b"
+# Words that QUALIFY a name without distinguishing it. Dropping these is what
+# lets "Blue Fin Restaurant" meet "Blue Fin" and "The Russian Tea Room" meet
+# "Russian Tea Room".
+GENERIC = re.compile(
+    r"\b(the|restaurant|ristorante|nyc|new york(?: city)?|manhattan|brooklyn)\b"
 )
+
+# Venue types used to be stripped alongside those, which was the bug. They are
+# not noise -- they are precisely what separates one restaurant from its
+# sibling. "Bar Boulud" and "Café Boulud" both collapsed to "boulud", and
+# "Osteria Brooklyn" lost BOTH its words and collapsed onto "Brasserie". Those
+# two false positives had to be suppressed by hand and came back every Monday.
+# Keeping venue types means the names stay distinct in the first place.
 
 
 def norm_name(s):
@@ -57,8 +66,49 @@ def norm_name(s):
     s = s.lower()
     s = re.sub(r"[’'`´]", "", s)
     s = re.sub(r"[^a-z0-9 ]", " ", s)
-    s = STOP.sub(" ", s)
-    return re.sub(r"\s+", " ", s).strip()
+    base = re.sub(r"\s+", " ", s).strip()
+    stripped = re.sub(r"\s+", " ", GENERIC.sub(" ", base)).strip()
+    # A name made ONLY of qualifiers ("The Restaurant", "Brooklyn") must not
+    # normalise to the empty string -- every such name would share one bucket
+    # and match each other.
+    return stripped or base
+
+
+# Both halves of the contract, as cases. SAME pairs must keep collapsing
+# together or real awards go unmatched; DIFFERENT pairs must stay apart or the
+# false positives return. Checked on every run (see main) because this file is
+# executed weekly by the Action and nobody is watching it.
+NAME_SAME = [
+    ("Blue Fin Restaurant", "Blue Fin"),
+    ("The Russian Tea Room", "Russian Tea Room"),
+    ("Restaurant Le B", "Le B."),
+    ("Sylvia's Restaurant", "Sylvia's"),
+    ("Elcielo New York", "Elcielo"),
+    ("Josephs", "Joseph's"),
+    ("Cafe Boulud", "Café Boulud"),
+]
+NAME_DIFFERENT = [
+    ("Bar Boulud", "Café Boulud"),          # venue type is the ONLY difference
+    ("Brasserie", "Osteria Brooklyn"),      # both used to normalise to ""
+    ("Osteria Morini", "Morini"),
+    ("Bar Primi", "Primi"),
+]
+
+
+def check_norm_name():
+    """Fail the run rather than quietly re-import known-bad matches."""
+    for a, b in NAME_SAME:
+        if norm_name(a) != norm_name(b):
+            raise AssertionError(
+                f"norm_name must collapse {a!r} and {b!r} "
+                f"({norm_name(a)!r} != {norm_name(b)!r}) — real awards would be missed")
+    for a, b in NAME_DIFFERENT:
+        if norm_name(a) == norm_name(b):
+            raise AssertionError(
+                f"norm_name must keep {a!r} and {b!r} apart "
+                f"(both {norm_name(a)!r}) — this is the false-positive bug")
+    if not norm_name("Brooklyn") or not norm_name("The Restaurant"):
+        raise AssertionError("a name of pure qualifiers must not normalise to empty")
 
 
 def street_key(addr):
@@ -132,6 +182,7 @@ def match(externals, restaurants, source):
 
 
 def main():
+    check_norm_name()
     tmp = Path(tempfile.mkdtemp()) / DB.name
     shutil.copyfile(DB, tmp)
     con = sqlite3.connect(tmp)
@@ -149,7 +200,7 @@ def main():
         if not f.exists():
             print(f"{source}: no raw file, skipped")
             continue
-        externals = json.loads(f.read_text())
+        externals = json.loads(f.read_text(encoding="utf-8"))
         accepted, review = match(externals, restaurants, source)
         for slug, e, conf, how in accepted:
             con.execute(
@@ -163,7 +214,8 @@ def main():
         all_review[source] = review
         print(f"{source}: {len(externals)} external, {len(accepted)} matched, "
               f"{len(review)} to review")
-    REVIEW.write_text(json.dumps(all_review, indent=1))
+    REVIEW.write_text(json.dumps(all_review, indent=1, ensure_ascii=False),
+                      encoding="utf-8")
     print("\n== match_confidence distribution ==")
     for row in con.execute(
         "SELECT source, match_confidence, COUNT(*) FROM recognition GROUP BY 1,2"

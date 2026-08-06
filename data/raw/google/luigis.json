@@ -1,0 +1,18 @@
+{
+ "slug": "luigis",
+ "query_name": "Luigi's",
+ "matched": {
+  "place_id": "ChIJq7l85XtiwokRiLieNJOBm68",
+  "name": "Luigi's Restaurant And Bar",
+  "address": "265-21 Union Tpke, Queens, NY 11040, USA",
+  "rating": 4.5,
+  "user_ratings_total": 2356,
+  "business_status": "OPERATIONAL",
+  "lat": 40.749627,
+  "lng": -73.707534
+ },
+ "accepted": true,
+ "reason": "5m away",
+ "source": "textsearch",
+ "error": null
+}

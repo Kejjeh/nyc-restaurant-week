@@ -1,0 +1,18 @@
+{
+ "slug": "wagamama-murray-hill",
+ "query_name": "Wagamama - Murray Hill",
+ "matched": {
+  "place_id": "ChIJmw7HvHpZwokR_jQtbm6Zrj0",
+  "name": "wagamama murray hill, new york",
+  "address": "605 3rd Ave, New York, NY 10158, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1408,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7488776,
+  "lng": -73.97544169999999
+ },
+ "accepted": true,
+ "reason": "14m away",
+ "source": "textsearch",
+ "error": null
+}

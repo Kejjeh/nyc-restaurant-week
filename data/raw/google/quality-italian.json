@@ -1,0 +1,18 @@
+{
+ "slug": "quality-italian",
+ "query_name": "Quality Italian",
+ "matched": {
+  "place_id": "ChIJsTgQqfBYwokRU3iwRQ4U0Hc",
+  "name": "Quality Italian",
+  "address": "57 W 57th St, New York, NY 10019, USA",
+  "rating": 4.4,
+  "user_ratings_total": 2965,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7645133,
+  "lng": -73.9768271
+ },
+ "accepted": true,
+ "reason": "76m away",
+ "source": "textsearch",
+ "error": null
+}

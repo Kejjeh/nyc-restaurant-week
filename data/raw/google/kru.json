@@ -1,0 +1,18 @@
+{
+ "slug": "kru",
+ "query_name": "Kru",
+ "matched": {
+  "place_id": "ChIJz0Bt0ldZwokR698-eT0Dh88",
+  "name": "KRU Brooklyn",
+  "address": "190 N 14th St, Brooklyn, NY 11249, USA",
+  "rating": 4.2,
+  "user_ratings_total": 299,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7228016,
+  "lng": -73.9557975
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

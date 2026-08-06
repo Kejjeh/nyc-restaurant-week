@@ -1,0 +1,18 @@
+{
+ "slug": "yama-ramen",
+ "query_name": "Yama Ramen",
+ "matched": {
+  "place_id": "ChIJ62NuGv9YwokRqn6PL48zKcw",
+  "name": "Yama Ramen",
+  "address": "60 W 48th St, New York, NY 10036, USA",
+  "rating": 4.1,
+  "user_ratings_total": 1983,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7580976,
+  "lng": -73.980796
+ },
+ "accepted": true,
+ "reason": "10m away",
+ "source": "textsearch",
+ "error": null
+}

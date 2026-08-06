@@ -1,0 +1,18 @@
+{
+ "slug": "the-fulton",
+ "query_name": "The Fulton",
+ "matched": {
+  "place_id": "ChIJaXwp6UBbwokR1Ki9x6-BIug",
+  "name": "The Fulton by Jean-Georges",
+  "address": "Northeast corner of Pier 17, 89 South St, New York, NY 10038, USA",
+  "rating": 4.2,
+  "user_ratings_total": 1337,
+  "business_status": "OPERATIONAL",
+  "lat": 40.705527,
+  "lng": -74.0015724
+ },
+ "accepted": true,
+ "reason": "11m away",
+ "source": "textsearch",
+ "error": null
+}

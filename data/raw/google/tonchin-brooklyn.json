@@ -1,0 +1,18 @@
+{
+ "slug": "tonchin-brooklyn",
+ "query_name": "Tonchin Brooklyn",
+ "matched": {
+  "place_id": "ChIJVQw7S69ZwokRxkRkuFLa494",
+  "name": "TONCHIN BROOKLYN",
+  "address": "109 N 3rd St, Brooklyn, NY 11249, USA",
+  "rating": 4.6,
+  "user_ratings_total": 708,
+  "business_status": "OPERATIONAL",
+  "lat": 40.716755,
+  "lng": -73.9616957
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "chatti-by-regi-mathew",
+ "query_name": "Chatti by Regi Mathew",
+ "matched": {
+  "place_id": "ChIJxeVnwqNZwokR9p_8Ofyh83Q",
+  "name": "Chatti by Regi Mathew",
+  "address": "252 W 37th St, New York, NY 10018, USA",
+  "rating": 4.4,
+  "user_ratings_total": 931,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7535628,
+  "lng": -73.9914967
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

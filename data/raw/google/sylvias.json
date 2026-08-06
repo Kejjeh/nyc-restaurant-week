@@ -1,0 +1,18 @@
+{
+ "slug": "sylvias",
+ "query_name": "Sylvia's",
+ "matched": {
+  "place_id": "ChIJb8Xw0wz2wokRXhp1-HSLvkI",
+  "name": "Sylvia's Restaurant",
+  "address": "328 Malcolm X Blvd, New York, NY 10027, USA",
+  "rating": 4.3,
+  "user_ratings_total": 9026,
+  "business_status": "OPERATIONAL",
+  "lat": 40.8086445,
+  "lng": -73.944479
+ },
+ "accepted": true,
+ "reason": "5m away",
+ "source": "textsearch",
+ "error": null
+}

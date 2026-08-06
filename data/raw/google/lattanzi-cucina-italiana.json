@@ -1,0 +1,18 @@
+{
+ "slug": "lattanzi-cucina-italiana",
+ "query_name": "Lattanzi Cucina Italiana",
+ "matched": {
+  "place_id": "ChIJBQop4lNYwokR5TMewzzDyrs",
+  "name": "Lattanzi Cucina Italiana",
+  "address": "361 W 46th St, New York, NY 10036, USA",
+  "rating": 4.3,
+  "user_ratings_total": 742,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7608225,
+  "lng": -73.98999719999999
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

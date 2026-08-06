@@ -1,0 +1,18 @@
+{
+ "slug": "ammos-estiatorio-grand-central",
+ "query_name": "Ammos Estiatorio - Grand Central",
+ "matched": {
+  "place_id": "ChIJHwqo_wFZwokRQN1JF-q8O1o",
+  "name": "Ammos Estiatorio",
+  "address": "52 Vanderbilt Ave, New York, NY 10017, USA",
+  "rating": 4.1,
+  "user_ratings_total": 779,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7542898,
+  "lng": -73.9771371
+ },
+ "accepted": true,
+ "reason": "19m away",
+ "source": "textsearch",
+ "error": null
+}

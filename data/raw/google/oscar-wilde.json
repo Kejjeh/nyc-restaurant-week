@@ -1,0 +1,18 @@
+{
+ "slug": "oscar-wilde",
+ "query_name": "Oscar Wilde",
+ "matched": {
+  "place_id": "ChIJgbdZ6aVZwokRxtWri-IDLJw",
+  "name": "Oscar Wilde",
+  "address": "45 W 27th St, New York, NY 10001, USA",
+  "rating": 4.3,
+  "user_ratings_total": 6070,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7451638,
+  "lng": -73.99007209999999
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

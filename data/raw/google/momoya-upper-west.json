@@ -1,0 +1,18 @@
+{
+ "slug": "momoya-upper-west",
+ "query_name": "Momoya - Upper West Side",
+ "matched": {
+  "place_id": "ChIJgTrKAYZYwokRrLF7JiGwdNM",
+  "name": "Momoya Upper West",
+  "address": "427 Amsterdam Ave, New York, NY 10024, USA",
+  "rating": 4.4,
+  "user_ratings_total": 886,
+  "business_status": "OPERATIONAL",
+  "lat": 40.784053,
+  "lng": -73.9774448
+ },
+ "accepted": true,
+ "reason": "16m away",
+ "source": "textsearch",
+ "error": null
+}

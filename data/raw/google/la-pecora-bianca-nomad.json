@@ -1,0 +1,18 @@
+{
+ "slug": "la-pecora-bianca-nomad",
+ "query_name": "La Pecora Bianca NoMad",
+ "matched": {
+  "place_id": "ChIJPf0L06VZwokRD6L-7RV-7Yg",
+  "name": "La Pecora Bianca NoMad",
+  "address": "1133 Broadway, New York, NY 10010, USA",
+  "rating": 4.7,
+  "user_ratings_total": 6858,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7436754,
+  "lng": -73.9891719
+ },
+ "accepted": true,
+ "reason": "20m away",
+ "source": "textsearch",
+ "error": null
+}

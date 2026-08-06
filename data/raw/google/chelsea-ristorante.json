@@ -1,0 +1,18 @@
+{
+ "slug": "chelsea-ristorante",
+ "query_name": "Chelsea Ristorante",
+ "matched": {
+  "place_id": "ChIJ3Qtyib5ZwokRswc-QzntwIU",
+  "name": "Chelsea Ristorante Italiano",
+  "address": "108 8th Ave, New York, NY 10011, USA",
+  "rating": 4.4,
+  "user_ratings_total": 880,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7406515,
+  "lng": -74.0015913
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

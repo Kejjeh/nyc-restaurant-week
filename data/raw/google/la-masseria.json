@@ -1,0 +1,18 @@
+{
+ "slug": "la-masseria",
+ "query_name": "La Masseria",
+ "matched": {
+  "place_id": "ChIJjfIegVZYwokRyqdwvzBC27s",
+  "name": "La Masseria NY",
+  "address": "235 W 48th St, New York, NY 10036, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1677,
+  "business_status": "OPERATIONAL",
+  "lat": 40.76088499999999,
+  "lng": -73.9863
+ },
+ "accepted": true,
+ "reason": "21m away",
+ "source": "textsearch",
+ "error": null
+}

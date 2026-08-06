@@ -1,0 +1,18 @@
+{
+ "slug": "estiatorio-milos",
+ "query_name": "Estiatorio Milos",
+ "matched": {
+  "place_id": "ChIJbRaexvlYwokRYc5RgUjlsIY",
+  "name": "estiatorio Milos Midtown",
+  "address": "125 W 55th St, New York, NY 10019, USA",
+  "rating": 4.5,
+  "user_ratings_total": 2396,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7635461,
+  "lng": -73.9790278
+ },
+ "accepted": true,
+ "reason": "9m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "pulperia-latin-mediterranean-kitchen",
+ "query_name": "Pulperia Latin Mediterranean Kitchen",
+ "matched": {
+  "place_id": "ChIJf03C8VNYwokRLiiXdB_MK3o",
+  "name": "Pulperia Latin Mediterranean Kitchen",
+  "address": "338 W 46th St, New York, NY 10036, USA",
+  "rating": 4.9,
+  "user_ratings_total": 663,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7603188,
+  "lng": -73.9894384
+ },
+ "accepted": true,
+ "reason": "23m away",
+ "source": "textsearch",
+ "error": null
+}

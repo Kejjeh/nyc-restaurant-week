@@ -1,0 +1,18 @@
+{
+ "slug": "bocca-di-bacco-theatre-district",
+ "query_name": "Bocca Di Bacco—Theatre District",
+ "matched": {
+  "place_id": "ChIJAbHSp8NZwokRV56pK23WC_Y",
+  "name": "Bocca di Bacco Theater District",
+  "address": "635 9th Ave, New York, NY 10036, USA",
+  "rating": 4.4,
+  "user_ratings_total": 605,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7602533,
+  "lng": -73.9916643
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

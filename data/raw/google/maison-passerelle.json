@@ -1,0 +1,18 @@
+{
+ "slug": "maison-passerelle",
+ "query_name": "Maison Passerelle",
+ "matched": {
+  "place_id": "ChIJTQ0bJiJbwokRIjq-0C-madM",
+  "name": "Maison Passerelle",
+  "address": "80A Broadway, New York, NY 10005, USA",
+  "rating": 4.4,
+  "user_ratings_total": 186,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7073805,
+  "lng": -74.0118316
+ },
+ "accepted": true,
+ "reason": "20m away",
+ "source": "textsearch",
+ "error": null
+}

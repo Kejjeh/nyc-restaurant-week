@@ -1,0 +1,18 @@
+{
+ "slug": "stk-midtown",
+ "query_name": "STK Midtown",
+ "matched": {
+  "place_id": "ChIJXTDiAwBZwokRHTaHoPYW5oo",
+  "name": "STK Steakhouse Midtown NYC",
+  "address": "1114 6th Ave, New York, NY 10036, USA",
+  "rating": 4.8,
+  "user_ratings_total": 38063,
+  "business_status": "OPERATIONAL",
+  "lat": 40.754721,
+  "lng": -73.982759
+ },
+ "accepted": true,
+ "reason": "10m away",
+ "source": "textsearch",
+ "error": null
+}

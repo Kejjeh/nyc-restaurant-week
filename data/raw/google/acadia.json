@@ -1,0 +1,18 @@
+{
+ "slug": "acadia",
+ "query_name": "Acadia",
+ "matched": {
+  "place_id": "ChIJq6rmUvdYwokRh9lMK1FlmRs",
+  "name": "Acadia",
+  "address": "101 W 57th St, New York, NY 10019, USA",
+  "rating": 4.7,
+  "user_ratings_total": 1693,
+  "business_status": "OPERATIONAL",
+  "lat": 40.764653,
+  "lng": -73.97724339999999
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

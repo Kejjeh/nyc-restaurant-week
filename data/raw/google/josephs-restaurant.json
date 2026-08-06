@@ -1,0 +1,18 @@
+{
+ "slug": "josephs-restaurant",
+ "query_name": "Joseph's",
+ "matched": {
+  "place_id": "ChIJST0cgRZawokRNvJv5mhG57E",
+  "name": "Joseph's Restaurant",
+  "address": "3 Hanover Square, New York, NY 10004, USA",
+  "rating": 4.5,
+  "user_ratings_total": 384,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7048499,
+  "lng": -74.0095927
+ },
+ "accepted": true,
+ "reason": "17m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "rialto-ristorante",
+ "query_name": "Rialto Ristorante",
+ "matched": {
+  "place_id": "ChIJmxrxyg9fwokRfictqoPvDe8",
+  "name": "Rialto Ristorante",
+  "address": "28-11 Astoria Blvd, Astoria, NY 11102, USA",
+  "rating": 4.9,
+  "user_ratings_total": 164,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7708193,
+  "lng": -73.9203836
+ },
+ "accepted": true,
+ "reason": "5m away",
+ "source": "textsearch",
+ "error": null
+}

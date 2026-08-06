@@ -1,0 +1,18 @@
+{
+ "slug": "mezze-on-the-river",
+ "query_name": "Mezze on the River",
+ "matched": {
+  "place_id": "ChIJySoGRqBbwokRjQ3Z2U3Ben4",
+  "name": "Mezze on the River",
+  "address": "375 S End Ave, New York, NY 10280, USA",
+  "rating": 4.3,
+  "user_ratings_total": 885,
+  "business_status": "OPERATIONAL",
+  "lat": 40.71133090000001,
+  "lng": -74.0178908
+ },
+ "accepted": true,
+ "reason": "21m away",
+ "source": "textsearch",
+ "error": null
+}

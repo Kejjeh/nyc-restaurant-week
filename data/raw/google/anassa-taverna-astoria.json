@@ -1,0 +1,18 @@
+{
+ "slug": "anassa-taverna-astoria",
+ "query_name": "Anassa Taverna - Astoria",
+ "matched": {
+  "place_id": "ChIJN7M5ifhfwokR0ojtSOmzHrY",
+  "name": "Anassa Taverna Astoria",
+  "address": "28-10 Astoria Blvd, Astoria, NY 11102, USA",
+  "rating": 4.7,
+  "user_ratings_total": 880,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7705679,
+  "lng": -73.9206612
+ },
+ "accepted": true,
+ "reason": "6m away",
+ "source": "textsearch",
+ "error": null
+}

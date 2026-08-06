@@ -1,0 +1,18 @@
+{
+ "slug": "code-red-restaurant-and-lounge",
+ "query_name": "Code Red Restaurant & Lounge",
+ "matched": {
+  "place_id": "ChIJAQAQfEnzwokR5cXlw6wWYxU",
+  "name": "Code Red Restaurant & Lounge",
+  "address": "1320 E Gun Hill Rd, Bronx, NY 10469, USA",
+  "rating": 4.4,
+  "user_ratings_total": 2652,
+  "business_status": "OPERATIONAL",
+  "lat": 40.8711939,
+  "lng": -73.848109
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

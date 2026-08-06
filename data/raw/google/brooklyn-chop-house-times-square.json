@@ -1,0 +1,18 @@
+{
+ "slug": "brooklyn-chop-house-times-square",
+ "query_name": "Brooklyn Chop House - Times Square",
+ "matched": {
+  "place_id": "ChIJ8cXwOqtZwokRcaCG-esAYPY",
+  "name": "Brooklyn Chop House Steakhouse Times Square",
+  "address": "253 W 47th St, New York, NY 10036, USA",
+  "rating": 4.1,
+  "user_ratings_total": 1313,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7601081,
+  "lng": -73.9865064
+ },
+ "accepted": true,
+ "reason": "16m away",
+ "source": "textsearch",
+ "error": null
+}

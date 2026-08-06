@@ -1,0 +1,18 @@
+{
+ "slug": "five-napkin-burger-hells-kitchen",
+ "query_name": "5 Napkin Burger - Hell's Kitchen",
+ "matched": {
+  "place_id": "ChIJscoCyFNYwokRDMEEfPoNM8o",
+  "name": "5 Napkin Burger",
+  "address": "630 9th Ave, New York, NY 10036, USA",
+  "rating": null,
+  "user_ratings_total": null,
+  "business_status": "OPERATIONAL",
+  "lat": 40.76018000000001,
+  "lng": -73.9910951
+ },
+ "accepted": true,
+ "reason": "24m away",
+ "source": "textsearch",
+ "error": null
+}

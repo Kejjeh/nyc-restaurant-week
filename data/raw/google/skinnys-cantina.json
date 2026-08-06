@@ -1,0 +1,18 @@
+{
+ "slug": "skinnys-cantina",
+ "query_name": "Skinny's Cantina",
+ "matched": {
+  "place_id": "ChIJm8F21CNZwokRy0e82y_rLAk",
+  "name": "Skinnys Cantina",
+  "address": "Avalon Riverview, 47-05 Center Blvd, Long Island City, NY 11109, USA",
+  "rating": 3.9,
+  "user_ratings_total": 1059,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7456226,
+  "lng": -73.95686119999999
+ },
+ "accepted": true,
+ "reason": "51m away",
+ "source": "textsearch",
+ "error": null
+}

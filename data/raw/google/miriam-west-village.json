@@ -1,0 +1,18 @@
+{
+ "slug": "miriam-west-village",
+ "query_name": "Miriam West Village",
+ "matched": {
+  "place_id": "ChIJ47ksW1FZwokRvk9gBIKnyJ0",
+  "name": "Miriam West Village",
+  "address": "140 7th Ave S, New York, NY 10014, USA",
+  "rating": 4.5,
+  "user_ratings_total": 124,
+  "business_status": "OPERATIONAL",
+  "lat": 40.734727,
+  "lng": -74.0023992
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

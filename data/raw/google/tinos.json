@@ -1,0 +1,18 @@
+{
+ "slug": "tinos",
+ "query_name": "Tinos",
+ "matched": {
+  "place_id": "ChIJAx204q9YwokRdfgKIOB5oAQ",
+  "name": "Tinos",
+  "address": "1748 1st Ave, New York, NY 10128, USA",
+  "rating": 4.6,
+  "user_ratings_total": 370,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7796701,
+  "lng": -73.94698140000001
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

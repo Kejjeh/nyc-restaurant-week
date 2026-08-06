@@ -1,0 +1,18 @@
+{
+ "slug": "marseille",
+ "query_name": "Marseille",
+ "matched": {
+  "place_id": "ChIJDf7etFNYwokR_b7pJ_D2_dM",
+  "name": "Marseille",
+  "address": "630 9th Ave, New York, NY 10036, USA",
+  "rating": 4.7,
+  "user_ratings_total": 5967,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7597451,
+  "lng": -73.9913945
+ },
+ "accepted": true,
+ "reason": "30m away",
+ "source": "textsearch",
+ "error": null
+}

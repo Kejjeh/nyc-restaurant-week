@@ -1,0 +1,18 @@
+{
+ "slug": "junoon",
+ "query_name": "Junoon",
+ "matched": {
+  "place_id": "ChIJD4wsQaRZwokRQIswTkF3YIc",
+  "name": "Junoon",
+  "address": "19 W 24th St, New York, NY 10010, USA",
+  "rating": 4.4,
+  "user_ratings_total": 4610,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7430703,
+  "lng": -73.9903968
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

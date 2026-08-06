@@ -1,0 +1,18 @@
+{
+ "slug": "beauty-essex",
+ "query_name": "Beauty & Essex",
+ "matched": {
+  "place_id": "ChIJJWCTb4FZwokRLe7HgJSuHFI",
+  "name": "Beauty & Essex",
+  "address": "146 Essex St, New York, NY 10002, USA",
+  "rating": 4.5,
+  "user_ratings_total": 4786,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7204282,
+  "lng": -73.9868606
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

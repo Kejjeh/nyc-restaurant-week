@@ -1,0 +1,18 @@
+{
+ "slug": "florentin-bistro",
+ "query_name": "Florentin Bistro",
+ "matched": {
+  "place_id": "ChIJE27K7lpZwokR8G1u2pvT_WY",
+  "name": "Florentin",
+  "address": "480 Amsterdam Ave, New York, NY 10024, USA",
+  "rating": 4.9,
+  "user_ratings_total": 442,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7859257,
+  "lng": -73.9766018
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

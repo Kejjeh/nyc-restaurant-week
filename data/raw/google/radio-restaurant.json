@@ -1,0 +1,18 @@
+{
+ "slug": "radio-restaurant",
+ "query_name": "Radio Restaurant",
+ "matched": {
+  "place_id": "ChIJq6rqPh_0wokRYx9DPUPrCJs",
+  "name": "Radio Restaurant",
+  "address": "Inside Radio Hotel, 2420 Amsterdam Ave, New York, NY 10033, USA",
+  "rating": 4.2,
+  "user_ratings_total": 1148,
+  "business_status": "OPERATIONAL",
+  "lat": 40.8475308,
+  "lng": -73.93146349999999
+ },
+ "accepted": true,
+ "reason": "40m away",
+ "source": "textsearch",
+ "error": null
+}

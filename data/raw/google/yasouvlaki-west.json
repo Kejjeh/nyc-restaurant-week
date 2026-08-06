@@ -1,0 +1,18 @@
+{
+ "slug": "yasouvlaki-west",
+ "query_name": "Yasouvlaki West",
+ "matched": {
+  "place_id": "ChIJzYz1HABZwokRzMK5iSGo8t0",
+  "name": "Yasouvlaki",
+  "address": "594 Amsterdam Ave, New York, NY 10024, USA",
+  "rating": null,
+  "user_ratings_total": null,
+  "business_status": "OPERATIONAL",
+  "lat": 40.78964000000001,
+  "lng": -73.973978
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

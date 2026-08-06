@@ -1,0 +1,18 @@
+{
+ "slug": "chela",
+ "query_name": "Chela",
+ "matched": {
+  "place_id": "ChIJ3Vkgyv1awokRa95N29fo1DY",
+  "name": "Chela",
+  "address": "408 5th Ave, Brooklyn, NY 11215, USA",
+  "rating": 4.6,
+  "user_ratings_total": 1482,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6702928,
+  "lng": -73.9856078
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "bixi",
+ "query_name": "Bixi",
+ "matched": {
+  "place_id": "ChIJr5HCUpf3wokRVRIWsXTKEwU",
+  "name": "BIXI",
+  "address": "2164 Frederick Douglass Blvd, New York, NY 10026, USA",
+  "rating": 4.6,
+  "user_ratings_total": 267,
+  "business_status": "OPERATIONAL",
+  "lat": 40.8048198,
+  "lng": -73.9547643
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "jojo",
+ "query_name": "JoJo",
+ "matched": {
+  "place_id": "ChIJI9k11O5YwokRJXZKb8r3CoQ",
+  "name": "JoJo by Jean-Georges",
+  "address": "160 E 64th St, New York, NY 10065, USA",
+  "rating": 4.2,
+  "user_ratings_total": 731,
+  "business_status": "OPERATIONAL",
+  "lat": 40.76508949999999,
+  "lng": -73.9657019
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

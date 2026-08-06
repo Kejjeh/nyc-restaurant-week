@@ -1,0 +1,18 @@
+{
+ "slug": "le-gratin",
+ "query_name": "Le Gratin",
+ "matched": {
+  "place_id": "ChIJj4fN7HBbwokRCB5xca3KF1E",
+  "name": "Le Gratin",
+  "address": "5 Beekman St, New York, NY 10038, USA",
+  "rating": 4.7,
+  "user_ratings_total": 747,
+  "business_status": "OPERATIONAL",
+  "lat": 40.711274,
+  "lng": -74.0066676
+ },
+ "accepted": true,
+ "reason": "21m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "mr-chow-new-york-57th-street",
+ "query_name": "Mr Chow New York - 57th Street",
+ "matched": {
+  "place_id": "ChIJj1En45dcwokR4BRFTdCs-k4",
+  "name": "Mr Chow",
+  "address": "324 E 57th St, New York, NY 10022, USA",
+  "rating": 4,
+  "user_ratings_total": 615,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7588323,
+  "lng": -73.9643541
+ },
+ "accepted": true,
+ "reason": "15m away",
+ "source": "textsearch",
+ "error": null
+}

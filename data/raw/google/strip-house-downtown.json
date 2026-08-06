@@ -1,0 +1,18 @@
+{
+ "slug": "strip-house-downtown",
+ "query_name": "Strip House Downtown",
+ "matched": {
+  "place_id": "ChIJ99hry5lZwokRlClJt421pzs",
+  "name": "Strip House Steakhouse",
+  "address": "13 E 12th St, New York, NY 10003, USA",
+  "rating": 4.6,
+  "user_ratings_total": 1455,
+  "business_status": "OPERATIONAL",
+  "lat": 40.734399,
+  "lng": -73.9934116
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

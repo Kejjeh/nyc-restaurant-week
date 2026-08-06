@@ -1,0 +1,18 @@
+{
+ "slug": "trapizzino",
+ "query_name": "Trapizzino",
+ "matched": {
+  "place_id": "ChIJE46otIZZwokRlpOttitF5JM",
+  "name": "Trapizzino",
+  "address": "144 Orchard St, New York, NY 10002, USA",
+  "rating": 4.5,
+  "user_ratings_total": 880,
+  "business_status": "OPERATIONAL",
+  "lat": 40.720409,
+  "lng": -73.988922
+ },
+ "accepted": true,
+ "reason": "6m away",
+ "source": "textsearch",
+ "error": null
+}

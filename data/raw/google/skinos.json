@@ -1,0 +1,18 @@
+{
+ "slug": "skinos",
+ "query_name": "Skinos",
+ "matched": {
+  "place_id": "ChIJQV4litZbwokRPc2qPtWjFsw",
+  "name": "Skinos",
+  "address": "123 Washington St, New York, NY 10006, USA",
+  "rating": 4.6,
+  "user_ratings_total": 1936,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7092191,
+  "lng": -74.0137534
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

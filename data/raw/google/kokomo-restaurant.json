@@ -1,0 +1,18 @@
+{
+ "slug": "kokomo-restaurant",
+ "query_name": "Kokomo",
+ "matched": {
+  "place_id": "ChIJ9-EhOXlZwokRSdB_B9mYM30",
+  "name": "Kokomo Restaurant & Lounge",
+  "address": "65 Kent Ave, Brooklyn, NY 11249, USA",
+  "rating": 4.4,
+  "user_ratings_total": 3164,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7219794,
+  "lng": -73.9597134
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

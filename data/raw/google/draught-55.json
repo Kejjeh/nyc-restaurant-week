@@ -1,0 +1,18 @@
+{
+ "slug": "draught-55",
+ "query_name": "Draught 55",
+ "matched": {
+  "place_id": "ChIJNRp4EuRYwokRkc8M1fcNSVs",
+  "name": "Draught 55",
+  "address": "245 E 55th St, New York, NY 10022, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1348,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7583639,
+  "lng": -73.96652499999999
+ },
+ "accepted": true,
+ "reason": "9m away",
+ "source": "textsearch",
+ "error": null
+}

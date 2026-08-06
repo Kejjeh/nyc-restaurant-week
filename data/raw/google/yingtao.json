@@ -1,0 +1,18 @@
+{
+ "slug": "yingtao",
+ "query_name": "Yingtao",
+ "matched": {
+  "place_id": "ChIJkYkkoh1ZwokRE01ymVZhhpg",
+  "name": "Yingtao",
+  "address": "805 9th Ave, New York, NY 10019, USA",
+  "rating": 4.4,
+  "user_ratings_total": 226,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7657219,
+  "lng": -73.987724
+ },
+ "accepted": true,
+ "reason": "6m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "la-grande-boucherie",
+ "query_name": "La Grande Boucherie",
+ "matched": {
+  "place_id": "ChIJ58OtM8pZwokRbd6DT6gcVys",
+  "name": "La Grande Boucherie",
+  "address": "145 W 53rd St, New York, NY 10019, USA",
+  "rating": 4.6,
+  "user_ratings_total": 10834,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7626274,
+  "lng": -73.98084109999999
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

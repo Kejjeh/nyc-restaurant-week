@@ -1,0 +1,18 @@
+{
+ "slug": "meadowsweet-williamsburg",
+ "query_name": "Meadowsweet",
+ "matched": {
+  "place_id": "ChIJwXUoA99bwokRU2bF-gdB25I",
+  "name": "Meadowsweet",
+  "address": "149 Broadway, Brooklyn, NY 11211, USA",
+  "rating": 4.6,
+  "user_ratings_total": 1118,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7104256,
+  "lng": -73.96312429999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

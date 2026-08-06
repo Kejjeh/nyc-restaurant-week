@@ -1,0 +1,18 @@
+{
+ "slug": "grand-brasserie",
+ "query_name": "Grand Brasserie",
+ "matched": {
+  "place_id": "ChIJ8Ym0ZABZwokRPanEDBHn04o",
+  "name": "Grand Brasserie",
+  "address": "89 E 42nd St, New York, NY 10017, USA",
+  "rating": 4.3,
+  "user_ratings_total": 813,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7527277,
+  "lng": -73.97723529999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

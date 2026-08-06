@@ -1,0 +1,18 @@
+{
+ "slug": "tarallucci-e-vino-nomad",
+ "query_name": "Tarallucci e Vino - NoMad",
+ "matched": {
+  "place_id": "ChIJ4zfZAKdZwokRrsYhDxNqGEo",
+  "name": "Tarallucci e Vino NoMad",
+  "address": "44 E 28th St, New York, NY 10016, USA",
+  "rating": 4.6,
+  "user_ratings_total": 452,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7434168,
+  "lng": -73.9847247
+ },
+ "accepted": true,
+ "reason": "8m away",
+ "source": "textsearch",
+ "error": null
+}

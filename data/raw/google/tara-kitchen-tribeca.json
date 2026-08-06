@@ -1,0 +1,18 @@
+{
+ "slug": "tara-kitchen-tribeca",
+ "query_name": "Tara Kitchen TriBeCa",
+ "matched": {
+  "place_id": "ChIJoz4wBFFbwokRpkJ9fa2n4i8",
+  "name": "Tara Kitchen Tribeca",
+  "address": "253 Church St, New York, NY 10013, USA",
+  "rating": 4.6,
+  "user_ratings_total": 288,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7178686,
+  "lng": -74.0053451
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

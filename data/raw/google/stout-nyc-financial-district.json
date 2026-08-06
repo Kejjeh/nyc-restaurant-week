@@ -1,0 +1,18 @@
+{
+ "slug": "stout-nyc-financial-district",
+ "query_name": "Stout NYC Financial District",
+ "matched": {
+  "place_id": "ChIJI9Gs4RdawokRYK7bZE8reok",
+  "name": "Stout NYC",
+  "address": "90 John St, New York, NY 10038, USA",
+  "rating": 4.2,
+  "user_ratings_total": 1486,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7079196,
+  "lng": -74.0065166
+ },
+ "accepted": true,
+ "reason": "8m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "olio-e-piu",
+ "query_name": "Olio e Più",
+ "matched": {
+  "place_id": "ChIJ_RUJvZZZwokRNUEv3K4nSik",
+  "name": "OLIO E PIÙ",
+  "address": "3 Greenwich Ave, New York, NY 10014, USA",
+  "rating": 4.7,
+  "user_ratings_total": 12039,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7338208,
+  "lng": -73.99979309999999
+ },
+ "accepted": true,
+ "reason": "10m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "hasaki",
+ "query_name": "Hasaki",
+ "matched": {
+  "place_id": "ChIJ3cUFdpxZwokR6oOwbesBRXQ",
+  "name": "Hasaki",
+  "address": "210 E 9th St, New York, NY 10003, USA",
+  "rating": 4.4,
+  "user_ratings_total": 455,
+  "business_status": "OPERATIONAL",
+  "lat": 40.72969990000001,
+  "lng": -73.98881349999999
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

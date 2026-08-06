@@ -1,0 +1,18 @@
+{
+ "slug": "dinner-party",
+ "query_name": "Dinner Party",
+ "matched": {
+  "place_id": "ChIJrYK5Zd9bwokRsOPttcjWkMo",
+  "name": "Dinner Party",
+  "address": "274 Hall St, Brooklyn, NY 11205, USA",
+  "rating": 4.5,
+  "user_ratings_total": 321,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6900427,
+  "lng": -73.9654379
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

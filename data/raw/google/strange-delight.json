@@ -1,0 +1,18 @@
+{
+ "slug": "strange-delight",
+ "query_name": "Strange Delight",
+ "matched": {
+  "place_id": "ChIJSZ__agBbwokRFqNZkOBfbsk",
+  "name": "Strange Delight",
+  "address": "63 Lafayette Ave, Brooklyn, NY 11217, USA",
+  "rating": 4.5,
+  "user_ratings_total": 344,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6873624,
+  "lng": -73.9760048
+ },
+ "accepted": true,
+ "reason": "12m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "socarrat-paella-bar-midtown-east",
+ "query_name": "Socarrat Paella Bar - Midtown East",
+ "matched": {
+  "place_id": "ChIJUfnx_uJYwokRgDmbCNlTEcw",
+  "name": "Socarrat Paella Bar - Midtown East",
+  "address": "953 2nd Ave, New York, NY 10022, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1527,
+  "business_status": "OPERATIONAL",
+  "lat": 40.75529,
+  "lng": -73.96846
+ },
+ "accepted": true,
+ "reason": "6m away",
+ "source": "textsearch",
+ "error": null
+}

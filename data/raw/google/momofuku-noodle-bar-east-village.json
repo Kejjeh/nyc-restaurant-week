@@ -1,0 +1,18 @@
+{
+ "slug": "momofuku-noodle-bar-east-village",
+ "query_name": "Momofuku Noodle Bar",
+ "matched": {
+  "place_id": "ChIJkXQ3_INZwokRE74ZvG46Jjc",
+  "name": "Momofuku Noodle Bar",
+  "address": "171 1st Ave, New York, NY 10003, USA",
+  "rating": 4.5,
+  "user_ratings_total": 5361,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7292083,
+  "lng": -73.98441500000001
+ },
+ "accepted": true,
+ "reason": "8m away",
+ "source": "textsearch",
+ "error": null
+}

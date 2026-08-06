@@ -1,0 +1,18 @@
+{
+ "slug": "zaytinya",
+ "query_name": "Zaytinya",
+ "matched": {
+  "place_id": "ChIJl_24MRlZwokRvdVm_R4O8A8",
+  "name": "Zaytinya",
+  "address": "1185 Broadway Ground Floor, New York, NY 10001, USA",
+  "rating": 4.4,
+  "user_ratings_total": 2061,
+  "business_status": "OPERATIONAL",
+  "lat": 40.745546,
+  "lng": -73.9889515
+ },
+ "accepted": true,
+ "reason": "7m away",
+ "source": "textsearch",
+ "error": null
+}

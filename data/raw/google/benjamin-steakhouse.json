@@ -1,0 +1,18 @@
+{
+ "slug": "benjamin-steakhouse",
+ "query_name": "Benjamin Steakhouse",
+ "matched": {
+  "place_id": "ChIJ3TH9CwFZwokRIvNO1SP0WLg",
+  "name": "Benjamin Steakhouse",
+  "address": "Inside The Chemists' Club Hotel, 52 E 41st St, New York, NY 10017, USA",
+  "rating": 4.5,
+  "user_ratings_total": 2728,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7516345,
+  "lng": -73.9790926
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

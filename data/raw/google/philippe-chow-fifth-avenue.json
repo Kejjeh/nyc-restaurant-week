@@ -1,0 +1,18 @@
+{
+ "slug": "philippe-chow-fifth-avenue",
+ "query_name": "Philippe Chow Fifth Avenue",
+ "matched": {
+  "place_id": "ChIJcYjz5e9YwokRO6lR3XH7PKA",
+  "name": "Philippe Chow",
+  "address": "10 E 52nd St, New York, NY 10022, USA",
+  "rating": 4.3,
+  "user_ratings_total": 1412,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7592885,
+  "lng": -73.9756381
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "the-dram-shop-bar",
+ "query_name": "The Dram Shop Bar",
+ "matched": {
+  "place_id": "ChIJ8wlrCP1awokRNK8tujudQr8",
+  "name": "The Dram Shop Bar",
+  "address": "339 9th St, Brooklyn, NY 11215, USA",
+  "rating": 4.4,
+  "user_ratings_total": 727,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6688796,
+  "lng": -73.9850597
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

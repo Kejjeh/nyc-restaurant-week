@@ -1,0 +1,18 @@
+{
+ "slug": "bourbon-steak-new-york",
+ "query_name": "Bourbon Steak New York",
+ "matched": {
+  "place_id": "ChIJvbDuO1lZwokRhz97XRAAtHA",
+  "name": "Bourbon Steak by Michael Mina",
+  "address": "160 Central Park S Ste 1101-62, New York, NY 10019, USA",
+  "rating": 4.5,
+  "user_ratings_total": 533,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7662802,
+  "lng": -73.9785674
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

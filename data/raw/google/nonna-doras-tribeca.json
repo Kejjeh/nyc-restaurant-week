@@ -1,0 +1,18 @@
+{
+ "slug": "nonna-doras-tribeca",
+ "query_name": "Nonna Dora's - Tribeca",
+ "matched": {
+  "place_id": "ChIJY4-AAABbwokRUaTvDok8VL0",
+  "name": "Nonna Dora’s Tribeca",
+  "address": "200 Church St, New York, NY 10013, USA",
+  "rating": 4.6,
+  "user_ratings_total": 215,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7163855,
+  "lng": -74.0071346
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

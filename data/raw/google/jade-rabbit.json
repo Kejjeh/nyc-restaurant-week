@@ -1,0 +1,18 @@
+{
+ "slug": "jade-rabbit",
+ "query_name": "Jade Rabbit",
+ "matched": {
+  "place_id": "ChIJoXI72m5ZwokRqrj27IlpvfQ",
+  "name": "Jade Rabbit",
+  "address": "32 W 48th St Rooftop, New York, NY 10036, USA",
+  "rating": 4.3,
+  "user_ratings_total": 84,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7577789,
+  "lng": -73.9798407
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

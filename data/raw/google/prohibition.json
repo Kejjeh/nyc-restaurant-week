@@ -1,0 +1,18 @@
+{
+ "slug": "prohibition",
+ "query_name": "Prohibition",
+ "matched": {
+  "place_id": "ChIJSc_3GIVYwokRh6OzVnCnh6g",
+  "name": "Prohibition",
+  "address": "503 Columbus Ave, New York, NY 10024, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1059,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7852428,
+  "lng": -73.972764
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "masseria-dei-vini",
+ "query_name": "Masseria Dei Vini",
+ "matched": {
+  "place_id": "ChIJeVfr_FhYwokRVM1IjwyvQpE",
+  "name": "Masseria Dei Vini",
+  "address": "887 9th Ave, New York, NY 10019, USA",
+  "rating": 4.6,
+  "user_ratings_total": 1012,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7684477,
+  "lng": -73.9857048
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

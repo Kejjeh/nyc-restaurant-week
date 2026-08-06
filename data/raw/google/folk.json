@@ -1,0 +1,18 @@
+{
+ "slug": "folk",
+ "query_name": "Folk",
+ "matched": {
+  "place_id": "ChIJSTTBZoJbwokRAqhtyjmoq_s",
+  "name": "FOLK",
+  "address": "689 6th Ave, Brooklyn, NY 11215, USA",
+  "rating": 4.8,
+  "user_ratings_total": 118,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6605649,
+  "lng": -73.9903719
+ },
+ "accepted": true,
+ "reason": "hand-verified place_id",
+ "source": "place_id",
+ "error": null
+}

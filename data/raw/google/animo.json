@@ -1,0 +1,18 @@
+{
+ "slug": "animo",
+ "query_name": "Animo!",
+ "matched": {
+  "place_id": "ChIJZf0rfQBZwokRvRHby7vh1js",
+  "name": "Animo!",
+  "address": "1004 2nd Ave, New York, NY 10022, USA",
+  "rating": 4.8,
+  "user_ratings_total": 699,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7567764,
+  "lng": -73.9668003
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

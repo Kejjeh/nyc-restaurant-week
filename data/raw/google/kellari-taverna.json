@@ -1,0 +1,18 @@
+{
+ "slug": "kellari-taverna",
+ "query_name": "Kellari Taverna",
+ "matched": {
+  "place_id": "ChIJDcyu2_9YwokRN2jyzlJQBWc",
+  "name": "Kellari Taverna",
+  "address": "19 W 44th St, New York, NY 10036, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1520,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7553634,
+  "lng": -73.9810562
+ },
+ "accepted": true,
+ "reason": "25m away",
+ "source": "textsearch",
+ "error": null
+}

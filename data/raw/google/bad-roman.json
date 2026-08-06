@@ -1,0 +1,18 @@
+{
+ "slug": "bad-roman",
+ "query_name": "Bad Roman",
+ "matched": {
+  "place_id": "ChIJG0fkfuJZwokRqmAxXTpYP2I",
+  "name": "Bad Roman",
+  "address": "3rd floor, 10 Columbus Cir, New York, NY 10019, USA",
+  "rating": 4.2,
+  "user_ratings_total": 1543,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7685526,
+  "lng": -73.9831866
+ },
+ "accepted": true,
+ "reason": "14m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "american-cut-steakhouse-tribeca",
+ "query_name": "American Cut Tribeca",
+ "matched": {
+  "place_id": "ChIJv-a4KB5awokR6TLKvHwGqQE",
+  "name": "American Cut",
+  "address": "363 Greenwich St, New York, NY 10013, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1056,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7191028,
+  "lng": -74.0100227
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

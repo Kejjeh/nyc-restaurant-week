@@ -1,0 +1,18 @@
+{
+ "slug": "fushimi-times-square",
+ "query_name": "Fushimi - Times Square",
+ "matched": {
+  "place_id": "ChIJ99ryy6tZwokRUawWuQwr04Q",
+  "name": "Fushimi Times Square",
+  "address": "311 W 43rd St, New York, NY 10036, USA",
+  "rating": 4.6,
+  "user_ratings_total": 765,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7584564,
+  "lng": -73.9900329
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

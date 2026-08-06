@@ -1,0 +1,18 @@
+{
+ "slug": "the-parliament",
+ "query_name": "The Parliament",
+ "matched": {
+  "place_id": "ChIJ___7z_xYwokR5HzTdFOyHes",
+  "name": "The Parliament",
+  "address": "557 Lexington Ave, New York, NY 10022, USA",
+  "rating": 4.8,
+  "user_ratings_total": 56,
+  "business_status": "OPERATIONAL",
+  "lat": 40.756593,
+  "lng": -73.971947
+ },
+ "accepted": true,
+ "reason": "16m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "gyu-kaku-japanese-bbq-east-village",
+ "query_name": "Gyu-Kaku Japanese BBQ - East Village",
+ "matched": {
+  "place_id": "ChIJd5vUG5tZwokR4auQzzfh1Fs",
+  "name": "Gyu-Kaku Japanese BBQ",
+  "address": "34 Cooper Sq, New York, NY 10003, USA",
+  "rating": 4.5,
+  "user_ratings_total": 2824,
+  "business_status": "OPERATIONAL",
+  "lat": 40.728255,
+  "lng": -73.9914601
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

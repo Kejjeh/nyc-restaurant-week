@@ -1,0 +1,18 @@
+{
+ "slug": "rosemarys-east",
+ "query_name": "Rosemary's East",
+ "matched": {
+  "place_id": "ChIJqfd3jX9ZwokRS1hCsvCFcE8",
+  "name": "Rosemary's East",
+  "address": "350 1st Ave, New York, NY 10010, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1056,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7350189,
+  "lng": -73.9793814
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

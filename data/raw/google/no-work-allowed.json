@@ -1,0 +1,18 @@
+{
+ "slug": "no-work-allowed",
+ "query_name": "No Work Allowed",
+ "matched": {
+  "place_id": "ChIJhQG76axZwokRCNRGqTNQkTs",
+  "name": "No Work Allowed",
+  "address": "235 E 53rd St Basement, New York, NY 10022, USA",
+  "rating": 4.5,
+  "user_ratings_total": 421,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7572785,
+  "lng": -73.9679736
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

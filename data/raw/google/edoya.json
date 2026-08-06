@@ -1,0 +1,18 @@
+{
+ "slug": "edoya",
+ "query_name": "EdoYa",
+ "matched": {
+  "place_id": "ChIJ42Zn1oxZwokRVMdAqJDP5Vw",
+  "name": "Edoya Sushi",
+  "address": "151 Rivington St, New York, NY 10002, USA",
+  "rating": 5,
+  "user_ratings_total": 65,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7191507,
+  "lng": -73.9857347
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

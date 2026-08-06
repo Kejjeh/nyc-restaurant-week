@@ -1,0 +1,18 @@
+{
+ "slug": "saar",
+ "query_name": "Saar",
+ "matched": {
+  "place_id": "ChIJr-ldS1ZYwokR1UaVyDZ15I8",
+  "name": "Saar Indian Cuisine & Bar",
+  "address": "241 W 51st St, New York, NY 10019, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1977,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7626911,
+  "lng": -73.9848128
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "malii-gramercy",
+ "query_name": "Malii Gramercy",
+ "matched": {
+  "place_id": "ChIJVeMsuJxZwokRMmTyY-QOKwY",
+  "name": "Malii Gramercy",
+  "address": "391 2nd Ave, New York, NY 10010, USA",
+  "rating": 4.9,
+  "user_ratings_total": 2376,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7377136,
+  "lng": -73.9813386
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

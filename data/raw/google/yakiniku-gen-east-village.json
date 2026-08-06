@@ -1,0 +1,18 @@
+{
+ "slug": "yakiniku-gen-east-village",
+ "query_name": "Yakiniku Gen - East Village",
+ "matched": {
+  "place_id": "ChIJTUG5WQBZwokRHXmgejplJMQ",
+  "name": "Yakiniku Gen East Village",
+  "address": "218 E 9th St, New York, NY 10003, USA",
+  "rating": 4.9,
+  "user_ratings_total": 1615,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7295872,
+  "lng": -73.9885698
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

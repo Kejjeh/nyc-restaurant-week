@@ -1,0 +1,18 @@
+{
+ "slug": "pico-de-gallo-bar-and-kitchen",
+ "query_name": "Pico De Gallo Bar & Kitchen",
+ "matched": {
+  "place_id": "ChIJW6LNyif2wokR0qiNKyJlEHA",
+  "name": "Pico De Gallo Bar & Kitchen",
+  "address": "768 Amsterdam Ave, New York, NY 10025, USA",
+  "rating": 4.4,
+  "user_ratings_total": 675,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7951789,
+  "lng": -73.9698463
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

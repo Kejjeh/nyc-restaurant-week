@@ -1,0 +1,18 @@
+{
+ "slug": "crave-fishbar-turtle-bay",
+ "query_name": "Crave Fishbar - Midtown",
+ "matched": {
+  "place_id": "ChIJBUB1-eJYwokRwqGsIIvAPls",
+  "name": "Crave Fishbar",
+  "address": "945 2nd Ave, New York, NY 10022, USA",
+  "rating": 4.6,
+  "user_ratings_total": 1227,
+  "business_status": "OPERATIONAL",
+  "lat": 40.755129,
+  "lng": -73.9686887
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "stella-34-trattoria",
+ "query_name": "Stella 34 Trattoria",
+ "matched": {
+  "place_id": "ChIJ98yXUKlZwokRdb3AjM-Y0zo",
+  "name": "Stella 34 Trattoria",
+  "address": "151 W 34th St., New York, NY 10001, USA",
+  "rating": 4.2,
+  "user_ratings_total": 1528,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7506123,
+  "lng": -73.9879934
+ },
+ "accepted": true,
+ "reason": "127m away",
+ "source": "textsearch",
+ "error": null
+}

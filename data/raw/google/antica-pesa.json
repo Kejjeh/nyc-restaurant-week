@@ -1,0 +1,18 @@
+{
+ "slug": "antica-pesa",
+ "query_name": "Antica Pesa",
+ "matched": {
+  "place_id": "ChIJPSVfkF1ZwokRAg317OWxQq8",
+  "name": "Antica Pesa Brooklyn",
+  "address": "115 Berry St, Brooklyn, NY 11249, USA",
+  "rating": 4.2,
+  "user_ratings_total": 753,
+  "business_status": "CLOSED_TEMPORARILY",
+  "lat": 40.7188116,
+  "lng": -73.9586417
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

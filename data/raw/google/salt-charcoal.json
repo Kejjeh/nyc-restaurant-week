@@ -1,0 +1,18 @@
+{
+ "slug": "salt-charcoal",
+ "query_name": "Salt + Charcoal",
+ "matched": {
+  "place_id": "ChIJYUlOWWBZwokRiO-JUciJ0uE",
+  "name": "Salt + Charcoal",
+  "address": "171 Grand St, Brooklyn, NY 11249, USA",
+  "rating": 4.3,
+  "user_ratings_total": 867,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7147055,
+  "lng": -73.9613
+ },
+ "accepted": true,
+ "reason": "9m away",
+ "source": "textsearch",
+ "error": null
+}

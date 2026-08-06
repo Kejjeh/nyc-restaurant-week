@@ -1,0 +1,18 @@
+{
+ "slug": "jack-and-charlies-no-118",
+ "query_name": "Jack & Charlie’s No. 118",
+ "matched": {
+  "place_id": "ChIJt4VcYsZZwokRYEw3XwUJP_I",
+  "name": "Jack & Charlie’s No. 118",
+  "address": "118 Greenwich Ave, New York, NY 10011, USA",
+  "rating": 4.4,
+  "user_ratings_total": 312,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7385129,
+  "lng": -74.0020857
+ },
+ "accepted": true,
+ "reason": "6m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "union-square-cafe",
+ "query_name": "Union Square Cafe",
+ "matched": {
+  "place_id": "ChIJxTHke6JZwokRCLWVd99eDBw",
+  "name": "Union Square Cafe",
+  "address": "101 E 19th St, New York, NY 10003, USA",
+  "rating": 4.6,
+  "user_ratings_total": 2540,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7377702,
+  "lng": -73.9878767
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "gyu-kaku-midtown",
+ "query_name": "Gyu-Kaku Japanese BBQ - Midtown",
+ "matched": {
+  "place_id": "ChIJszmN0-JYwokRk-XCDbO6X_Y",
+  "name": "Gyu-Kaku Japanese BBQ",
+  "address": "805 3rd Ave #2, New York, NY 10022, USA",
+  "rating": 4.5,
+  "user_ratings_total": 3677,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7555178,
+  "lng": -73.9704168
+ },
+ "accepted": true,
+ "reason": "18m away",
+ "source": "textsearch",
+ "error": null
+}

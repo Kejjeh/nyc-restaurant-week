@@ -1,0 +1,18 @@
+{
+ "slug": "hanaya-omakase",
+ "query_name": "Hanaya Omakase",
+ "matched": {
+  "place_id": "ChIJL6IRjZFZwokRI23jWcC3-C0",
+  "name": "Hanaya Omakase",
+  "address": "630 9th Ave, New York, NY 10036, USA",
+  "rating": 4.9,
+  "user_ratings_total": 236,
+  "business_status": "OPERATIONAL",
+  "lat": 40.759987,
+  "lng": -73.9912338
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "don-don-korean-bbq",
+ "query_name": "Don Don Korean BBQ",
+ "matched": {
+  "place_id": "ChIJ0dQgSclZwokR16uaA-zxl4g",
+  "name": "Don Don Korean BBQ",
+  "address": "37 W 43rd St, New York, NY 10036, USA",
+  "rating": 4.6,
+  "user_ratings_total": 358,
+  "business_status": "OPERATIONAL",
+  "lat": 40.755136,
+  "lng": -73.98219399999999
+ },
+ "accepted": true,
+ "reason": "133m away",
+ "source": "textsearch",
+ "error": null
+}

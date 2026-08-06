@@ -1,0 +1,18 @@
+{
+ "slug": "dinosaur-bar-b-que",
+ "query_name": "Dinosaur Bar-B-Que - Harlem",
+ "matched": {
+  "place_id": "ChIJpcanZ0L2wokRoWs8p9gEJcM",
+  "name": "Dinosaur Bar-B-Que",
+  "address": "700 W 125th St, New York, NY 10027, USA",
+  "rating": 4.4,
+  "user_ratings_total": 7516,
+  "business_status": "OPERATIONAL",
+  "lat": 40.8180979,
+  "lng": -73.9608447
+ },
+ "accepted": true,
+ "reason": "10m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "da-andrea-chelsea",
+ "query_name": "Da Andrea - Chelsea",
+ "matched": {
+  "place_id": "ChIJ0cAUoztZwokRvaGH6QGTV9U",
+  "name": "Da Andrea Chelsea",
+  "address": "160 8th Ave, New York, NY 10011, USA",
+  "rating": 4.8,
+  "user_ratings_total": 2181,
+  "business_status": "OPERATIONAL",
+  "lat": 40.74209159999999,
+  "lng": -74.00059379999999
+ },
+ "accepted": true,
+ "reason": "13m away",
+ "source": "textsearch",
+ "error": null
+}

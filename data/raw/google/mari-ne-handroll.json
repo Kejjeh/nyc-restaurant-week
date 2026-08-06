@@ -1,0 +1,18 @@
+{
+ "slug": "mari-ne-handroll",
+ "query_name": "Mari.ne Handroll",
+ "matched": {
+  "place_id": "ChIJH5aItUZZwokRlZOBBhZnEBI",
+  "name": "Mari.ne Handroll",
+  "address": "135 W 41st St, New York, NY 10036, USA",
+  "rating": 4.5,
+  "user_ratings_total": 383,
+  "business_status": "OPERATIONAL",
+  "lat": 40.754814,
+  "lng": -73.9857693
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

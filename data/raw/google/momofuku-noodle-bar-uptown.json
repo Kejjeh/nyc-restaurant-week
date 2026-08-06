@@ -1,0 +1,18 @@
+{
+ "slug": "momofuku-noodle-bar-uptown",
+ "query_name": "Momofuku Noodle Bar - Uptown",
+ "matched": {
+  "place_id": "ChIJKzLt4dZZwokRbv-Ebx1hBo0",
+  "name": "Momofuku Noodle Bar",
+  "address": "10 Columbus Cir, New York, NY 10019, USA",
+  "rating": 4.2,
+  "user_ratings_total": 1761,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7680157,
+  "lng": -73.9829136
+ },
+ "accepted": true,
+ "reason": "67m away",
+ "source": "textsearch",
+ "error": null
+}

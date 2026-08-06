@@ -1,0 +1,18 @@
+{
+ "slug": "la-pecora-bianca-soho",
+ "query_name": "La Pecora Bianca SoHo",
+ "matched": {
+  "place_id": "ChIJfe6ZYKFZwokR_mHm7GNoAxc",
+  "name": "La Pecora Bianca SoHo",
+  "address": "54 Prince St, New York, NY 10012, USA",
+  "rating": 4.8,
+  "user_ratings_total": 7375,
+  "business_status": "OPERATIONAL",
+  "lat": 40.72346,
+  "lng": -73.9963118
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

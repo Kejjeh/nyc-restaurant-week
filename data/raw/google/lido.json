@@ -1,0 +1,18 @@
+{
+ "slug": "lido",
+ "query_name": "Lido",
+ "matched": {
+  "place_id": "ChIJ2yTMoxb2wokRixfwCY3ltok",
+  "name": "Lido Harlem Restaurant",
+  "address": "2168 Frederick Douglass Blvd, New York, NY 10026, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1790,
+  "business_status": "OPERATIONAL",
+  "lat": 40.8048926,
+  "lng": -73.9546798
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

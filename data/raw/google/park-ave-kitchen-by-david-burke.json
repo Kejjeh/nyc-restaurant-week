@@ -1,0 +1,18 @@
+{
+ "slug": "park-ave-kitchen-by-david-burke",
+ "query_name": "Park Ave Kitchen by David Burke",
+ "matched": {
+  "place_id": "ChIJ43gKX0JZwokRxkmmWZosSI4",
+  "name": "PARK AVE KITCHEN BY DAVID BURKE",
+  "address": "514 Lexington Ave, New York, NY 10017, USA",
+  "rating": 4.5,
+  "user_ratings_total": 394,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7552566,
+  "lng": -73.97356169999999
+ },
+ "accepted": true,
+ "reason": "25m away",
+ "source": "textsearch",
+ "error": null
+}

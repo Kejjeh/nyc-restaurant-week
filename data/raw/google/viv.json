@@ -1,0 +1,18 @@
+{
+ "slug": "viv",
+ "query_name": "Viv",
+ "matched": {
+  "place_id": "ChIJJ4ARMFFYwokRRyJCDyI-fyM",
+  "name": "V{IV}",
+  "address": "717 9th Ave, New York, NY 10019, USA",
+  "rating": 4.7,
+  "user_ratings_total": 4638,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7627843,
+  "lng": -73.9897032
+ },
+ "accepted": true,
+ "reason": "11m away",
+ "source": "textsearch",
+ "error": null
+}

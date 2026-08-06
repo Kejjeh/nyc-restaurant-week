@@ -1,0 +1,18 @@
+{
+ "slug": "sungold",
+ "query_name": "Sungold",
+ "matched": {
+  "place_id": "ChIJ7foAEE1ZwokRuCUXXm3WxGs",
+  "name": "Sungold",
+  "address": "96 Wythe Ave, Brooklyn, NY 11249, USA",
+  "rating": 4.8,
+  "user_ratings_total": 1335,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7216057,
+  "lng": -73.9589007
+ },
+ "accepted": true,
+ "reason": "20m away",
+ "source": "textsearch",
+ "error": null
+}

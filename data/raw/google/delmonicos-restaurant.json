@@ -1,0 +1,18 @@
+{
+ "slug": "delmonicos-restaurant",
+ "query_name": "Delmonico's",
+ "matched": {
+  "place_id": "ChIJwy8lmxZawokRtWUTg5wuv6I",
+  "name": "Delmonico's",
+  "address": "56 Beaver St, New York, NY 10004, USA",
+  "rating": 4.5,
+  "user_ratings_total": 3409,
+  "business_status": "OPERATIONAL",
+  "lat": 40.70502680000001,
+  "lng": -74.0102557
+ },
+ "accepted": true,
+ "reason": "11m away",
+ "source": "textsearch",
+ "error": null
+}

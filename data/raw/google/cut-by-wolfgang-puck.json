@@ -1,0 +1,18 @@
+{
+ "slug": "cut-by-wolfgang-puck",
+ "query_name": "Cut",
+ "matched": {
+  "place_id": "ChIJ87qt5hhawokRfDHmVxCxPJY",
+  "name": "CUT by Wolfgang Puck",
+  "address": "99 Church St, New York, NY 10007, USA",
+  "rating": 4.4,
+  "user_ratings_total": 802,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7128554,
+  "lng": -74.0093466
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "la-pecora-bianca-upper-east-side",
+ "query_name": "La Pecora Bianca Upper East Side",
+ "matched": {
+  "place_id": "ChIJ9YlInwlZwokRDb-WWDZkU1s",
+  "name": "La Pecora Bianca UES",
+  "address": "1562 2nd Ave, New York, NY 10028, USA",
+  "rating": 4.8,
+  "user_ratings_total": 2864,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7747233,
+  "lng": -73.9538158
+ },
+ "accepted": true,
+ "reason": "12m away",
+ "source": "textsearch",
+ "error": null
+}

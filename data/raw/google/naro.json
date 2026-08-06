@@ -1,0 +1,18 @@
+{
+ "slug": "naro",
+ "query_name": "Naro",
+ "matched": {
+  "place_id": "ChIJp7Ql8AZZwokRecf5nJr8RJU",
+  "name": "NARO",
+  "address": "Rink Level CO, 610 5th Ave #04, New York, NY 10020, USA",
+  "rating": 4.5,
+  "user_ratings_total": 633,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7583251,
+  "lng": -73.9780787
+ },
+ "accepted": true,
+ "reason": "12m away",
+ "source": "textsearch",
+ "error": null
+}

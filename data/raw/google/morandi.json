@@ -1,0 +1,18 @@
+{
+ "slug": "morandi",
+ "query_name": "Morandi",
+ "matched": {
+  "place_id": "ChIJ_UahM5RZwokRBtHbK9TH_z0",
+  "name": "Morandi",
+  "address": "211 Waverly Pl, New York, NY 10014, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1667,
+  "business_status": "OPERATIONAL",
+  "lat": 40.73531699999999,
+  "lng": -74.00142819999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

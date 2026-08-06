@@ -1,0 +1,18 @@
+{
+ "slug": "central-park-boathouse",
+ "query_name": "Central Park Boathouse",
+ "matched": {
+  "place_id": "ChIJm17AB5pYwokRWLJ6lEtXKOA",
+  "name": "Central Park Boathouse",
+  "address": "EAST 72ND ST +, Center Dr, New York, NY 10021, USA",
+  "rating": 4.3,
+  "user_ratings_total": 5244,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7752246,
+  "lng": -73.9687604
+ },
+ "accepted": true,
+ "reason": "hand-verified place_id",
+ "source": "place_id",
+ "error": null
+}

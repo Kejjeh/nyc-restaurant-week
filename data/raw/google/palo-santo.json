@@ -1,0 +1,18 @@
+{
+ "slug": "palo-santo",
+ "query_name": "Palo Santo",
+ "matched": {
+  "place_id": "ChIJYZfAu6pbwokRiqt0jqEm3Ng",
+  "name": "Palo Santo",
+  "address": "652 Union St, Brooklyn, NY 11215, USA",
+  "rating": 4.6,
+  "user_ratings_total": 761,
+  "business_status": "OPERATIONAL",
+  "lat": 40.67672779999999,
+  "lng": -73.9819833
+ },
+ "accepted": true,
+ "reason": "8m away",
+ "source": "textsearch",
+ "error": null
+}

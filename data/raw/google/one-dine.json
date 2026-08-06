@@ -1,0 +1,18 @@
+{
+ "slug": "one-dine",
+ "query_name": "One Dine",
+ "matched": {
+  "place_id": "ChIJXRDwzxtawokRcQTLdZuAsKY",
+  "name": "ONE Dine at One World Observatory",
+  "address": "117 West St, New York, NY 10007, USA",
+  "rating": 4.3,
+  "user_ratings_total": 2243,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7130062,
+  "lng": -74.013173
+ },
+ "accepted": true,
+ "reason": "21m away",
+ "source": "textsearch",
+ "error": null
+}

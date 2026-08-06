@@ -1,0 +1,18 @@
+{
+ "slug": "cafe-boulud",
+ "query_name": "Café Boulud",
+ "matched": {
+  "place_id": "ChIJCcAxi5RYwokRdUqdw5_FHIk",
+  "name": "Café Boulud at Maison BARNES",
+  "address": "100 E 63rd St, New York, NY 10065, USA",
+  "rating": 4.5,
+  "user_ratings_total": 979,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7650665,
+  "lng": -73.9676538
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

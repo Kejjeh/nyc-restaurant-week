@@ -1,0 +1,18 @@
+{
+ "slug": "francie",
+ "query_name": "Francie",
+ "matched": {
+  "place_id": "ChIJ35V_tZlbwokRzolpCln-mG4",
+  "name": "Francie",
+  "address": "136 Broadway, Brooklyn, NY 11249, USA",
+  "rating": 4.4,
+  "user_ratings_total": 738,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7101876,
+  "lng": -73.9640308
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

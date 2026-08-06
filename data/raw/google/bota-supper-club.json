@@ -1,0 +1,18 @@
+{
+ "slug": "bota-supper-club",
+ "query_name": "BOTA Supper Club",
+ "matched": {
+  "place_id": "ChIJLV-64QpPwokRiLhVCqornHM",
+  "name": "BOTA Supper Club",
+  "address": "402 St Marks Pl, Staten Island, NY 10301, USA",
+  "rating": 4.9,
+  "user_ratings_total": 814,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6399537,
+  "lng": -74.0777016
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

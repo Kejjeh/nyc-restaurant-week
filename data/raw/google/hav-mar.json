@@ -1,0 +1,18 @@
+{
+ "slug": "hav-mar",
+ "query_name": "Hav & Mar",
+ "matched": {
+  "place_id": "ChIJkzm4uVZZwokRpH8jUC56Ry4",
+  "name": "Hav & Mar",
+  "address": "245 11th Ave, New York, NY 10001, USA",
+  "rating": 4.5,
+  "user_ratings_total": 643,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7510904,
+  "lng": -74.0056714
+ },
+ "accepted": true,
+ "reason": "hand-verified place_id",
+ "source": "place_id",
+ "error": null
+}

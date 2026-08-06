@@ -1,0 +1,18 @@
+{
+ "slug": "le-rivage-restaurant",
+ "query_name": "Le Rivage",
+ "matched": {
+  "place_id": "ChIJP9968FNYwokRluXA9d7952g",
+  "name": "Le Rivage",
+  "address": "340 W 46th St, New York, NY 10036, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1743,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7603006,
+  "lng": -73.98953329999999
+ },
+ "accepted": true,
+ "reason": "5m away",
+ "source": "textsearch",
+ "error": null
+}

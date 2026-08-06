@@ -1,0 +1,18 @@
+{
+ "slug": "1803-nyc",
+ "query_name": "1803 NYC",
+ "matched": {
+  "place_id": "ChIJ0yKXaB9awokR6WFqdEE9aBY",
+  "name": "1803 NYC",
+  "address": "82 Reade St, New York, NY 10007, USA",
+  "rating": 4.5,
+  "user_ratings_total": 2109,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7154539,
+  "lng": -74.00733009999999
+ },
+ "accepted": true,
+ "reason": "95m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "mae-mae-cafe-and-plant-shop",
+ "query_name": "Mae Mae Cafe & Plant Shop",
+ "matched": {
+  "place_id": "ChIJ7UcN1vJZwokRhdf9LtldRPQ",
+  "name": "Mae Mae Café & Plant Shop",
+  "address": "2417 3rd Ave, Bronx, NY 10451, USA",
+  "rating": 4.6,
+  "user_ratings_total": 126,
+  "business_status": "OPERATIONAL",
+  "lat": 40.8087961,
+  "lng": -73.9307007
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

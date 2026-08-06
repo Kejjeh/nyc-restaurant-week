@@ -1,0 +1,18 @@
+{
+ "slug": "il-carino",
+ "query_name": "Il Carino",
+ "matched": {
+  "place_id": "ChIJiTxP17pYwokR0Gj0Wrd5cOg",
+  "name": "IL Carino Restaurant",
+  "address": "1710 2nd Ave, New York, NY 10128, USA",
+  "rating": 4.5,
+  "user_ratings_total": 297,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7794927,
+  "lng": -73.9501884
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

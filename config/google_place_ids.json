@@ -1,0 +1,36 @@
+{
+  "_doc": "Hand-verified Google place_ids. Text Search matches a NAME, which is not an identifier: it put 53 at 621m, and an address-only rescue picked a 115-review business for Central Park Boathouse when the real one has 5,244. Each entry below was checked by eye. fetch_google_ratings.py uses Place Details for these and skips the geometry test, because a pinned place_id IS the verification.",
+  "checked": "2026-08-05",
+  "place_ids": {
+    "53": "ChIJQ2rWiydZwokRKb1IcXrXZ-E",
+    "abc-kitchens-dumbo": "ChIJ8a8K5ddbwokR91gCtKTspc0",
+    "alta-calidad": "ChIJQ928SqRbwokRKuID55C7xFo",
+    "catria-nyc": "ChIJl5YxH-5ZwokRsCiFUdJez-o",
+    "central-park-boathouse": "ChIJm17AB5pYwokRWLJ6lEtXKOA",
+    "city-winery": "ChIJz6xj485ZwokRie0FM1Zumng",
+    "dubuhaus": "ChIJLTAznpRZwokR9ILaBL9mjOc",
+    "estiatorio-milos-hudson-yards": "ChIJg8puJSdZwokR8fwzSFFDll4",
+    "folk": "ChIJSTTBZoJbwokRAqhtyjmoq_s",
+    "hav-mar": "ChIJkzm4uVZZwokRpH8jUC56Ry4",
+    "izakaya-futago": "ChIJ14y5HwNZwokRrNpTpUqpB7Q",
+    "miriam-brooklyn": "ChIJ_yaCB6xbwokRzsbqAJUYxpY",
+    "musaek": "ChIJh3IcTNhZwokR2SJXmWwsTJY",
+    "the-kunjip": "ChIJdQxV-KhZwokRsyAt1XYvtiQ"
+  },
+  "notes": {
+    "53": "53 — 53 W 53rd St, New York, NY 10019, USA (4.3*, 723 reviews)",
+    "abc-kitchens-dumbo": "abc kitchens — 55 Water St, Brooklyn, NY 11201, USA (4.4*, 205 reviews)",
+    "alta-calidad": "Alta Calidad — 552 Vanderbilt Ave, Brooklyn, NY 11238, USA (4.5*, 878 reviews)",
+    "catria-nyc": "Catria Cucina and Bar — 461 W 34th St. Frnt 1, New York, NY 10001, USA (4.4*, 208 reviews)",
+    "central-park-boathouse": "Central Park Boathouse — EAST 72ND ST +, Center Dr, New York, NY 10021, USA (4.3*, 5244 reviews)",
+    "city-winery": "City Winery New York City — 25 11th Ave, New York, NY 10011, USA (4.3*, 1952 reviews)",
+    "dubuhaus": "DubuHaus — 6 E 32nd St, New York, NY 10016, USA (4.2*, 569 reviews)",
+    "estiatorio-milos-hudson-yards": "estiatorio Milos Hudson Yards — 20 Hudson Yards Fifth Floor, New York, NY 10001, USA (4.4*, 1133 reviews)",
+    "folk": "FOLK — 689 6th Ave, Brooklyn, NY 11215, USA (4.8*, 118 reviews)",
+    "hav-mar": "Hav & Mar — 245 11th Ave, New York, NY 10001, USA (4.5*, 643 reviews)",
+    "izakaya-futago": "Izakaya Futago — 211 E 43rd St, New York, NY 10017, USA (4.4*, 1065 reviews)",
+    "miriam-brooklyn": "Miriam Restaurant — 79 5th Ave, Brooklyn, NY 11217, USA (4.4*, 2316 reviews)",
+    "musaek": "MUSAEK — 6 E 32nd St Lower Level, New York, NY 10016, USA (4.4*, 72 reviews)",
+    "the-kunjip": "The Kunjip — 32 W 32nd St, New York, NY 10001, USA (4*, 3771 reviews)"
+  }
+}

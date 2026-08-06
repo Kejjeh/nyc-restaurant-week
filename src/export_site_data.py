@@ -295,6 +295,67 @@ def build_offsite():
     return by_slug, swept
 
 
+# --------------------------------------------------------------------------
+# Google ratings (src/fetch_google_ratings.py)
+#
+# A raw star average is not comparable across restaurants: Maison Madison's
+# 4.9 comes from 14 reviews and Manhatta's 4.7 from 3,999. Sorting on the raw
+# number puts the 14-review restaurant on top, which is noise, not a finding.
+#
+# So the published score is a Bayesian shrinkage toward the corpus mean:
+#
+#     score = (v*R + m*C) / (v + m)
+#
+# R = the restaurant's average, v = how many reviews it rests on, C = the mean
+# across every rated restaurant here, m = how many reviews it takes before we
+# mostly believe the restaurant's own average.
+#
+# m = 150 chosen against the actual distribution, not by feel: the 10th
+# percentile is 188 reviews, so most restaurants stay essentially themselves
+# (Manhatta 4.7 -> 4.69), while the 27 restaurants under 100 reviews get pulled
+# meaningfully toward the middle (Maison Madison 4.9 -> 4.53). Larger values
+# over-correct -- at m=400 Le B.'s 3.4 from 227 reviews is dragged to 4.10,
+# which hides a real and well-evidenced result.
+#
+# The raw rating and the count are BOTH published alongside the score. The
+# weighting is there to make sorting honest, not to hide the input.
+GOOGLE = ROOT / "data" / "raw" / "google"
+GOOGLE_PRIOR = 150
+
+
+def build_google():
+    """slug -> {rating, reviews, score, ...}. Unmatched restaurants get nothing
+    rather than a zero, exactly like every other unknown here."""
+    if not GOOGLE.exists():
+        return {}, 0.0
+    raw = {}
+    for f in sorted(GOOGLE.glob("*.json")):
+        rec = json.loads(f.read_text(encoding="utf-8"))
+        m = rec.get("matched") or {}
+        if not rec.get("accepted") or m.get("rating") is None:
+            continue
+        raw[rec["slug"]] = (float(m["rating"]), int(m.get("user_ratings_total") or 0),
+                            m, rec)
+    if not raw:
+        return {}, 0.0
+    mean = sum(r for r, _, _, _ in raw.values()) / len(raw)
+    out = {}
+    for slug, (r, v, m, rec) in raw.items():
+        score = (v * r + GOOGLE_PRIOR * mean) / (v + GOOGLE_PRIOR)
+        out[slug] = {
+            "rating": round(r, 2),
+            "reviews": v,
+            "score": round(score, 3),
+            "place_id": m.get("place_id"),
+            "matched_name": clean(m.get("name")),
+            # 'place_id' means a human pinned it; 'textsearch' means it was
+            # accepted on coordinates, which the UI should not overstate.
+            "basis": rec.get("source") or "textsearch",
+            "closed": m.get("business_status") not in (None, "OPERATIONAL"),
+        }
+    return out, mean
+
+
 MONTHS = {m: i for i, ms in enumerate(
     [("jan", "january"), ("feb", "february"), ("mar", "march"), ("apr", "april"),
      ("may",), ("jun", "june"), ("jul", "july"), ("aug", "august"),
@@ -705,6 +766,7 @@ def build_payload():
     stations = load_stations()
     licences = load_outdoor()
     offsite, _ = build_offsite()
+    google, google_mean = build_google()
     verified = json.loads(VERIFIED.read_text(encoding="utf-8"))["restaurants"]
     menus = {r[0]: r[1] for r in con.execute(
         "SELECT restaurant_slug, parse_quality FROM menus")}
@@ -873,6 +935,7 @@ def build_payload():
                                  key=lambda e: ERA_ORDER[e]),
             "tags": tags_by_slug.get(slug, []),
             "offsite_tags": offsite.get(slug, []),
+            "google": google.get(slug),
             "links": {
                 "listing": listing or None,
                 "menu": (menu_url or "").strip() or None,
@@ -892,6 +955,8 @@ def build_payload():
         "book_by": BOOK_BY,
         "program_end": PROGRAM_END,
         "tag_vocabulary": sorted(rules),
+        "google_mean": round(google_mean, 3),
+        "google_prior": GOOGLE_PRIOR,
         "restaurants": out,
     }
     return payload, stats, tags_dropped, recog_dropped
@@ -995,6 +1060,8 @@ def main():
         print(f"outdoor       {stats['outdoor_licensed']} in the city register"
               f" · {stats['outdoor_described_only']} described only"
               f" · {len(payload['restaurants']) - stats['outdoor_licensed'] - stats['outdoor_described_only']} unknown")
+        g = [r["google"] for r in payload["restaurants"] if r["google"]]
+        print(f"google        {len(g)} rated · mean {payload['google_mean']}* · shrunk toward it with m={GOOGLE_PRIOR}")
         off = sum(1 for r in payload["restaurants"] if r["offsite_tags"])
         swept = len(list(MENUSWEEP.glob("*.json"))) if MENUSWEEP.exists() else 0
         print(f"offsite tags  {off} restaurants (own websites; {swept} swept)")

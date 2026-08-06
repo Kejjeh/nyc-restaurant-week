@@ -1,0 +1,18 @@
+{
+ "slug": "the-greenhouse-cafe",
+ "query_name": "The Greenhouse Cafe",
+ "matched": {
+  "place_id": "ChIJhReR7FhFwokR8bS-WjMXqk0",
+  "name": "Greenhouse Cafe",
+  "address": "7717 3rd Ave, Brooklyn, NY 11209, USA",
+  "rating": 4.5,
+  "user_ratings_total": 767,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6295802,
+  "lng": -74.0284223
+ },
+ "accepted": true,
+ "reason": "11m away",
+ "source": "textsearch",
+ "error": null
+}

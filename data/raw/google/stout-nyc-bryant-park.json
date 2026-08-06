@@ -1,0 +1,18 @@
+{
+ "slug": "stout-nyc-bryant-park",
+ "query_name": "Stout NYC Bryant Park",
+ "matched": {
+  "place_id": "ChIJ_cCepmVZwokRlX4q2VDJOJo",
+  "name": "Stout NYC",
+  "address": "109 W 39th St, New York, NY 10018, USA",
+  "rating": 4.6,
+  "user_ratings_total": 900,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7533433,
+  "lng": -73.986043
+ },
+ "accepted": true,
+ "reason": "8m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "carne-mare",
+ "query_name": "Carne Mare",
+ "matched": {
+  "place_id": "ChIJBaD9A0ZbwokRu6ArQW3Nj1E",
+  "name": "Carne Mare",
+  "address": "89 South St, New York, NY 10038, USA",
+  "rating": 4.5,
+  "user_ratings_total": 920,
+  "business_status": "OPERATIONAL",
+  "lat": 40.705645,
+  "lng": -74.0021484
+ },
+ "accepted": true,
+ "reason": "59m away",
+ "source": "textsearch",
+ "error": null
+}

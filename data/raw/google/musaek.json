@@ -1,0 +1,18 @@
+{
+ "slug": "musaek",
+ "query_name": "Musaek",
+ "matched": {
+  "place_id": "ChIJh3IcTNhZwokR2SJXmWwsTJY",
+  "name": "MUSAEK",
+  "address": "6 E 32nd St Lower Level, New York, NY 10016, USA",
+  "rating": 4.4,
+  "user_ratings_total": 72,
+  "business_status": "OPERATIONAL",
+  "lat": 40.746545,
+  "lng": -73.98498219999999
+ },
+ "accepted": true,
+ "reason": "hand-verified place_id",
+ "source": "place_id",
+ "error": null
+}

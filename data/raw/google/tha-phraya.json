@@ -1,0 +1,18 @@
+{
+ "slug": "tha-phraya",
+ "query_name": "Tha Phraya",
+ "matched": {
+  "place_id": "ChIJXbVh8gRZwokR-uEVlFisxFE",
+  "name": "Tha Phraya",
+  "address": "1553 2nd Ave, New York, NY 10028, USA",
+  "rating": 4.8,
+  "user_ratings_total": 1342,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7745281,
+  "lng": -73.9545117
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

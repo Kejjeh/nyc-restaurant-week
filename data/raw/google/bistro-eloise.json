@@ -1,0 +1,18 @@
+{
+ "slug": "bistro-eloise",
+ "query_name": "Bistro Eloise",
+ "matched": {
+  "place_id": "ChIJaW0AKldfwokRZh8-LdwLkkY",
+  "name": "Bistro Eloise - French Restaurant",
+  "address": "75-57 31st Ave, East Elmhurst, NY 11370, USA",
+  "rating": 4.6,
+  "user_ratings_total": 599,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7600249,
+  "lng": -73.8920991
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "sant-ambroeus-brookfield",
+ "query_name": "Sant Ambroeus—Brookfield",
+ "matched": {
+  "place_id": "ChIJBfPp9pNbwokRhmKBnSX-_bc",
+  "name": "Sant Ambroeus Brookfield",
+  "address": "230 Vesey St, New York, NY 10080, USA",
+  "rating": 4.5,
+  "user_ratings_total": 657,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7138158,
+  "lng": -74.0152083
+ },
+ "accepted": true,
+ "reason": "50m away",
+ "source": "textsearch",
+ "error": null
+}

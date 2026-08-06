@@ -1,0 +1,18 @@
+{
+ "slug": "wagamama-midtown",
+ "query_name": "Wagamama - Midtown",
+ "matched": {
+  "place_id": "ChIJucC69nVZwokRmziSfSAfhFA",
+  "name": "wagamama midtown, new york",
+  "address": "100 W 55th St, New York, NY 10019, USA",
+  "rating": 4.3,
+  "user_ratings_total": 1202,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7631438,
+  "lng": -73.9788554
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

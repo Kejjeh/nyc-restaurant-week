@@ -1,0 +1,18 @@
+{
+ "slug": "burger-lobster-bryant-park",
+ "query_name": "Burger & Lobster Bryant Park",
+ "matched": {
+  "place_id": "ChIJd44fMFVYwokRqpXE6s9gnV4",
+  "name": "Burger & Lobster Bryant Park",
+  "address": "132 W 43rd St, New York, NY 10036, USA",
+  "rating": 4.6,
+  "user_ratings_total": 5091,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7559517,
+  "lng": -73.9851995
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

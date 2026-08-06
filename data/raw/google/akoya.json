@@ -1,0 +1,18 @@
+{
+ "slug": "akoya",
+ "query_name": "Akoya",
+ "matched": {
+  "place_id": "ChIJQThp8dZZwokRF92olcyZZVI",
+  "name": "Akoya",
+  "address": "6 Times Sq, New York, NY 10036, USA",
+  "rating": 4.7,
+  "user_ratings_total": 10,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7555831,
+  "lng": -73.9862701
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

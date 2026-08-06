@@ -1,0 +1,18 @@
+{
+ "slug": "stout-nyc-penn-station",
+ "query_name": "Stout NYC Penn Station",
+ "matched": {
+  "place_id": "ChIJJ91wx65ZwokRnjW2e69Imic",
+  "name": "Stout NYC",
+  "address": "215 W 35th St, New York, NY 10001, USA",
+  "rating": 4.3,
+  "user_ratings_total": 3675,
+  "business_status": "OPERATIONAL",
+  "lat": 40.752069,
+  "lng": -73.9907953
+ },
+ "accepted": true,
+ "reason": "32m away",
+ "source": "textsearch",
+ "error": null
+}

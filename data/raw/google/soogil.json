@@ -1,0 +1,18 @@
+{
+ "slug": "soogil",
+ "query_name": "Soogil",
+ "matched": {
+  "place_id": "ChIJgzeCUpxZwokRbd_EmbP7osI",
+  "name": "Soogil",
+  "address": "108 E 4th St, New York, NY 10003, USA",
+  "rating": 4.5,
+  "user_ratings_total": 316,
+  "business_status": "OPERATIONAL",
+  "lat": 40.725625,
+  "lng": -73.98834169999999
+ },
+ "accepted": true,
+ "reason": "10m away",
+ "source": "textsearch",
+ "error": null
+}

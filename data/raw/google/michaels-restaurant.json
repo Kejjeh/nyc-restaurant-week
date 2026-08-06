@@ -1,0 +1,18 @@
+{
+ "slug": "michaels-restaurant",
+ "query_name": "Michael's",
+ "matched": {
+  "place_id": "ChIJR-58MPpYwokR6uvm2VX0MK4",
+  "name": "Michael's New York",
+  "address": "24 W 55th St, New York, NY 10019, USA",
+  "rating": 4.5,
+  "user_ratings_total": 387,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7620797,
+  "lng": -73.97644380000001
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

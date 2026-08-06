@@ -1,0 +1,18 @@
+{
+ "slug": "copinette",
+ "query_name": "Copinette",
+ "matched": {
+  "place_id": "ChIJ-WurqYFZwokRb4iMLqcZotE",
+  "name": "Copinette",
+  "address": "891 1st Ave, New York, NY 10022, USA",
+  "rating": 4.5,
+  "user_ratings_total": 733,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7541516,
+  "lng": -73.96626169999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "strip-house-midtown",
+ "query_name": "Strip House Midtown",
+ "matched": {
+  "place_id": "ChIJpeX32v9YwokRb9hCErfiyVk",
+  "name": "Strip House Steakhouse",
+  "address": "15 W 44th St, New York, NY 10036, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1445,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7552982,
+  "lng": -73.9806899
+ },
+ "accepted": true,
+ "reason": "6m away",
+ "source": "textsearch",
+ "error": null
+}

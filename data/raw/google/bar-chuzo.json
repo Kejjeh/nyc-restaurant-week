@@ -1,0 +1,18 @@
+{
+ "slug": "bar-chuzo",
+ "query_name": "Bar Chuzo",
+ "matched": {
+  "place_id": "ChIJZ3IAwKdPwokRvVp59xU15kA",
+  "name": "Bar Chuzo",
+  "address": "9324 3rd Ave, Brooklyn, NY 11209, USA",
+  "rating": 4.8,
+  "user_ratings_total": 262,
+  "business_status": "OPERATIONAL",
+  "lat": 40.618124,
+  "lng": -74.0335037
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

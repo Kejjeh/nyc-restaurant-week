@@ -1,0 +1,18 @@
+{
+ "slug": "izakaya-futago",
+ "query_name": "Izakaya Futago",
+ "matched": {
+  "place_id": "ChIJ14y5HwNZwokRrNpTpUqpB7Q",
+  "name": "Izakaya Futago",
+  "address": "211 E 43rd St, New York, NY 10017, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1065,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7512322,
+  "lng": -73.9731998
+ },
+ "accepted": true,
+ "reason": "hand-verified place_id",
+ "source": "place_id",
+ "error": null
+}

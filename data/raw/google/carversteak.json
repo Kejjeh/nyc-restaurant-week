@@ -1,0 +1,18 @@
+{
+ "slug": "carversteak",
+ "query_name": "Carversteak",
+ "matched": {
+  "place_id": "ChIJ2TLWKNJZwokR7HjL7973f_c",
+  "name": "Carversteak",
+  "address": "305 W 48th St 1st Floor, New York, NY 10036, USA",
+  "rating": 4.8,
+  "user_ratings_total": 312,
+  "business_status": "OPERATIONAL",
+  "lat": 40.76143,
+  "lng": -73.9874509
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

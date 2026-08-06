@@ -1,0 +1,18 @@
+{
+ "slug": "rosemarys-west-village",
+ "query_name": "Rosemary's West Village",
+ "matched": {
+  "place_id": "ChIJCW5gj5ZZwokRtfK4UZxkcr4",
+  "name": "Rosemary's",
+  "address": "18 Greenwich Ave, New York, NY 10011, USA",
+  "rating": 4.4,
+  "user_ratings_total": 2902,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7348368,
+  "lng": -73.9998009
+ },
+ "accepted": true,
+ "reason": "12m away",
+ "source": "textsearch",
+ "error": null
+}

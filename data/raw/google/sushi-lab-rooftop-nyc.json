@@ -1,0 +1,18 @@
+{
+ "slug": "sushi-lab-rooftop-nyc",
+ "query_name": "Sushi Lab Rooftop",
+ "matched": {
+  "place_id": "ChIJscH4RxpZwokRFIrk37HvBT8",
+  "name": "Sushi Lab Rooftop",
+  "address": "132 W 47th St, New York, NY 10036, USA",
+  "rating": 4.2,
+  "user_ratings_total": 1206,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7584855,
+  "lng": -73.983205
+ },
+ "accepted": true,
+ "reason": "15m away",
+ "source": "textsearch",
+ "error": null
+}

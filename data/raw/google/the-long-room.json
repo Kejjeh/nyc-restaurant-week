@@ -1,0 +1,18 @@
+{
+ "slug": "the-long-room",
+ "query_name": "The Long Room",
+ "matched": {
+  "place_id": "ChIJWZVoalVYwokRnPIXV2adxKA",
+  "name": "The Long Room",
+  "address": "120 W 44th St, New York, NY 10036, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1319,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7564107,
+  "lng": -73.9843398
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "fogo-de-chao-churrascaria-brazilian-steakhouse",
+ "query_name": "Fogo de Chão Brazilian Steakhouse",
+ "matched": {
+  "place_id": "ChIJqZ5ObvlYwokRhm9I3a2de8I",
+  "name": "Fogo de Chão Brazilian Steakhouse",
+  "address": "40 W 53rd St, New York, NY 10019, USA",
+  "rating": 4.5,
+  "user_ratings_total": 10178,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7610957,
+  "lng": -73.9777572
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

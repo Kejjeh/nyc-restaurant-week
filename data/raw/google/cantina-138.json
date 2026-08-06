@@ -1,0 +1,18 @@
+{
+ "slug": "cantina-138",
+ "query_name": "Cantina 138",
+ "matched": {
+  "place_id": "ChIJezxyWSdZwokRJsXmElcMZgo",
+  "name": "CANTINA 138",
+  "address": "138 Havemeyer St, Brooklyn, NY 11211, USA",
+  "rating": 4.7,
+  "user_ratings_total": 303,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7120779,
+  "lng": -73.9574391
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

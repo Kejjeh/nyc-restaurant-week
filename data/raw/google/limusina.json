@@ -1,0 +1,18 @@
+{
+ "slug": "limusina",
+ "query_name": "Limusina",
+ "matched": {
+  "place_id": "ChIJ6RpitgJZwokR3C4t3R7rRoc",
+  "name": "Limusina",
+  "address": "441 9th Ave, New York, NY 10001, USA",
+  "rating": 4.5,
+  "user_ratings_total": 251,
+  "business_status": "OPERATIONAL",
+  "lat": 40.753737,
+  "lng": -73.9964832
+ },
+ "accepted": true,
+ "reason": "48m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "patsys-italian-restaurant",
+ "query_name": "Patsy's Italian Restaurant",
+ "matched": {
+  "place_id": "ChIJ22yt_PdYwokRFf4cnErij6k",
+  "name": "Patsy's Italian Restaurant",
+  "address": "236 W 56th St, New York, NY 10019, USA",
+  "rating": 4.3,
+  "user_ratings_total": 2173,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7656391,
+  "lng": -73.9827408
+ },
+ "accepted": true,
+ "reason": "12m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "felice-flatiron",
+ "query_name": "Felice Flatiron",
+ "matched": {
+  "place_id": "ChIJVcrAJABZwokRdS9J7invxDw",
+  "name": "Felice Flatiron",
+  "address": "220 5th Ave, New York, NY 10001, USA",
+  "rating": 4.7,
+  "user_ratings_total": 72,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7437206,
+  "lng": -73.9884707
+ },
+ "accepted": true,
+ "reason": "19m away",
+ "source": "textsearch",
+ "error": null
+}

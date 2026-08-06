@@ -1,0 +1,18 @@
+{
+ "slug": "flava-of-the-bronx",
+ "query_name": "Flava of the Bronx",
+ "matched": {
+  "place_id": "ChIJp6WLi4P1wokR9-BAWMMn2Qg",
+  "name": "Flava Of The Bronx",
+  "address": "3114 3rd Ave, Bronx, NY 10451, USA",
+  "rating": 3.5,
+  "user_ratings_total": 676,
+  "business_status": "OPERATIONAL",
+  "lat": 40.8219974,
+  "lng": -73.91152650000001
+ },
+ "accepted": true,
+ "reason": "6m away",
+ "source": "textsearch",
+ "error": null
+}

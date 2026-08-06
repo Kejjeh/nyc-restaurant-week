@@ -1,0 +1,18 @@
+{
+ "slug": "osteria-57",
+ "query_name": "Osteria 57",
+ "matched": {
+  "place_id": "ChIJ5wNF_JZZwokRdHf_CE95YJc",
+  "name": "Osteria 57",
+  "address": "453 6th Ave, New York, NY 10011, USA",
+  "rating": 4.5,
+  "user_ratings_total": 980,
+  "business_status": "OPERATIONAL",
+  "lat": 40.735162,
+  "lng": -73.9987529
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

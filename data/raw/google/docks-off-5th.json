@@ -1,0 +1,18 @@
+{
+ "slug": "docks-off-5th",
+ "query_name": "Docks Off 5th",
+ "matched": {
+  "place_id": "ChIJ84fxRflYwokRXhgD3ibl1u0",
+  "name": "Docks Off 5th",
+  "address": "25 W 51st St #6939, New York, NY 10019, USA",
+  "rating": 3.9,
+  "user_ratings_total": 727,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7599981,
+  "lng": -73.9781592
+ },
+ "accepted": true,
+ "reason": "8m away",
+ "source": "textsearch",
+ "error": null
+}

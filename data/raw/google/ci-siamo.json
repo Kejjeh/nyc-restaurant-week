@@ -1,0 +1,18 @@
+{
+ "slug": "ci-siamo",
+ "query_name": "Ci Siamo",
+ "matched": {
+  "place_id": "ChIJ_ci7bvdZwokRsL4rlCOqsMk",
+  "name": "Ci Siamo",
+  "address": "440 W 33rd St Ste 100, New York, NY 10001, USA",
+  "rating": 4.6,
+  "user_ratings_total": 2384,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7526152,
+  "lng": -73.9989141
+ },
+ "accepted": true,
+ "reason": "80m away",
+ "source": "textsearch",
+ "error": null
+}

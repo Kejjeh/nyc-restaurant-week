@@ -1,0 +1,18 @@
+{
+ "slug": "san-carlo-osteria-piemonte",
+ "query_name": "San Carlo",
+ "matched": {
+  "place_id": "ChIJ5RzhN4xZwokRp13Jc3DxBOI",
+  "name": "San Carlo Osteria Piemonte",
+  "address": "90 Thompson St, New York, NY 10012, USA",
+  "rating": 4.7,
+  "user_ratings_total": 1110,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7251858,
+  "lng": -74.00223179999999
+ },
+ "accepted": true,
+ "reason": "13m away",
+ "source": "textsearch",
+ "error": null
+}

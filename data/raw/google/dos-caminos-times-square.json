@@ -1,0 +1,18 @@
+{
+ "slug": "dos-caminos-times-square",
+ "query_name": "Dos Caminos Times Square",
+ "matched": {
+  "place_id": "ChIJlUTKy1VYwokREq7LLltPsGU",
+  "name": "Dos Caminos",
+  "address": "1567 Broadway, New York, NY 10036, USA",
+  "rating": 4,
+  "user_ratings_total": 2469,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7593727,
+  "lng": -73.98532809999999
+ },
+ "accepted": true,
+ "reason": "26m away",
+ "source": "textsearch",
+ "error": null
+}

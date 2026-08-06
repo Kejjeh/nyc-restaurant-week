@@ -1,0 +1,18 @@
+{
+ "slug": "socarrat-paella-bar-chelsea",
+ "query_name": "Socarrat Paella Bar - Chelsea",
+ "matched": {
+  "place_id": "ChIJ9ajN9btZwokRIxQws60QJq8",
+  "name": "Socarrat Paella Bar - Chelsea",
+  "address": "259 W 19th St, New York, NY 10011, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1744,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7426956,
+  "lng": -73.9995488
+ },
+ "accepted": true,
+ "reason": "9m away",
+ "source": "textsearch",
+ "error": null
+}

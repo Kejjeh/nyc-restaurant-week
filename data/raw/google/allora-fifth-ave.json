@@ -1,0 +1,18 @@
+{
+ "slug": "allora-fifth-ave",
+ "query_name": "Allora Fifth Ave",
+ "matched": {
+  "place_id": "ChIJM21sj6hZwokRWbnPNVELqG0",
+  "name": "Allora Fifth Ave",
+  "address": "292 5th Ave, New York, NY 10001, USA",
+  "rating": 4.4,
+  "user_ratings_total": 260,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7463831,
+  "lng": -73.98642679999999
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

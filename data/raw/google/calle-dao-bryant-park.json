@@ -1,0 +1,18 @@
+{
+ "slug": "calle-dao-bryant-park",
+ "query_name": "Calle Dão - Bryant Park",
+ "matched": {
+  "place_id": "ChIJnYkfZqpZwokRLxGbURXlMfQ",
+  "name": "Calle Dao",
+  "address": "38 W 39th St, New York, NY 10018, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1449,
+  "business_status": "OPERATIONAL",
+  "lat": 40.752167,
+  "lng": -73.984218
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "mr-chow-new-york-tribeca",
+ "query_name": "Mr Chow New York - Tribeca",
+ "matched": {
+  "place_id": "ChIJlfNObvVZwokRYKVKPX21uOU",
+  "name": "Mr Chow",
+  "address": "121 Hudson St, New York, NY 10013, USA",
+  "rating": 4,
+  "user_ratings_total": 739,
+  "business_status": "OPERATIONAL",
+  "lat": 40.720095,
+  "lng": -74.0088869
+ },
+ "accepted": true,
+ "reason": "15m away",
+ "source": "textsearch",
+ "error": null
+}

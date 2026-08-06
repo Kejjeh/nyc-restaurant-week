@@ -1,0 +1,18 @@
+{
+ "slug": "traveler",
+ "query_name": "Traveler",
+ "matched": {
+  "place_id": "ChIJNXqetWlZwokRDuGom-Bariw",
+  "name": "Traveler",
+  "address": "56 E 41st St Ground Floor, New York, NY 10017, USA",
+  "rating": 4.4,
+  "user_ratings_total": 218,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7516756,
+  "lng": -73.97893499999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

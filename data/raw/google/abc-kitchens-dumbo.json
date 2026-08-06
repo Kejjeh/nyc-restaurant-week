@@ -1,0 +1,18 @@
+{
+ "slug": "abc-kitchens-dumbo",
+ "query_name": "ABC Kitchens DUMBO",
+ "matched": {
+  "place_id": "ChIJ8a8K5ddbwokR91gCtKTspc0",
+  "name": "abc kitchens",
+  "address": "55 Water St, Brooklyn, NY 11201, USA",
+  "rating": 4.4,
+  "user_ratings_total": 205,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7036451,
+  "lng": -73.99196599999999
+ },
+ "accepted": true,
+ "reason": "hand-verified place_id",
+ "source": "place_id",
+ "error": null
+}

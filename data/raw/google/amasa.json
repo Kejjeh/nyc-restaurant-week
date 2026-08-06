@@ -1,0 +1,18 @@
+{
+ "slug": "amasa",
+ "query_name": "Amasa",
+ "matched": {
+  "place_id": "ChIJia-aeTBZwokRztTdWmjg-gA",
+  "name": "Amasa Latin Steakhouse",
+  "address": "32 W 48th St Lower Level, New York, NY 10036, USA",
+  "rating": 5,
+  "user_ratings_total": 214,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7577789,
+  "lng": -73.9798407
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

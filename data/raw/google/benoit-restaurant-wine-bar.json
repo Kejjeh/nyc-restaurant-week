@@ -1,0 +1,18 @@
+{
+ "slug": "benoit-restaurant-wine-bar",
+ "query_name": "Benoit Restaurant & Wine Bar",
+ "matched": {
+  "place_id": "ChIJ397qiflYwokRx2AOUyRXMMo",
+  "name": "Benoit New York",
+  "address": "60 W 55th St, New York, NY 10019, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1207,
+  "business_status": "OPERATIONAL",
+  "lat": 40.762523,
+  "lng": -73.977277
+ },
+ "accepted": true,
+ "reason": "7m away",
+ "source": "textsearch",
+ "error": null
+}

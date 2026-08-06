@@ -1,0 +1,18 @@
+{
+ "slug": "maiella",
+ "query_name": "Maiella",
+ "matched": {
+  "place_id": "ChIJd00MRyJZwokRU-lmTi8kC2I",
+  "name": "Maiella",
+  "address": "46-10 Center Blvd, Long Island City, NY 11109, USA",
+  "rating": 4.4,
+  "user_ratings_total": 2095,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7471944,
+  "lng": -73.9566667
+ },
+ "accepted": true,
+ "reason": "18m away",
+ "source": "textsearch",
+ "error": null
+}

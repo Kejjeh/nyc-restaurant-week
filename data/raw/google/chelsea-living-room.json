@@ -1,0 +1,18 @@
+{
+ "slug": "chelsea-living-room",
+ "query_name": "Chelsea Living Room",
+ "matched": {
+  "place_id": "ChIJD0k97wBZwokRQIQ9ioXsZD8",
+  "name": "Chelsea Living Room",
+  "address": "243 W 14th St, New York, NY 10011, USA",
+  "rating": 4.3,
+  "user_ratings_total": 180,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7395713,
+  "lng": -74.0013209
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

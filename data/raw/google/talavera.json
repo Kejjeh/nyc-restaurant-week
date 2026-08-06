@@ -1,0 +1,18 @@
+{
+ "slug": "talavera",
+ "query_name": "Talavera",
+ "matched": {
+  "place_id": "ChIJdTl3DDJZwokRgmKkvuDO4Gg",
+  "name": "Talavera",
+  "address": "485 10th Ave, New York, NY 10018, USA",
+  "rating": 4.6,
+  "user_ratings_total": 385,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7567889,
+  "lng": -73.9979592
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

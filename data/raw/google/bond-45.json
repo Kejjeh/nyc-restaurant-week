@@ -1,0 +1,18 @@
+{
+ "slug": "bond-45",
+ "query_name": "Bond 45",
+ "matched": {
+  "place_id": "ChIJdY2zDlVYwokREzNdClSZvTA",
+  "name": "Bond 45 NY",
+  "address": "221 W 46th St, New York, NY 10036, USA",
+  "rating": 4.2,
+  "user_ratings_total": 2964,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7592458,
+  "lng": -73.98629249999999
+ },
+ "accepted": true,
+ "reason": "17m away",
+ "source": "textsearch",
+ "error": null
+}

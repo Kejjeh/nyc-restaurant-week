@@ -1,0 +1,18 @@
+{
+ "slug": "baciccia-pizza-e-cucina",
+ "query_name": "Baciccia Pizza e Cucina",
+ "matched": {
+  "place_id": "ChIJqzfjYOJawokRLcfc3N0GAMA",
+  "name": "Baciccia",
+  "address": "426A 7th Ave, Brooklyn, NY 11215, USA",
+  "rating": 4.7,
+  "user_ratings_total": 382,
+  "business_status": "OPERATIONAL",
+  "lat": 40.663753,
+  "lng": -73.9843822
+ },
+ "accepted": true,
+ "reason": "9m away",
+ "source": "textsearch",
+ "error": null
+}

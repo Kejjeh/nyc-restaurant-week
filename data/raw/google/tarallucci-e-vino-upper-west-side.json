@@ -1,0 +1,18 @@
+{
+ "slug": "tarallucci-e-vino-upper-west-side",
+ "query_name": "Tarallucci e Vino - Upper West Side",
+ "matched": {
+  "place_id": "ChIJObyMbYVYwokRalcz9VGxvZI",
+  "name": "Tarallucci e Vino Upper West Side",
+  "address": "475 Columbus Ave, New York, NY 10024, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1059,
+  "business_status": "OPERATIONAL",
+  "lat": 40.784365,
+  "lng": -73.97349
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

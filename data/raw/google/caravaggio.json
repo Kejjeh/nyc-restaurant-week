@@ -1,0 +1,18 @@
+{
+ "slug": "caravaggio",
+ "query_name": "Caravaggio",
+ "matched": {
+  "place_id": "ChIJ9aRJopRYwokRTTPRXTCYgLE",
+  "name": "Caravaggio",
+  "address": "23 E 74th St, New York, NY 10021, USA",
+  "rating": 4.5,
+  "user_ratings_total": 377,
+  "business_status": "OPERATIONAL",
+  "lat": 40.773303,
+  "lng": -73.9647723
+ },
+ "accepted": true,
+ "reason": "11m away",
+ "source": "textsearch",
+ "error": null
+}

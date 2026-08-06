@@ -1,0 +1,18 @@
+{
+ "slug": "estiatorio-milos-hudson-yards",
+ "query_name": "Estiatorio Milos Hudson Yards",
+ "matched": {
+  "place_id": "ChIJg8puJSdZwokR8fwzSFFDll4",
+  "name": "estiatorio Milos Hudson Yards",
+  "address": "20 Hudson Yards Fifth Floor, New York, NY 10001, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1133,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7538419,
+  "lng": -74.00107679999999
+ },
+ "accepted": true,
+ "reason": "hand-verified place_id",
+ "source": "place_id",
+ "error": null
+}

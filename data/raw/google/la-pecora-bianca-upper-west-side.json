@@ -1,0 +1,18 @@
+{
+ "slug": "la-pecora-bianca-upper-west-side",
+ "query_name": "La Pecora Bianca Upper West Side",
+ "matched": {
+  "place_id": "ChIJlYuHaAtZwokRTrF1jKtMdvg",
+  "name": "La Pecora Bianca UWS",
+  "address": "359 Columbus Ave, New York, NY 10024, USA",
+  "rating": 4.8,
+  "user_ratings_total": 3621,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7804753,
+  "lng": -73.9763467
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

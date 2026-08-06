@@ -1,0 +1,18 @@
+{
+ "slug": "the-ivory-peacock",
+ "query_name": "The Ivory Peacock",
+ "matched": {
+  "place_id": "ChIJx4mRX0RZwokR2MzGQveMqzs",
+  "name": "The Ivory Peacock",
+  "address": "38 W 26th St, New York, NY 10010, USA",
+  "rating": 4.7,
+  "user_ratings_total": 1797,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7442721,
+  "lng": -73.9907621
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

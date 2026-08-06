@@ -1,0 +1,18 @@
+{
+ "slug": "travelers-poets-and-friends",
+ "query_name": "Travelers Poets & Friends",
+ "matched": {
+  "place_id": "ChIJD6PYkVJZwokRXUVbcQM5QwE",
+  "name": "Travelers Poets & Friends",
+  "address": "457 6th Ave, New York, NY 10011, USA",
+  "rating": 4.7,
+  "user_ratings_total": 544,
+  "business_status": "OPERATIONAL",
+  "lat": 40.735255,
+  "lng": -73.998673
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

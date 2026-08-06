@@ -1,0 +1,18 @@
+{
+ "slug": "bobo",
+ "query_name": "Bobo",
+ "matched": {
+  "place_id": "ChIJn6dnQpRZwokRqXNiYx0ZzLw",
+  "name": "Bobo",
+  "address": "181 W 10th St, New York, NY 10014, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1049,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7344552,
+  "lng": -74.0026304
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

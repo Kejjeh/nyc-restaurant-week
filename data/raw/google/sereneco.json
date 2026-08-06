@@ -1,0 +1,18 @@
+{
+ "slug": "sereneco",
+ "query_name": "Sereneco",
+ "matched": {
+  "place_id": "ChIJH_-tMGlZwokRqIqHR22D-zU",
+  "name": "Sereneco",
+  "address": "113 Franklin St, Brooklyn, NY 11222, USA",
+  "rating": 4.6,
+  "user_ratings_total": 840,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7300241,
+  "lng": -73.957793
+ },
+ "accepted": true,
+ "reason": "19m away",
+ "source": "textsearch",
+ "error": null
+}

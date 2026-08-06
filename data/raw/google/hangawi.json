@@ -1,0 +1,18 @@
+{
+ "slug": "hangawi",
+ "query_name": "HanGawi",
+ "matched": {
+  "place_id": "ChIJtSk6aqhZwokRAA7X1yq7onk",
+  "name": "Hangawi",
+  "address": "12 E 32nd St, New York, NY 10016, USA",
+  "rating": 4.6,
+  "user_ratings_total": 2117,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7466013,
+  "lng": -73.98476169999999
+ },
+ "accepted": true,
+ "reason": "8m away",
+ "source": "textsearch",
+ "error": null
+}

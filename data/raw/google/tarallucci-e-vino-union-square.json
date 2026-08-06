@@ -1,0 +1,18 @@
+{
+ "slug": "tarallucci-e-vino-union-square",
+ "query_name": "Tarallucci e Vino - Union Square",
+ "matched": {
+  "place_id": "ChIJkZl4RqJZwokRh8_7vKnsdTI",
+  "name": "Tarallucci e Vino Union Square",
+  "address": "15 E 18th St, New York, NY 10003, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1068,
+  "business_status": "OPERATIONAL",
+  "lat": 40.738201,
+  "lng": -73.990605
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

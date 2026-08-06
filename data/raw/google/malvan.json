@@ -1,0 +1,18 @@
+{
+ "slug": "malvan",
+ "query_name": "Malvan",
+ "matched": {
+  "place_id": "ChIJC9PSN-1bwokR6FwMww-9CzE",
+  "name": "Malvan",
+  "address": "550 Court St, Brooklyn, NY 11231, USA",
+  "rating": 4.7,
+  "user_ratings_total": 62,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6750723,
+  "lng": -73.9996534
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "atrio-bar-restaurant",
+ "query_name": "Atrio Wine Bar & Restaurant",
+ "matched": {
+  "place_id": "ChIJoZ7p5FhbwokRz21YCmQv3xk",
+  "name": "Atrio Wine Bar & Restaurant",
+  "address": "102 N End Ave, New York, NY 10282, USA",
+  "rating": 3.9,
+  "user_ratings_total": 145,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7150499,
+  "lng": -74.0155621
+ },
+ "accepted": true,
+ "reason": "18m away",
+ "source": "textsearch",
+ "error": null
+}

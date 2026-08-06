@@ -1,0 +1,18 @@
+{
+ "slug": "rosevale-cocktail-room",
+ "query_name": "Rosevale Cocktail Room",
+ "matched": {
+  "place_id": "ChIJ_XQGaExZwokRTmvrhBoWHUY",
+  "name": "Rosevale Cocktail Room",
+  "address": "305 W 48th St 2nd Floor, New York, NY 10036, USA",
+  "rating": 4.6,
+  "user_ratings_total": 345,
+  "business_status": "OPERATIONAL",
+  "lat": 40.76143,
+  "lng": -73.9874509
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

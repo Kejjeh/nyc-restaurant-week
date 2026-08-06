@@ -1,0 +1,18 @@
+{
+ "slug": "fish-cheeks",
+ "query_name": "Fish Cheeks",
+ "matched": {
+  "place_id": "ChIJgc7fPIVZwokRQMnqTxTf_Qk",
+  "name": "Fish Cheeks",
+  "address": "55 Bond St, New York, NY 10012, USA",
+  "rating": 4.7,
+  "user_ratings_total": 5429,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7257881,
+  "lng": -73.99263859999999
+ },
+ "accepted": true,
+ "reason": "13m away",
+ "source": "textsearch",
+ "error": null
+}

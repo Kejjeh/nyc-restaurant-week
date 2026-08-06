@@ -1,0 +1,18 @@
+{
+ "slug": "abc-cocina",
+ "query_name": "ABC Cocina",
+ "matched": {
+  "place_id": "ChIJY_5NoVZZwokRukBqpfMzz0Y",
+  "name": "abc cocina",
+  "address": "38 E 19th St, New York, NY 10003, USA",
+  "rating": 4.3,
+  "user_ratings_total": 944,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7379868,
+  "lng": -73.9892758
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

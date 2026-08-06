@@ -1,0 +1,18 @@
+{
+ "slug": "jue-lan-club",
+ "query_name": "Jue Lan Club",
+ "matched": {
+  "place_id": "ChIJpZ1jwAFZwokRmfXFIqDLYjU",
+  "name": "Jue Lan Club",
+  "address": "49 W 20th St, New York, NY 10011, USA",
+  "rating": 3.8,
+  "user_ratings_total": 1002,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7409461,
+  "lng": -73.9935311
+ },
+ "accepted": true,
+ "reason": "17m away",
+ "source": "textsearch",
+ "error": null
+}

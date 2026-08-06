@@ -1,0 +1,18 @@
+{
+ "slug": "osteria-figa",
+ "query_name": "Osteria Figa",
+ "matched": {
+  "place_id": "ChIJR6BCikVZwokRi6XkjS0KRgY",
+  "name": "Osteria Figa",
+  "address": "15 E 12th St, New York, NY 10003, USA",
+  "rating": 4.8,
+  "user_ratings_total": 77,
+  "business_status": "OPERATIONAL",
+  "lat": 40.734416,
+  "lng": -73.99326429999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

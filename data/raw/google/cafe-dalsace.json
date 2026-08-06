@@ -1,0 +1,18 @@
+{
+ "slug": "cafe-dalsace",
+ "query_name": "Cafe D'Alsace",
+ "matched": {
+  "place_id": "ChIJ4Q06IbtYwokRcV8iHlJky_M",
+  "name": "Cafe d’Alsace",
+  "address": "1703 2nd Ave, New York, NY 10128, USA",
+  "rating": 4.7,
+  "user_ratings_total": 2998,
+  "business_status": "OPERATIONAL",
+  "lat": 40.77945760000001,
+  "lng": -73.95092989999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

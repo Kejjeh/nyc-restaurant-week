@@ -1,0 +1,18 @@
+{
+ "slug": "ginger-ristoranti-new-york",
+ "query_name": "Ginger Ristoranti",
+ "matched": {
+  "place_id": "ChIJeSfHrQtZwokR8fHTQ4dMftc",
+  "name": "Ginger - Ristorante NYC Midtown",
+  "address": "123 W 49th St, New York, NY 10020, USA",
+  "rating": 4.8,
+  "user_ratings_total": 411,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7601622,
+  "lng": -73.98237069999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

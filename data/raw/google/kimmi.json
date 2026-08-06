@@ -1,0 +1,18 @@
+{
+ "slug": "kimmi",
+ "query_name": "Kimmi",
+ "matched": {
+  "place_id": "ChIJ75HiCl5bwokRYSOfVHo6ec8",
+  "name": "KIMMI",
+  "address": "125 Canal St, New York, NY 10002, USA",
+  "rating": 4.7,
+  "user_ratings_total": 82,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7161006,
+  "lng": -73.9951758
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

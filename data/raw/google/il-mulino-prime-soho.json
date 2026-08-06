@@ -1,0 +1,18 @@
+{
+ "slug": "il-mulino-prime-soho",
+ "query_name": "Il Mulino Prime | Soho",
+ "matched": {
+  "place_id": "ChIJeTgmC4tZwokR1Q4cZET_PQ8",
+  "name": "Il Mulino Prime",
+  "address": "331 W Broadway, New York, NY 10013, USA",
+  "rating": 4.4,
+  "user_ratings_total": 353,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7221986,
+  "lng": -74.0037652
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

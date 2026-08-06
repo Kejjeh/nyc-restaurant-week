@@ -1,0 +1,18 @@
+{
+ "slug": "kubeh",
+ "query_name": "Kubeh",
+ "matched": {
+  "place_id": "ChIJ5fW8U5ZZwokRlk_uZ6uLlgg",
+  "name": "Kubeh",
+  "address": "464 6th Ave, New York, NY 10011, USA",
+  "rating": 4.3,
+  "user_ratings_total": 969,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7354756,
+  "lng": -73.99802749999999
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

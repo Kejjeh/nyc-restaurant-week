@@ -1,0 +1,18 @@
+{
+ "slug": "margaux-by-la-sirene",
+ "query_name": "Margaux by La Sirène",
+ "matched": {
+  "place_id": "ChIJR_ZSBAlZwokRwMVF5nJhbSQ",
+  "name": "Margaux by La Sirène",
+  "address": "238 Madison Ave, New York, NY 10016, USA",
+  "rating": 4.5,
+  "user_ratings_total": 103,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7499446,
+  "lng": -73.9817461
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

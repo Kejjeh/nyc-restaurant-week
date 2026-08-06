@@ -1,0 +1,18 @@
+{
+ "slug": "nizza",
+ "query_name": "Nizza",
+ "matched": {
+  "place_id": "ChIJb--jlAtZwokRYpzf9D2aSPI",
+  "name": "Nizza",
+  "address": "630 9th Ave, New York, NY 10036, USA",
+  "rating": 4.7,
+  "user_ratings_total": 2191,
+  "business_status": "OPERATIONAL",
+  "lat": 40.759987,
+  "lng": -73.9912338
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

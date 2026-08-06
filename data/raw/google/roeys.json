@@ -1,0 +1,18 @@
+{
+ "slug": "roeys",
+ "query_name": "Roey's",
+ "matched": {
+  "place_id": "ChIJuwgQBM9ZwokR_tL0uQ1wTTU",
+  "name": "Roey's",
+  "address": "1 Perry St, New York, NY 10014, USA",
+  "rating": 4.3,
+  "user_ratings_total": 835,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7359857,
+  "lng": -74.00098919999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

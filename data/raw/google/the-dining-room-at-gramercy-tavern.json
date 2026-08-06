@@ -1,0 +1,18 @@
+{
+ "slug": "the-dining-room-at-gramercy-tavern",
+ "query_name": "The Dining Room at Gramercy Tavern",
+ "matched": {
+  "place_id": "ChIJvSQIgqFZwokRFYQbJdzceSs",
+  "name": "Gramercy Tavern",
+  "address": "42 E 20th St, New York, NY 10003, USA",
+  "rating": 4.6,
+  "user_ratings_total": 4974,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7384555,
+  "lng": -73.98850639999999
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

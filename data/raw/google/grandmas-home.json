@@ -1,0 +1,18 @@
+{
+ "slug": "grandmas-home",
+ "query_name": "Grandma's Home",
+ "matched": {
+  "place_id": "ChIJG6UKFLRZwokR0zfgsrYFJCA",
+  "name": "Grandma's Home 外婆家",
+  "address": "56 W 22nd St, New York, NY 10010, USA",
+  "rating": null,
+  "user_ratings_total": null,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7418412,
+  "lng": -73.9928814
+ },
+ "accepted": true,
+ "reason": "117m away",
+ "source": "textsearch",
+ "error": null
+}

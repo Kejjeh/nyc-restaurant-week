@@ -1,0 +1,18 @@
+{
+ "slug": "havana-central-times-square",
+ "query_name": "Havana Central",
+ "matched": {
+  "place_id": "ChIJy0KKmVVYwokRyab_FcJzFA0",
+  "name": "Havana Central Times Square",
+  "address": "151 W 46th St, New York, NY 10036, USA",
+  "rating": 4.4,
+  "user_ratings_total": 7055,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7583364,
+  "lng": -73.9841591
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

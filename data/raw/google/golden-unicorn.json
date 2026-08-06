@@ -1,0 +1,18 @@
+{
+ "slug": "golden-unicorn",
+ "query_name": "Golden Unicorn",
+ "matched": {
+  "place_id": "ChIJXczCZSZawokRerIzds-K5e0",
+  "name": "Golden Unicorn",
+  "address": "18 E Broadway, New York, NY 10002, USA",
+  "rating": 4,
+  "user_ratings_total": 3594,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7137006,
+  "lng": -73.997193
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

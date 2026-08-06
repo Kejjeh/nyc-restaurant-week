@@ -1,0 +1,18 @@
+{
+ "slug": "the-quimby",
+ "query_name": "The Quimby",
+ "matched": {
+  "place_id": "ChIJq6rquR9nwokRWCGgEBxuuVs",
+  "name": "The Quimby Restaurant",
+  "address": "135-25 142nd St, South Ozone Park, NY 11436, USA",
+  "rating": 4.2,
+  "user_ratings_total": 95,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6673225,
+  "lng": -73.7967931
+ },
+ "accepted": true,
+ "reason": "18m away",
+ "source": "textsearch",
+ "error": null
+}

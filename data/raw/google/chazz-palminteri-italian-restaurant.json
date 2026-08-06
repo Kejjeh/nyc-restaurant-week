@@ -1,0 +1,18 @@
+{
+ "slug": "chazz-palminteri-italian-restaurant",
+ "query_name": "Chazz Palminteri Italian Restaurant",
+ "matched": {
+  "place_id": "ChIJGSQEnuJYwokRTcsuPJjna7A",
+  "name": "Chazz Palminteri Italian Restaurant",
+  "address": "30 W 46th St, New York, NY 10036, USA",
+  "rating": 4.7,
+  "user_ratings_total": 2225,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7564645,
+  "lng": -73.980563
+ },
+ "accepted": true,
+ "reason": "10m away",
+ "source": "textsearch",
+ "error": null
+}

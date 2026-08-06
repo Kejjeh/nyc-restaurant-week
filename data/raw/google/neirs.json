@@ -1,0 +1,18 @@
+{
+ "slug": "neirs",
+ "query_name": "Neir's Tavern",
+ "matched": {
+  "place_id": "ChIJj6Zpx-ddwokRm5R41uLVdJI",
+  "name": "Neir's Tavern",
+  "address": "87-48 78th St, Woodhaven, NY 11421, USA",
+  "rating": 4.7,
+  "user_ratings_total": 1096,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6898112,
+  "lng": -73.8635147
+ },
+ "accepted": true,
+ "reason": "7m away",
+ "source": "textsearch",
+ "error": null
+}

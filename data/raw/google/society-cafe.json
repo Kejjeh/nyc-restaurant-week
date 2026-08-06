@@ -1,0 +1,18 @@
+{
+ "slug": "society-cafe",
+ "query_name": "Society Cafe",
+ "matched": {
+  "place_id": "ChIJVyHLxpdZwokRwXVZrVKPFnQ",
+  "name": "Society Cafe",
+  "address": "52 W 13th St, New York, NY 10011, USA",
+  "rating": 4.5,
+  "user_ratings_total": 703,
+  "business_status": "OPERATIONAL",
+  "lat": 40.73618,
+  "lng": -73.9966
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

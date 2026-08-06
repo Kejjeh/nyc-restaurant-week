@@ -1,0 +1,18 @@
+{
+ "slug": "marks-off-madison",
+ "query_name": "Mark's Off Madison",
+ "matched": {
+  "place_id": "ChIJ4c0uYh5ZwokRMrPmexnbPoY",
+  "name": "Mark's Off Madison",
+  "address": "41 Madison Ave Ground Level, New York, NY 10010, USA",
+  "rating": 4,
+  "user_ratings_total": 683,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7423278,
+  "lng": -73.9862644
+ },
+ "accepted": true,
+ "reason": "191m away, name agrees (1.00)",
+ "source": "textsearch",
+ "error": null
+}

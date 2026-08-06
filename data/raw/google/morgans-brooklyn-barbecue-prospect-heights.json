@@ -1,0 +1,18 @@
+{
+ "slug": "morgans-brooklyn-barbecue-prospect-heights",
+ "query_name": "Morgan's Brooklyn Barbecue",
+ "matched": {
+  "place_id": "ChIJlylvKq9bwokRkslMvmbAJ7Q",
+  "name": "Morgan's Brooklyn Barbecue",
+  "address": "267 Flatbush Ave, Brooklyn, NY 11217, USA",
+  "rating": 4.1,
+  "user_ratings_total": 1779,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6798958,
+  "lng": -73.9740726
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

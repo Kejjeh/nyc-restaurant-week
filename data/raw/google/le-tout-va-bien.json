@@ -1,0 +1,18 @@
+{
+ "slug": "le-tout-va-bien",
+ "query_name": "Le Tout Va Bien",
+ "matched": {
+  "place_id": "ChIJa-hSAVdYwokR-CMV2cYCFjY",
+  "name": "Le Tout Va Bien - French Restaurant",
+  "address": "311 W 51st St, New York, NY 10019, USA",
+  "rating": 4.6,
+  "user_ratings_total": 802,
+  "business_status": "OPERATIONAL",
+  "lat": 40.763406,
+  "lng": -73.98621899999999
+ },
+ "accepted": true,
+ "reason": "17m away",
+ "source": "textsearch",
+ "error": null
+}

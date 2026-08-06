@@ -1,0 +1,18 @@
+{
+ "slug": "siren-oyster-bar-and-restaurant",
+ "query_name": "Siren Oyster Bar & Restaurant",
+ "matched": {
+  "place_id": "ChIJ9VG9IbJbwokRI76S2r-HyLM",
+  "name": "Siren Restaurant & Bar",
+  "address": "687 5th Ave, Brooklyn, NY 11215, USA",
+  "rating": 4.4,
+  "user_ratings_total": 217,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6614403,
+  "lng": -73.9930691
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

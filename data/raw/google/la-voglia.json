@@ -1,0 +1,18 @@
+{
+ "slug": "la-voglia",
+ "query_name": "La Voglia",
+ "matched": {
+  "place_id": "ChIJ2Z_EuD9ZwokRB_t-ovxEzxI",
+  "name": "La Voglia NYC",
+  "address": "1645 3rd Ave, New York, NY 10128, USA",
+  "rating": 4.7,
+  "user_ratings_total": 1241,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7826745,
+  "lng": -73.9508638
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

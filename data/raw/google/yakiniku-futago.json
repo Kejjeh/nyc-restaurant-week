@@ -1,0 +1,18 @@
+{
+ "slug": "yakiniku-futago",
+ "query_name": "Yakiniku Futago",
+ "matched": {
+  "place_id": "ChIJucdA0KJZwokRSRxyOarSWoI",
+  "name": "Yakiniku Futago Chelsea",
+  "address": "37 W 17th St, New York, NY 10011, USA",
+  "rating": 4.6,
+  "user_ratings_total": 1280,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7389084,
+  "lng": -73.9940515
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

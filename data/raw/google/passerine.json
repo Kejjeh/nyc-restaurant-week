@@ -1,0 +1,18 @@
+{
+ "slug": "passerine",
+ "query_name": "Passerine",
+ "matched": {
+  "place_id": "ChIJNz2NYnNZwokRmpUsT-iz-ZE",
+  "name": "Passerine",
+  "address": "36 E 20th St, New York, NY 10003, USA",
+  "rating": 4.6,
+  "user_ratings_total": 265,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7385115,
+  "lng": -73.988664
+ },
+ "accepted": true,
+ "reason": "5m away",
+ "source": "textsearch",
+ "error": null
+}

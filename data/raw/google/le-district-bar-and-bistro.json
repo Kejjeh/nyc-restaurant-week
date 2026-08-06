@@ -1,0 +1,18 @@
+{
+ "slug": "le-district-bar-and-bistro",
+ "query_name": "Le District Bar & Bistro",
+ "matched": {
+  "place_id": "ChIJ9ZadAhtawokRn4lqJxlSbYs",
+  "name": "Le District Bar & Bistro",
+  "address": "225 Liberty St, New York, NY 10281, USA",
+  "rating": null,
+  "user_ratings_total": null,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7128308,
+  "lng": -74.0159195
+ },
+ "accepted": true,
+ "reason": "81m away",
+ "source": "textsearch",
+ "error": null
+}

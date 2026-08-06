@@ -1,0 +1,18 @@
+{
+ "slug": "yakiniku-toraji-an",
+ "query_name": "Yakiniku Toraji An",
+ "matched": {
+  "place_id": "ChIJDdQ2uidawokRf7aaXtFMWAI",
+  "name": "Yakiniku Toraji An",
+  "address": "18 Elizabeth St, New York, NY 10013, USA",
+  "rating": 4.9,
+  "user_ratings_total": 807,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7159527,
+  "lng": -73.9972164
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "bronx-beer-hall",
+ "query_name": "The Bronx Beer Hall",
+ "matched": {
+  "place_id": "ChIJl0vNXIf0wokRAa4bYitALWU",
+  "name": "The Bronx Beer Hall",
+  "address": "2344 Arthur Ave, Bronx, NY 10458, USA",
+  "rating": 4.5,
+  "user_ratings_total": 568,
+  "business_status": "OPERATIONAL",
+  "lat": 40.854064,
+  "lng": -73.88821589999999
+ },
+ "accepted": true,
+ "reason": "26m away",
+ "source": "textsearch",
+ "error": null
+}

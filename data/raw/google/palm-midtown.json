@@ -1,0 +1,18 @@
+{
+ "slug": "palm-midtown",
+ "query_name": "The Palm - Midtown",
+ "matched": {
+  "place_id": "ChIJrdFMWVZYwokReS2W7dYYK0E",
+  "name": "The Palm – New York",
+  "address": "250 W 50th St, New York, NY 10019, USA",
+  "rating": 4.3,
+  "user_ratings_total": 1188,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7619684,
+  "lng": -73.9857193
+ },
+ "accepted": true,
+ "reason": "17m away",
+ "source": "textsearch",
+ "error": null
+}

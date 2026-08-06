@@ -1,0 +1,18 @@
+{
+ "slug": "gupshup",
+ "query_name": "GupShup",
+ "matched": {
+  "place_id": "ChIJvYavzZ5ZwokRBQj3hhDtpfk",
+  "name": "GupShup",
+  "address": "115 E 18th St (Between Park Ave &, Irving Pl, New York, NY 10003, USA",
+  "rating": 4.4,
+  "user_ratings_total": 3539,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7368777,
+  "lng": -73.98764
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

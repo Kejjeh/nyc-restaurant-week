@@ -1,0 +1,18 @@
+{
+ "slug": "dhamaka",
+ "query_name": "Dhamaka",
+ "matched": {
+  "place_id": "ChIJJyPbJe1ZwokRu8dDEOqAYDc",
+  "name": "Dhamaka",
+  "address": "119 Delancey St, New York, NY 10002, USA",
+  "rating": 4.5,
+  "user_ratings_total": 3736,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7182426,
+  "lng": -73.9879902
+ },
+ "accepted": true,
+ "reason": "23m away",
+ "source": "textsearch",
+ "error": null
+}

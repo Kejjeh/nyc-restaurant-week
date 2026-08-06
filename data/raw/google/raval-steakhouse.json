@@ -1,0 +1,18 @@
+{
+ "slug": "raval-steakhouse",
+ "query_name": "Raval Steakhouse",
+ "matched": {
+  "place_id": "ChIJ5Zfe7DVPwokRVyoUHJ7ei04",
+  "name": "Raval Steakhouse",
+  "address": "12 Minthorne St, Staten Island, NY 10301, USA",
+  "rating": 4.8,
+  "user_ratings_total": 289,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6371226,
+  "lng": -74.0755683
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

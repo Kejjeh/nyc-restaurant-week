@@ -1,0 +1,18 @@
+{
+ "slug": "heritage-grand-bakery",
+ "query_name": "Heritage Grand Bakery",
+ "matched": {
+  "place_id": "ChIJPa72SSdZwokR4kO-TXUQFW4",
+  "name": "Heritage Grand Bakery",
+  "address": "8 W 40th St, New York, NY 10018, USA",
+  "rating": 4.5,
+  "user_ratings_total": 620,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7523176,
+  "lng": -73.9826875
+ },
+ "accepted": true,
+ "reason": "8m away",
+ "source": "textsearch",
+ "error": null
+}

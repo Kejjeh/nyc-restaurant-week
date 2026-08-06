@@ -1,0 +1,18 @@
+{
+ "slug": "palermo-argentinian-bistro-gramercy",
+ "query_name": "Palermo Argentinian Bistro - Gramercy",
+ "matched": {
+  "place_id": "ChIJeQtcLHxZwokRO1IieeRtre0",
+  "name": "Palermo Argentinian Bistro - Gramercy",
+  "address": "53 Irving Pl, New York, NY 10003, USA",
+  "rating": 4.9,
+  "user_ratings_total": 1910,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7360984,
+  "lng": -73.98749160000001
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "celeste",
+ "query_name": "Celeste",
+ "matched": {
+  "place_id": "ChIJjUIzMYRYwokRpH6nkif-iZc",
+  "name": "Celeste",
+  "address": "502 Amsterdam Ave, New York, NY 10024, USA",
+  "rating": 4.8,
+  "user_ratings_total": 4097,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7866992,
+  "lng": -73.9760929
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

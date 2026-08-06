@@ -1,0 +1,18 @@
+{
+ "slug": "chez-nick",
+ "query_name": "Chez Nick",
+ "matched": {
+  "place_id": "ChIJy0KIAvFZwokRFpoF_hbSwXg",
+  "name": "Chez Nick",
+  "address": "1737 York Ave, New York, NY 10128, USA",
+  "rating": 4.6,
+  "user_ratings_total": 524,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7790105,
+  "lng": -73.9452127
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

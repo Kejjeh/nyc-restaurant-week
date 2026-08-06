@@ -1,0 +1,18 @@
+{
+ "slug": "vin-sur-vingt-e-51st-st",
+ "query_name": "Vin Sur Vingt - E. 51st St.",
+ "matched": {
+  "place_id": "ChIJF-g1rkpZwokRm1tzQ9sq1Xs",
+  "name": "Vin Sur Vingt Bistro",
+  "address": "230 E 51st St, New York, NY 10022, USA",
+  "rating": 4.6,
+  "user_ratings_total": 203,
+  "business_status": "OPERATIONAL",
+  "lat": 40.75572289999999,
+  "lng": -73.9691132
+ },
+ "accepted": true,
+ "reason": "5m away",
+ "source": "textsearch",
+ "error": null
+}

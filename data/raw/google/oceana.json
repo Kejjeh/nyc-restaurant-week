@@ -1,0 +1,18 @@
+{
+ "slug": "oceana",
+ "query_name": "Oceana",
+ "matched": {
+  "place_id": "ChIJ34SOS_9YwokR7vXpNdS9tZ8",
+  "name": "Oceana",
+  "address": "120 W 49th St, New York, NY 10020, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1554,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7597641,
+  "lng": -73.9823074
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

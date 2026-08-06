@@ -1,0 +1,18 @@
+{
+ "slug": "sicily-osteria",
+ "query_name": "Sicily Osteria",
+ "matched": {
+  "place_id": "ChIJ03krMjJZwokRYRF15upaCHw",
+  "name": "Sicily Osteria",
+  "address": "328-330 W 46th St, New York, NY 10036, USA",
+  "rating": 4.6,
+  "user_ratings_total": 3460,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7601601,
+  "lng": -73.9891863
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

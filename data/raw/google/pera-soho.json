@@ -1,0 +1,18 @@
+{
+ "slug": "pera-soho",
+ "query_name": "Pera SoHo",
+ "matched": {
+  "place_id": "ChIJPQ65gIxZwokRYYV9buM_BYw",
+  "name": "Pera Soho",
+  "address": "54 Thompson St, New York, NY 10012, USA",
+  "rating": 4,
+  "user_ratings_total": 1127,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7237889,
+  "lng": -74.0032322
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "cuna-nyc",
+ "query_name": "Cuna NYC",
+ "matched": {
+  "place_id": "ChIJgbDMmclZwokRzjhvk3L8CrI",
+  "name": "Cuna NYC",
+  "address": "25 Cooper Sq, New York, NY 10003, USA",
+  "rating": 4.3,
+  "user_ratings_total": 57,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7278329,
+  "lng": -73.9909406
+ },
+ "accepted": true,
+ "reason": "14m away",
+ "source": "textsearch",
+ "error": null
+}

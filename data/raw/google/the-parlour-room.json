@@ -1,0 +1,18 @@
+{
+ "slug": "the-parlour-room",
+ "query_name": "The Parlour Room",
+ "matched": {
+  "place_id": "ChIJCX5C4u5ZwokR3RzOYiuHifU",
+  "name": "The Parlour Room",
+  "address": "70 W 36th St. Front 1b, New York, NY 10018, USA",
+  "rating": 4.7,
+  "user_ratings_total": 1039,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7506112,
+  "lng": -73.9862911
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

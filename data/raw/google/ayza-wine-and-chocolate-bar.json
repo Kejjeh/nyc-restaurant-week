@@ -1,0 +1,18 @@
+{
+ "slug": "ayza-wine-and-chocolate-bar",
+ "query_name": "Ayza",
+ "matched": {
+  "place_id": "ChIJNw7LkqhZwokRwNMxjPkQ8Ts",
+  "name": "Ayza Wine & Chocolate Bar",
+  "address": "11 W 31st St, New York, NY 10001, USA",
+  "rating": 4.5,
+  "user_ratings_total": 2241,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7470962,
+  "lng": -73.9869045
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

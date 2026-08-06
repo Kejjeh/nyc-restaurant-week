@@ -1,0 +1,18 @@
+{
+ "slug": "felice-83",
+ "query_name": "Felice 83",
+ "matched": {
+  "place_id": "ChIJ9T4AfLlYwokRpcucXUsBIVU",
+  "name": "Felice 83",
+  "address": "1593 1st Ave, New York, NY 10028, USA",
+  "rating": 4.3,
+  "user_ratings_total": 686,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7749003,
+  "lng": -73.9510928
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

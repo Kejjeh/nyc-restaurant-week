@@ -4,6 +4,7 @@ Usage: python src/refresh.py [--force-menus]
   --force-menus  re-download every PDF (detects in-place menu content changes;
                  otherwise only new/missing PDFs are fetched)
 """
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -40,6 +41,14 @@ def main():
     # Outdoor licences are issued and expire continuously, so unlike the subway
     # stations this is re-pulled -- one request a week against NYC Open Data.
     run("fetch_outdoor_dining.py", "--refresh")
+    # Ratings drift slowly and the cache is keyed per slug, so this only calls
+    # the API for restaurants added since last week -- usually zero. Skipped
+    # entirely without a key, which is the case in CI: the key is gitignored
+    # and must never be committed to a public repo.
+    if os.environ.get("GOOGLE_PLACES_KEY"):
+        run("fetch_google_ratings.py")
+    else:
+        print("fetch_google_ratings.py skipped: no GOOGLE_PLACES_KEY in env")
     run("export_site_data.py")    # docs/ payload; must follow tag+recognition
     run("diff_report.py")
 

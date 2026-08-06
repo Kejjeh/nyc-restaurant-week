@@ -1,0 +1,18 @@
+{
+ "slug": "playa-bettys",
+ "query_name": "Playa Betty's",
+ "matched": {
+  "place_id": "ChIJK5VpoYlYwokRzzsrtQ0hmOM",
+  "name": "Playa Betty’s",
+  "address": "320 Amsterdam Ave, New York, NY 10023, USA",
+  "rating": 4.5,
+  "user_ratings_total": 4043,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7808482,
+  "lng": -73.9803395
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

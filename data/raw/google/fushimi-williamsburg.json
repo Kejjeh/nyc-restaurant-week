@@ -1,0 +1,18 @@
+{
+ "slug": "fushimi-williamsburg",
+ "query_name": "Fushimi - Williamsburg",
+ "matched": {
+  "place_id": "ChIJDS1ofVxZwokR2lOOevVnAXA",
+  "name": "Fushimi",
+  "address": "475 Driggs Ave, Brooklyn, NY 11211, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1832,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7187868,
+  "lng": -73.95432749999999
+ },
+ "accepted": true,
+ "reason": "20m away",
+ "source": "textsearch",
+ "error": null
+}

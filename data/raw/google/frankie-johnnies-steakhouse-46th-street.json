@@ -1,0 +1,18 @@
+{
+ "slug": "frankie-johnnies-steakhouse-46th-street",
+ "query_name": "Frankie & Johnnie’s Steakhouse",
+ "matched": {
+  "place_id": "ChIJtV9HblRYwokRMAGnUHOJYrs",
+  "name": "Frankie & Johnnie's Steakhouse",
+  "address": "320 W 46th St, New York, NY 10036, USA",
+  "rating": 4.2,
+  "user_ratings_total": 748,
+  "business_status": "OPERATIONAL",
+  "lat": 40.759969,
+  "lng": -73.988935
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "docks-oyster-bar",
+ "query_name": "Docks Oyster Bar",
+ "matched": {
+  "place_id": "ChIJi9zckANZwokRwVvF58erwVc",
+  "name": "Docks Oyster Bar - Midtown East, NYC",
+  "address": "633 3rd Ave, New York, NY 10017, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1743,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7496523,
+  "lng": -73.97496509999999
+ },
+ "accepted": true,
+ "reason": "17m away",
+ "source": "textsearch",
+ "error": null
+}

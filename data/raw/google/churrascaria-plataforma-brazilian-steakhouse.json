@@ -1,0 +1,18 @@
+{
+ "slug": "churrascaria-plataforma-brazilian-steakhouse",
+ "query_name": "Churrascaria Plataforma Brazilian Steakhouse",
+ "matched": {
+  "place_id": "ChIJP9idxlZYwokRLH-I1mNfzYQ",
+  "name": "Churrascaria Plataforma Steakhouse",
+  "address": "316 W 49th St, New York, NY 10019, USA",
+  "rating": 4.5,
+  "user_ratings_total": 4151,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7619155,
+  "lng": -73.98773249999999
+ },
+ "accepted": true,
+ "reason": "14m away",
+ "source": "textsearch",
+ "error": null
+}

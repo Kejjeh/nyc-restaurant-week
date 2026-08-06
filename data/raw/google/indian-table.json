@@ -1,0 +1,18 @@
+{
+ "slug": "indian-table",
+ "query_name": "Indian Table",
+ "matched": {
+  "place_id": "ChIJoxQJdFBawokRXDFDwgZZ1hw",
+  "name": "Indian Table",
+  "address": "234 Court St, Brooklyn, NY 11201, USA",
+  "rating": 4.5,
+  "user_ratings_total": 576,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6860356,
+  "lng": -73.99441159999999
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

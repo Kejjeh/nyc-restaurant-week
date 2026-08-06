@@ -1,0 +1,18 @@
+{
+ "slug": "anassa-taverna-downtown",
+ "query_name": "Anassa Taverna - Downtown",
+ "matched": {
+  "place_id": "ChIJpzeSd8ZbwokRNe-wE09tlsI",
+  "name": "Anassa Taverna Downtown",
+  "address": "104 N End Ave, New York, NY 10282, USA",
+  "rating": 4.4,
+  "user_ratings_total": 318,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7153683,
+  "lng": -74.0154941
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

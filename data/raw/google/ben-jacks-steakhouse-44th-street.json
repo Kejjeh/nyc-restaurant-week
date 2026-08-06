@@ -1,0 +1,18 @@
+{
+ "slug": "ben-jacks-steakhouse-44th-street",
+ "query_name": "Ben & Jack's 44th Street",
+ "matched": {
+  "place_id": "ChIJ1eDX3AJZwokRRNbRs3CnJHo",
+  "name": "Ben & Jack's Steakhouse",
+  "address": "219 E 44th St, New York, NY 10017, USA",
+  "rating": 4.5,
+  "user_ratings_total": 882,
+  "business_status": "OPERATIONAL",
+  "lat": 40.75183930000001,
+  "lng": -73.97233039999999
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

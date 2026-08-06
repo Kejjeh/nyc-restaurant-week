@@ -1,0 +1,18 @@
+{
+ "slug": "ra-sushi-bar-restaurant-times-square",
+ "query_name": "RA Sushi Bar Restaurant – Times Square",
+ "matched": {
+  "place_id": "ChIJV0lhkFRYwokRnOYz2uD9LN4",
+  "name": "RA Sushi - New York (Times Square)",
+  "address": "229 W 43rd St, New York, NY 10036, USA",
+  "rating": 4.3,
+  "user_ratings_total": 2552,
+  "business_status": "OPERATIONAL",
+  "lat": 40.757176,
+  "lng": -73.98728799999999
+ },
+ "accepted": true,
+ "reason": "49m away",
+ "source": "textsearch",
+ "error": null
+}

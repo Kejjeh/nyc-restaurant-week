@@ -1,0 +1,18 @@
+{
+ "slug": "when-in-bangkok",
+ "query_name": "When in Bangkok",
+ "matched": {
+  "place_id": "ChIJI2E7PJphwokRpwMEjuffvHc",
+  "name": "When in Bangkok",
+  "address": "161-16 Northern Blvd, Flushing, NY 11358, USA",
+  "rating": 4.8,
+  "user_ratings_total": 2346,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7622141,
+  "lng": -73.8042603
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

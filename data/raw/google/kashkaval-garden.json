@@ -1,0 +1,18 @@
+{
+ "slug": "kashkaval-garden",
+ "query_name": "Kashkaval Garden",
+ "matched": {
+  "place_id": "ChIJ0xEQtFlYwokRTi07N6-ojBU",
+  "name": "Kashkaval Garden",
+  "address": "852 9th Ave, New York, NY 10019, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1482,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7667881,
+  "lng": -73.9862145
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

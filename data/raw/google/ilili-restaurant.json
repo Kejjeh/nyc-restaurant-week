@@ -1,0 +1,18 @@
+{
+ "slug": "ilili-restaurant",
+ "query_name": "Ilili Restaurant",
+ "matched": {
+  "place_id": "ChIJMTEubKZZwokRgjl8iXjVcLA",
+  "name": "ilili NoMad",
+  "address": "236 5th Ave, New York, NY 10001, USA",
+  "rating": 4.5,
+  "user_ratings_total": 4270,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7443856,
+  "lng": -73.9877581
+ },
+ "accepted": true,
+ "reason": "14m away",
+ "source": "textsearch",
+ "error": null
+}

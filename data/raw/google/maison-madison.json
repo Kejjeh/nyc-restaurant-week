@@ -1,0 +1,18 @@
+{
+ "slug": "maison-madison",
+ "query_name": "Maison Madison",
+ "matched": {
+  "place_id": "ChIJe7Pe6PZbwokRfTATRBvOxyk",
+  "name": "Maison Madison",
+  "address": "301 S End Ave, New York, NY 10280, USA",
+  "rating": 4.9,
+  "user_ratings_total": 14,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7103436,
+  "lng": -74.016542
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

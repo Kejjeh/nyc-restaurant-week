@@ -1,0 +1,18 @@
+{
+ "slug": "greywind",
+ "query_name": "Greywind",
+ "matched": {
+  "place_id": "ChIJRyAmqgpZwokRHjS6xvDPVfI",
+  "name": "Greywind",
+  "address": "451 10th Ave, New York, NY 10018, USA",
+  "rating": 4.6,
+  "user_ratings_total": 411,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7556046,
+  "lng": -73.99868579999999
+ },
+ "accepted": true,
+ "reason": "16m away",
+ "source": "textsearch",
+ "error": null
+}

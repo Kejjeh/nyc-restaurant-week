@@ -1,0 +1,18 @@
+{
+ "slug": "il-mulino-new-york-madison",
+ "query_name": "Il Mulino New York | Madison",
+ "matched": {
+  "place_id": "ChIJC68guy1ZwokRHflN-lHki60",
+  "name": "Il Mulino New York - Madison",
+  "address": "58 E 56th St, New York, NY 10022, USA",
+  "rating": 4.5,
+  "user_ratings_total": 28,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7612168,
+  "lng": -73.9724411
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

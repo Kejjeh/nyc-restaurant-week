@@ -1,0 +1,18 @@
+{
+ "slug": "cafe-fleuri",
+ "query_name": "Café Fleuri",
+ "matched": {
+  "place_id": "ChIJZXs66hBawokRizEXnDJplPw",
+  "name": "Café Fleuri",
+  "address": "109 Washington St, New York, NY 10006, USA",
+  "rating": 4.5,
+  "user_ratings_total": 655,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7085845,
+  "lng": -74.01401659999999
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

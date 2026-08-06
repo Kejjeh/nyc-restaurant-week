@@ -1,0 +1,18 @@
+{
+ "slug": "club-a-steakhouse",
+ "query_name": "Club A Steakhouse",
+ "matched": {
+  "place_id": "ChIJhWkA1eVYwokRPKlaxy81SAY",
+  "name": "Club A Steakhouse",
+  "address": "240 E 58th St, New York, NY 10022, USA",
+  "rating": 4.8,
+  "user_ratings_total": 3779,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7601535,
+  "lng": -73.9655121
+ },
+ "accepted": true,
+ "reason": "12m away",
+ "source": "textsearch",
+ "error": null
+}

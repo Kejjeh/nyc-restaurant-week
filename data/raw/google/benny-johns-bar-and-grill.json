@@ -1,0 +1,18 @@
+{
+ "slug": "benny-johns-bar-and-grill",
+ "query_name": "Benny John's Bar and Grill",
+ "matched": {
+  "place_id": "ChIJex5A3G1ZwokRNaWBWtxmD3U",
+  "name": "Benny John's Bar and Grill",
+  "address": "8 E 48th St, New York, NY 10017, USA",
+  "rating": 4.8,
+  "user_ratings_total": 2795,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7568173,
+  "lng": -73.9774474
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

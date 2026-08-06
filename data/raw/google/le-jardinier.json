@@ -1,0 +1,18 @@
+{
+ "slug": "le-jardinier",
+ "query_name": "Le Jardinier",
+ "matched": {
+  "place_id": "ChIJKdcKCelZwokRdFHp3hzUKok",
+  "name": "Le Jardinier",
+  "address": "610 Lexington Ave, New York, NY 10022, USA",
+  "rating": 4.4,
+  "user_ratings_total": 454,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7583107,
+  "lng": -73.9713452
+ },
+ "accepted": true,
+ "reason": "15m away",
+ "source": "textsearch",
+ "error": null
+}

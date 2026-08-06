@@ -1,0 +1,18 @@
+{
+ "slug": "recette",
+ "query_name": "Recette",
+ "matched": {
+  "place_id": "ChIJ27nCgv9ZwokRSMWUV3OS1aM",
+  "name": "Recette",
+  "address": "103 Havemeyer St, Brooklyn, NY 11211, USA",
+  "rating": 4.8,
+  "user_ratings_total": 1166,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7132215,
+  "lng": -73.95632549999999
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

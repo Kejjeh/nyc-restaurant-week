@@ -1,0 +1,18 @@
+{
+ "slug": "rokunana",
+ "query_name": "RokuNana",
+ "matched": {
+  "place_id": "ChIJi6xbNIZZwokR_3evmHpkSFQ",
+  "name": "RokuNana Sushi Bar & Cocktails",
+  "address": "67 Clinton St, New York, NY 10002, USA",
+  "rating": 4.8,
+  "user_ratings_total": 125,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7194463,
+  "lng": -73.9850185
+ },
+ "accepted": true,
+ "reason": "7m away",
+ "source": "textsearch",
+ "error": null
+}

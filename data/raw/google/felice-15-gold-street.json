@@ -1,0 +1,18 @@
+{
+ "slug": "felice-15-gold-street",
+ "query_name": "Felice 15 Gold Street",
+ "matched": {
+  "place_id": "ChIJtb0E3RdawokRqLP-FNIxvf8",
+  "name": "Felice 15 Gold",
+  "address": "15 Gold St, New York, NY 10038, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1121,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7078509,
+  "lng": -74.007046
+ },
+ "accepted": true,
+ "reason": "16m away",
+ "source": "textsearch",
+ "error": null
+}

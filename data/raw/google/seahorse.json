@@ -1,0 +1,18 @@
+{
+ "slug": "seahorse",
+ "query_name": "Seahorse",
+ "matched": {
+  "place_id": "ChIJgcMuOv9ZwokRR1rQ8Ln0fvI",
+  "name": "Seahorse",
+  "address": "201 Park Ave S, New York, NY 10003, USA",
+  "rating": 4.2,
+  "user_ratings_total": 82,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7366094,
+  "lng": -73.9885406
+ },
+ "accepted": true,
+ "reason": "19m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "sistina",
+ "query_name": "Sistina",
+ "matched": {
+  "place_id": "ChIJh2wSuL5YwokRc5xdH9f4nRA",
+  "name": "Sistina",
+  "address": "24 E 81st St, New York, NY 10028, USA",
+  "rating": 4.2,
+  "user_ratings_total": 606,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7776092,
+  "lng": -73.9616775
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

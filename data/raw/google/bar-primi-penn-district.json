@@ -1,0 +1,18 @@
+{
+ "slug": "bar-primi-penn-district",
+ "query_name": "Bar Primi - Penn District",
+ "matched": {
+  "place_id": "ChIJ3RWZH4dZwokR7glpy1CBkdo",
+  "name": "Bar Primi Penn District",
+  "address": "349 W 33rd St, New York, NY 10001, USA",
+  "rating": 4.2,
+  "user_ratings_total": 553,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7524624,
+  "lng": -73.9958877
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

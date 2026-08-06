@@ -1,0 +1,18 @@
+{
+ "slug": "haidilao-huoguo",
+ "query_name": "Haidilao Huoguo",
+ "matched": {
+  "place_id": "ChIJtdeAXXFhwokRoxVFjtD6ctU",
+  "name": "Haidilao Hotpot",
+  "address": "138-23 39th Ave, Flushing, NY 11354, USA",
+  "rating": 4.8,
+  "user_ratings_total": 8629,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7613242,
+  "lng": -73.8280583
+ },
+ "accepted": true,
+ "reason": "43m away",
+ "source": "textsearch",
+ "error": null
+}

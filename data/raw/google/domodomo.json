@@ -1,0 +1,18 @@
+{
+ "slug": "domodomo",
+ "query_name": "DomoDomo NYC",
+ "matched": {
+  "place_id": "ChIJKas69o1ZwokRzUumZ0jK0rk",
+  "name": "DOMODOMO New York",
+  "address": "140 W Houston St, New York, NY 10012, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1519,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7280131,
+  "lng": -74.00161779999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -8,3 +8,7 @@ data/raw/pricesweep/*.tmp
 # local preview tooling, not part of the site
 .claude/
 refresh.log
+
+# Google Places API key — never commit. Read from env GOOGLE_PLACES_KEY, or
+# from this file locally. Also see config/secrets.example.py.
+config/secrets.py

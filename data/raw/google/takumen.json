@@ -1,0 +1,18 @@
+{
+ "slug": "takumen",
+ "query_name": "Takumen",
+ "matched": {
+  "place_id": "ChIJh_i0biNZwokR7X8nFpR4L8g",
+  "name": "Takumen",
+  "address": "5-50 50th Ave, Long Island City, NY 11101, USA",
+  "rating": 4.4,
+  "user_ratings_total": 884,
+  "business_status": "OPERATIONAL",
+  "lat": 40.742736,
+  "lng": -73.9546542
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

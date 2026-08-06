@@ -1,0 +1,18 @@
+{
+ "slug": "restaurant-nippon",
+ "query_name": "Restaurant Nippon",
+ "matched": {
+  "place_id": "ChIJ88QfReNYwokRDwlvNwkIFVQ",
+  "name": "Restaurant Nippon",
+  "address": "155 E 52nd St, New York, NY 10022, USA",
+  "rating": 4.5,
+  "user_ratings_total": 327,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7574462,
+  "lng": -73.97047169999999
+ },
+ "accepted": true,
+ "reason": "12m away",
+ "source": "textsearch",
+ "error": null
+}

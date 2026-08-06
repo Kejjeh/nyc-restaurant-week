@@ -1,0 +1,18 @@
+{
+ "slug": "amelie-upper-west-side",
+ "query_name": "Amélie - Upper West Side",
+ "matched": {
+  "place_id": "ChIJBV27hoNYwokR20JihLuQdUs",
+  "name": "Amélie Upper West Side Bistro & Wine Bar",
+  "address": "566 Amsterdam Ave, New York, NY 10024, USA",
+  "rating": 4.5,
+  "user_ratings_total": 606,
+  "business_status": "OPERATIONAL",
+  "lat": 40.788696,
+  "lng": -73.97448829999999
+ },
+ "accepted": true,
+ "reason": "13m away",
+ "source": "textsearch",
+ "error": null
+}

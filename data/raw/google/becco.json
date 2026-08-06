@@ -1,0 +1,18 @@
+{
+ "slug": "becco",
+ "query_name": "Becco",
+ "matched": {
+  "place_id": "ChIJndGJ5FNYwokRricJvhT0t1s",
+  "name": "Becco",
+  "address": "355 W 46th St, New York, NY 10036, USA",
+  "rating": 4.3,
+  "user_ratings_total": 4644,
+  "business_status": "OPERATIONAL",
+  "lat": 40.760804,
+  "lng": -73.98983240000001
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

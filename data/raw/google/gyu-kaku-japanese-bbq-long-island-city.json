@@ -1,0 +1,18 @@
+{
+ "slug": "gyu-kaku-japanese-bbq-long-island-city",
+ "query_name": "Gyu-Kaku Japanese BBQ - Long Island City",
+ "matched": {
+  "place_id": "ChIJXzT_agBZwokRFMNizm5i-ZE",
+  "name": "Gyu-Kaku Japanese BBQ LIC",
+  "address": "44-45 21st St Upper Floor, Long Island City, NY 11101, USA",
+  "rating": 4.5,
+  "user_ratings_total": 188,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7482509,
+  "lng": -73.9470496
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

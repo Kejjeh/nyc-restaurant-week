@@ -161,6 +161,22 @@ const FACETS = [
                                                 note: 'From NYC’s Dining Out register, which covers only the '
                                                     + 'pavement and roadway — rooftops and gardens don’t appear in it. '
                                                     + 'No chip here means unknown, not “none”.' },
+  // Bands are cut on the WEIGHTED score, not the raw star average, so a 4.9
+  // from 14 reviews cannot sit in the same bucket as a 4.7 from 4,000.
+  { key: 'grating',     title: 'Google rating', values: (r) => {
+                                                  const g = r.google; if (!g) return [];
+                                                  const v = g.score;
+                                                  return [v >= 4.6 ? '4.6+' : v >= 4.4 ? '4.4-4.6'
+                                                        : v >= 4.2 ? '4.2-4.4' : v >= 4.0 ? '4.0-4.2' : 'under 4.0'];
+                                                },
+                                                note: 'Weighted: a rating resting on few reviews is pulled toward '
+                                                    + 'the average, so it cannot outrank a strong rating from thousands.' },
+  { key: 'greviews',    title: 'Review volume', values: (r) => {
+                                                  const g = r.google; if (!g) return [];
+                                                  const v = g.reviews;
+                                                  return [v >= 2000 ? '2,000+' : v >= 500 ? '500-2,000'
+                                                        : v >= 100 ? '100-500' : 'under 100'];
+                                                } },
   { key: 'menu',        title: 'Menu PDF',      values: (r) => [r.menu_state || 'none'],
                                                 labels: { pdf: 'Readable PDF', image_only: 'Image-only PDF', none: 'No menu published' } },
 ];
@@ -273,6 +289,11 @@ const SORTS = {
   // The default. Trust tier first, then size within the tier — so the ranked
   // picks and hand-verified gaps lead, and the estimates keep their own
   // ordering underneath instead of colonising the top of the page.
+  google_desc: (a, b) => cmpNullLast(a.google && a.google.score, b.google && b.google.score, -1)
+    || a._name.localeCompare(b._name),
+  google_raw_desc: (a, b) => cmpNullLast(a.google && a.google.rating, b.google && b.google.rating, -1)
+    || ((b.google && b.google.reviews) || 0) - ((a.google && a.google.reviews) || 0)
+    || a._name.localeCompare(b._name),
   distinction: (a, b) => cmpNullLast(a.recog_rank, b.recog_rank, 1)
     || (b.recog_top?.year || 0) - (a.recog_top?.year || 0)
     || a._name.localeCompare(b._name),
@@ -425,6 +446,13 @@ function renderRow(r) {
       + `${x.era ? ` · ${ERA_LABEL[x.era]}` : ''}`
       + `${x.name_match_only ? ' · name match only' : ''}`));
   });
+  if (r.google && r.google.rating != null) {
+    const g = r.google;
+    pills.append(pill('quiet',
+      g.rating.toFixed(1) + '\u2605 ' + g.reviews.toLocaleString(),
+      'Google: ' + g.rating + ' from ' + g.reviews.toLocaleString() + ' reviews'
+      + ' \u00b7 weighted to ' + g.score.toFixed(2) + ' for sorting'));
+  }
   (r.tags || []).forEach((t, i, arr) => {
     if (arr.findIndex((z) => z.tag === t.tag) !== i) return; // dedupe by tag
     pills.append(pill('tag', t.tag, t.confidence === 'low' ? 'Low-confidence match' : 'Dish tag match'));
@@ -537,6 +565,10 @@ function renderDetail(r) {
   }
   const lex = ['4', '5', '6'].map((k) => r.subway && r.subway[k]).filter((v) => v != null);
   if (lex.length) field(dl, 'Walk to 4/5/6', `~${Math.min(...lex)} min`, true);
+  field(dl, 'Google rating', r.google && r.google.rating != null
+    ? r.google.rating + ' from ' + r.google.reviews.toLocaleString() + ' reviews'
+      + ' \u00b7 weighted ' + r.google.score.toFixed(2)
+    : null, true);
   field(dl, 'Outdoor seating', outdoorText(r));
   field(dl, 'Address', r.address || (r.borough ? `${r.borough} — address unavailable` : null));
   field(dl, 'Final-list rank', r.rank != null ? `#${r.rank} of 15` : null, true);

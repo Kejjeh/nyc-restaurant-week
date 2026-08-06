@@ -1,0 +1,18 @@
+{
+ "slug": "aromi",
+ "query_name": "Aromi",
+ "matched": {
+  "place_id": "ChIJNfj_HvRbwokRe5uCgeIzrf4",
+  "name": "Aromi",
+  "address": "552 Court St, Brooklyn, NY 11231, USA",
+  "rating": 4.9,
+  "user_ratings_total": 807,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6750294,
+  "lng": -73.9996712
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "meet-the-meat",
+ "query_name": "Meet the Meat",
+ "matched": {
+  "place_id": "ChIJq5ie31pfwokRuo_S4CcXlqk",
+  "name": "Meet the Meat",
+  "address": "23-92 21st St, Astoria, NY 11105, USA",
+  "rating": 4.5,
+  "user_ratings_total": 534,
+  "business_status": "OPERATIONAL",
+  "lat": 40.77704809999999,
+  "lng": -73.9214503
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

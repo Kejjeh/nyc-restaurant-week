@@ -1,0 +1,18 @@
+{
+ "slug": "tachi",
+ "query_name": "Tachi",
+ "matched": {
+  "place_id": "ChIJESihDq5ZwokREKeijupCgQM",
+  "name": "Tachi",
+  "address": "339 W 44th St, New York, NY 10036, USA",
+  "rating": 4.4,
+  "user_ratings_total": 145,
+  "business_status": "OPERATIONAL",
+  "lat": 40.759418,
+  "lng": -73.99050559999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

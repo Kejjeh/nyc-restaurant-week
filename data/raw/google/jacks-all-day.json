@@ -1,0 +1,18 @@
+{
+ "slug": "jacks-all-day",
+ "query_name": "Jack's All Day",
+ "matched": {
+  "place_id": "ChIJ0x-n_dtZwokRJx66qmcgJuU",
+  "name": "Jack's All Day",
+  "address": "731 8th Ave, New York, NY 10036, USA",
+  "rating": 4.9,
+  "user_ratings_total": 100,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7597578,
+  "lng": -73.98818059999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

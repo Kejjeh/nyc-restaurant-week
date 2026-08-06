@@ -1,0 +1,18 @@
+{
+ "slug": "red-rooster-harlem",
+ "query_name": "Red Rooster Harlem",
+ "matched": {
+  "place_id": "ChIJFcYLJw32wokRnP5A9xO9JqM",
+  "name": "Red Rooster Harlem",
+  "address": "310 Lenox Ave, New York, NY 10027, USA",
+  "rating": 4.4,
+  "user_ratings_total": 7804,
+  "business_status": "OPERATIONAL",
+  "lat": 40.8081442,
+  "lng": -73.94488170000001
+ },
+ "accepted": true,
+ "reason": "12m away",
+ "source": "textsearch",
+ "error": null
+}

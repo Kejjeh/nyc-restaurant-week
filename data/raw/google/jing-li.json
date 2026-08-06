@@ -1,0 +1,18 @@
+{
+ "slug": "jing-li",
+ "query_name": "Jing Li",
+ "matched": {
+  "place_id": "ChIJ5dQtsxBZwokRbBdZUxaHzFE",
+  "name": "Jing Li",
+  "address": "27-35 Jackson Ave, Long Island City, NY 11101, USA",
+  "rating": 4.5,
+  "user_ratings_total": 846,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7481842,
+  "lng": -73.9400787
+ },
+ "accepted": true,
+ "reason": "19m away",
+ "source": "textsearch",
+ "error": null
+}

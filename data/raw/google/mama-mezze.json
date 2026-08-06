@@ -1,0 +1,18 @@
+{
+ "slug": "mama-mezze",
+ "query_name": "Mama Mezze",
+ "matched": {
+  "place_id": "ChIJD-dxXwBZwokR2-Mm23N51WA",
+  "name": "Mama Mezze",
+  "address": "1123 Broadway, New York, NY 10010, USA",
+  "rating": 4.9,
+  "user_ratings_total": 2625,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7432459,
+  "lng": -73.9892711
+ },
+ "accepted": true,
+ "reason": "22m away",
+ "source": "textsearch",
+ "error": null
+}

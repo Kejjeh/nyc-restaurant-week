@@ -1,0 +1,18 @@
+{
+ "slug": "aqua-boil",
+ "query_name": "Aqua Boil",
+ "matched": {
+  "place_id": "ChIJyR90JKxZwokRZc9iRIEIs3w",
+  "name": "Aqua Boil",
+  "address": "750 9th Ave, New York, NY 10019, USA",
+  "rating": 4.7,
+  "user_ratings_total": 3524,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7637639,
+  "lng": -73.9885489
+ },
+ "accepted": true,
+ "reason": "13m away",
+ "source": "textsearch",
+ "error": null
+}

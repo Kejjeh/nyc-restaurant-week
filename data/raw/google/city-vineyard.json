@@ -1,0 +1,18 @@
+{
+ "slug": "city-vineyard",
+ "query_name": "City Vineyard",
+ "matched": {
+  "place_id": "ChIJoXmx2PVZwokR4r8M3W1gOLk",
+  "name": "City Vineyard",
+  "address": "233 West St, New York, NY 10013, USA",
+  "rating": 4.3,
+  "user_ratings_total": 2452,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7213685,
+  "lng": -74.0126904
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

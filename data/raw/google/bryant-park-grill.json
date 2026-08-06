@@ -1,0 +1,18 @@
+{
+ "slug": "bryant-park-grill",
+ "query_name": "Bryant Park Grill",
+ "matched": {
+  "place_id": "ChIJqTF1eABZwokR3ZMQ2obIW4w",
+  "name": "Bryant Park Grill",
+  "address": "25 W 40th St, New York, NY 10018, USA",
+  "rating": 4.3,
+  "user_ratings_total": 3365,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7531999,
+  "lng": -73.982957
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "gyu-kaku-times-square",
+ "query_name": "Gyu-Kaku  - Times Square",
+ "matched": {
+  "place_id": "ChIJN2FymlNYwokRXXs_qNxlw5U",
+  "name": "Gyu-Kaku Japanese BBQ",
+  "address": "321 W 44th St #103, New York, NY 10036, USA",
+  "rating": 4.6,
+  "user_ratings_total": 3640,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7591328,
+  "lng": -73.9898984
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

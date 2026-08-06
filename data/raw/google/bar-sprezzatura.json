@@ -1,0 +1,18 @@
+{
+ "slug": "bar-sprezzatura",
+ "query_name": "Bar Sprezzatura",
+ "matched": {
+  "place_id": "ChIJNVkbEwBZwokRcQJBrkU_Wuo",
+  "name": "Bar Sprezzatura",
+  "address": "251 W 48th St, New York, NY 10036, USA",
+  "rating": 4.4,
+  "user_ratings_total": 184,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7610219,
+  "lng": -73.98665299999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "dos-caminos-lexington",
+ "query_name": "Dos Caminos Lexington",
+ "matched": {
+  "place_id": "ChIJa-TVwLZZwokRmS6lmOgg0p4",
+  "name": "Dos Caminos",
+  "address": "480 Lexington Ave, New York, NY 10167, USA",
+  "rating": 4.4,
+  "user_ratings_total": 769,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7542328,
+  "lng": -73.9742795
+ },
+ "accepted": true,
+ "reason": "36m away",
+ "source": "textsearch",
+ "error": null
+}

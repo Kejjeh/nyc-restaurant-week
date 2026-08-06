@@ -1,0 +1,18 @@
+{
+ "slug": "nick-stefs-steakhouse",
+ "query_name": "Nick + Stef's Steakhouse",
+ "matched": {
+  "place_id": "ChIJ25nNcq5ZwokRRLkSWz8jL3U",
+  "name": "Nick + Stef's Steakhouse",
+  "address": "9 Pennsylvania Plaza, New York, NY 10001, USA",
+  "rating": 4.2,
+  "user_ratings_total": 551,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7510502,
+  "lng": -73.9932346
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

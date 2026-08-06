@@ -1,0 +1,18 @@
+{
+ "slug": "mishik",
+ "query_name": "Mishik",
+ "matched": {
+  "place_id": "ChIJSx4uSy5ZwokRwqbvtErf43M",
+  "name": "Mishik",
+  "address": "259A Hudson St, New York, NY 10013, USA",
+  "rating": 4.6,
+  "user_ratings_total": 221,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7249077,
+  "lng": -74.0079398
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

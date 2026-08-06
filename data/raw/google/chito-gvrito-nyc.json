@@ -1,0 +1,18 @@
+{
+ "slug": "chito-gvrito-nyc",
+ "query_name": "Chito Gvrito NYC",
+ "matched": {
+  "place_id": "ChIJSalVPxJZwokR2JSiWIk0LtI",
+  "name": "Chito Gvrito NYC",
+  "address": "173 3rd Ave, New York, NY 10003, USA",
+  "rating": 4.7,
+  "user_ratings_total": 765,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7347628,
+  "lng": -73.9858605
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "lexpress",
+ "query_name": "L'Express",
+ "matched": {
+  "place_id": "ChIJb9HznqFZwokRHWxf3DbskaI",
+  "name": "L’Express",
+  "address": "249 Park Ave S, New York, NY 10003, USA",
+  "rating": 4.6,
+  "user_ratings_total": 3407,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7381523,
+  "lng": -73.987657
+ },
+ "accepted": true,
+ "reason": "8m away",
+ "source": "textsearch",
+ "error": null
+}

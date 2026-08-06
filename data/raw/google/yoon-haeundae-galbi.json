@@ -1,0 +1,18 @@
+{
+ "slug": "yoon-haeundae-galbi",
+ "query_name": "Yoon Haeundae Galbi",
+ "matched": {
+  "place_id": "ChIJPw03jalZwokRmsrs0PAc1bo",
+  "name": "Yoon Haeundae Galbi",
+  "address": "Restaurant, 8 W 36th St. 1st Floor, New York, NY 10018, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1308,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7499711,
+  "lng": -73.9844536
+ },
+ "accepted": true,
+ "reason": "13m away",
+ "source": "textsearch",
+ "error": null
+}

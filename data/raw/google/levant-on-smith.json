@@ -1,0 +1,18 @@
+{
+ "slug": "levant-on-smith",
+ "query_name": "Levant on Smith",
+ "matched": {
+  "place_id": "ChIJQeCPaFRbwokRXIJeDP_gwUg",
+  "name": "Levant on Smith",
+  "address": "223 Smith St, Brooklyn, NY 11201, USA",
+  "rating": 4.6,
+  "user_ratings_total": 487,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6842565,
+  "lng": -73.9920157
+ },
+ "accepted": true,
+ "reason": "8m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "zero-otto-nove",
+ "query_name": "Zero Otto Nove - Flatiron",
+ "matched": {
+  "place_id": "ChIJx2Iol6NZwokRE2cQll_KLqI",
+  "name": "Zero Otto Nove Manhattan",
+  "address": "15 W 21st St, New York, NY 10010, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1018,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7408377,
+  "lng": -73.9915684
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

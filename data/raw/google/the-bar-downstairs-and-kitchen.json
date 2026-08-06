@@ -1,0 +1,18 @@
+{
+ "slug": "the-bar-downstairs-and-kitchen",
+ "query_name": "The Bar Downstairs and Kitchen",
+ "matched": {
+  "place_id": "ChIJ8-Y8XgBZwokRoUtBlS4Vse4",
+  "name": "The Bar Downstairs & Kitchen",
+  "address": "485 5th Ave at, E 41st St, New York, NY 10017, USA",
+  "rating": 4.4,
+  "user_ratings_total": 467,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7528628,
+  "lng": -73.98102759999999
+ },
+ "accepted": true,
+ "reason": "7m away",
+ "source": "textsearch",
+ "error": null
+}

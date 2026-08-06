@@ -1,0 +1,18 @@
+{
+ "slug": "le-b",
+ "query_name": "Le B.",
+ "matched": {
+  "place_id": "ChIJExJQMsdZwokR7a48kYV6EMg",
+  "name": "Restaurant Le B",
+  "address": "283 W 12th St, New York, NY 10014, USA",
+  "rating": 3.4,
+  "user_ratings_total": 227,
+  "business_status": "OPERATIONAL",
+  "lat": 40.737684,
+  "lng": -74.0040136
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

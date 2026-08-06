@@ -1,0 +1,18 @@
+{
+ "slug": "aqua-roma",
+ "query_name": "Aqua Roma",
+ "matched": {
+  "place_id": "ChIJHQFj19tZwokRZLUlxxZmz2Q",
+  "name": "Aqua Roma | New York",
+  "address": "902 Broadway, New York, NY 10010, USA",
+  "rating": 4.3,
+  "user_ratings_total": 1134,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7393716,
+  "lng": -73.9894046
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

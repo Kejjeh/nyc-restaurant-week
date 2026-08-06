@@ -1,0 +1,18 @@
+{
+ "slug": "philippe-by-philippe-chow-downtown",
+ "query_name": "Philippe by Philippe Chow Downtown",
+ "matched": {
+  "place_id": "ChIJv3nES-RZwokRg0-3Ayacc5g",
+  "name": "Philippe Chow Downtown",
+  "address": "355 W 16th St, New York, NY 10011, USA",
+  "rating": 4.2,
+  "user_ratings_total": 601,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7420084,
+  "lng": -74.00350259999999
+ },
+ "accepted": true,
+ "reason": "36m away",
+ "source": "textsearch",
+ "error": null
+}

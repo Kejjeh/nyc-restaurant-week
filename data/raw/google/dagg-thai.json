@@ -1,0 +1,18 @@
+{
+ "slug": "dagg-thai",
+ "query_name": "Dagg Thai",
+ "matched": {
+  "place_id": "ChIJw9nCDVlZwokRYLgi11ZxnTE",
+  "name": "Dagg Thai Restaurant",
+  "address": "10 E 39th St, New York, NY 10016, USA",
+  "rating": 4.9,
+  "user_ratings_total": 3126,
+  "business_status": "OPERATIONAL",
+  "lat": 40.751161,
+  "lng": -73.981529
+ },
+ "accepted": true,
+ "reason": "13m away",
+ "source": "textsearch",
+ "error": null
+}

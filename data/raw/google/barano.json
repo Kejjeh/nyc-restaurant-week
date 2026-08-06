@@ -1,0 +1,18 @@
+{
+ "slug": "barano",
+ "query_name": "Barano",
+ "matched": {
+  "place_id": "ChIJ3_aKBdlbwokRB4MzhiifcfE",
+  "name": "Barano Restaurant",
+  "address": "26 Broadway, Brooklyn, NY 11249, USA",
+  "rating": 4.4,
+  "user_ratings_total": 698,
+  "business_status": "OPERATIONAL",
+  "lat": 40.71052780000001,
+  "lng": -73.9679151
+ },
+ "accepted": true,
+ "reason": "21m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "baires-grill-new-york",
+ "query_name": "Baires Grill New York",
+ "matched": {
+  "place_id": "ChIJd4bXK-xZwokRsYyD4y7IMMA",
+  "name": "Baires Grill - New York",
+  "address": "350 W 50th St, New York, NY 10019, USA",
+  "rating": 4.8,
+  "user_ratings_total": 825,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7628256,
+  "lng": -73.9879129
+ },
+ "accepted": true,
+ "reason": "19m away",
+ "source": "textsearch",
+ "error": null
+}

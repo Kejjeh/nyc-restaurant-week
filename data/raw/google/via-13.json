@@ -1,0 +1,18 @@
+{
+ "slug": "via-13",
+ "query_name": "Via 13",
+ "matched": {
+  "place_id": "ChIJW_42IpZZwokRIUPgfzLhxCg",
+  "name": "Via 13",
+  "address": "140 W 13th St, New York, NY 10011, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1258,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7372589,
+  "lng": -73.999146
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

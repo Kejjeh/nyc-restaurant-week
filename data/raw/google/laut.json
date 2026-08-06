@@ -1,0 +1,18 @@
+{
+ "slug": "laut",
+ "query_name": "Laut",
+ "matched": {
+  "place_id": "ChIJv_vCZ6JZwokR_2lI72wJsl0",
+  "name": "Laut",
+  "address": "15 E 17th St, New York, NY 10003, USA",
+  "rating": 4.4,
+  "user_ratings_total": 2350,
+  "business_status": "OPERATIONAL",
+  "lat": 40.73758429999999,
+  "lng": -73.9910991
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

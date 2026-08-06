@@ -1,0 +1,18 @@
+{
+ "slug": "kyma-hudson-yards",
+ "query_name": "Kyma Hudson Yards",
+ "matched": {
+  "place_id": "ChIJOfd8VqJZwokRaNg-hiPrL6M",
+  "name": "Kyma Hudson Yards",
+  "address": "445 W 35th St, New York, NY 10001, USA",
+  "rating": 4.4,
+  "user_ratings_total": 866,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7550643,
+  "lng": -73.9978137
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

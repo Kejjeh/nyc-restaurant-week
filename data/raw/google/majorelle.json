@@ -1,0 +1,18 @@
+{
+ "slug": "majorelle",
+ "query_name": "Majorelle",
+ "matched": {
+  "place_id": "ChIJc2HLTe5YwokR9etGl2lOIIE",
+  "name": "Majorelle",
+  "address": "28 E 63rd St, New York, NY 10065, USA",
+  "rating": 4.6,
+  "user_ratings_total": 285,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7657388,
+  "lng": -73.9692216
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

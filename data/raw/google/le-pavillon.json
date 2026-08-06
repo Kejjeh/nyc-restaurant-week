@@ -1,0 +1,18 @@
+{
+ "slug": "le-pavillon",
+ "query_name": "Le Pavillon",
+ "matched": {
+  "place_id": "ChIJjcAJd-tZwokRJ0GkkJ2Urp0",
+  "name": "Le Pavillon",
+  "address": "One Vanderbilt Ave, New York, NY 10017, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1107,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7528047,
+  "lng": -73.9784677
+ },
+ "accepted": true,
+ "reason": "26m away",
+ "source": "textsearch",
+ "error": null
+}

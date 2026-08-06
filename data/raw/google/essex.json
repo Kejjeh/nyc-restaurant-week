@@ -1,0 +1,18 @@
+{
+ "slug": "essex",
+ "query_name": "Essex",
+ "matched": {
+  "place_id": "ChIJ7fydz4BZwokRDDwDLrzF5ts",
+  "name": "Essex",
+  "address": "124 Rivington St, New York, NY 10002, USA",
+  "rating": 4.8,
+  "user_ratings_total": 9011,
+  "business_status": "OPERATIONAL",
+  "lat": 40.719819,
+  "lng": -73.9870967
+ },
+ "accepted": true,
+ "reason": "11m away",
+ "source": "textsearch",
+ "error": null
+}

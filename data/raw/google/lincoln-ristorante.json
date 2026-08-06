@@ -1,0 +1,18 @@
+{
+ "slug": "lincoln-ristorante",
+ "query_name": "Lincoln Ristorante",
+ "matched": {
+  "place_id": "ChIJk_Dtk19YwokRF5wWFVytjQM",
+  "name": "Lincoln Ristorante",
+  "address": "142 W 65th St, New York, NY 10023, USA",
+  "rating": 4.3,
+  "user_ratings_total": 535,
+  "business_status": "OPERATIONAL",
+  "lat": 40.77337010000001,
+  "lng": -73.983728
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "momoya-soho",
+ "query_name": "Momoya Soho",
+ "matched": {
+  "place_id": "ChIJ4Rw7sVhZwokRJuSZSI0jb4A",
+  "name": "Momoya SoHo",
+  "address": "47 Prince St, New York, NY 10012, USA",
+  "rating": 4.6,
+  "user_ratings_total": 1581,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7235132,
+  "lng": -73.9958467
+ },
+ "accepted": true,
+ "reason": "6m away",
+ "source": "textsearch",
+ "error": null
+}

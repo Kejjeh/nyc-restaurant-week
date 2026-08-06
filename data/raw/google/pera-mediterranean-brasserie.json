@@ -1,0 +1,18 @@
+{
+ "slug": "pera-mediterranean-brasserie",
+ "query_name": "Pera Mediterranean Brasserie",
+ "matched": {
+  "place_id": "ChIJW29zqQFZwokRBszElAdboKA",
+  "name": "Pera Mediterranean Brasserie",
+  "address": "303 Madison Ave, New York, NY 10017, USA",
+  "rating": 4.2,
+  "user_ratings_total": 865,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7523265,
+  "lng": -73.9794277
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

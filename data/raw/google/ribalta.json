@@ -1,0 +1,18 @@
+{
+ "slug": "ribalta",
+ "query_name": "Ribalta",
+ "matched": {
+  "place_id": "ChIJybOUCJlZwokRxiXBjbhX-iA",
+  "name": "Ribalta",
+  "address": "48 E 12th St, New York, NY 10003, USA",
+  "rating": 4.4,
+  "user_ratings_total": 2755,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7332782,
+  "lng": -73.9915595
+ },
+ "accepted": true,
+ "reason": "6m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "arte-cafe",
+ "query_name": "Arte Cafe",
+ "matched": {
+  "place_id": "ChIJHb3iwItYwokRqWQr8-yMXzg",
+  "name": "Arte Cafe",
+  "address": "106 W 73rd St, New York, NY 10023, USA",
+  "rating": 4.3,
+  "user_ratings_total": 1320,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7781378,
+  "lng": -73.9788193
+ },
+ "accepted": true,
+ "reason": "5m away",
+ "source": "textsearch",
+ "error": null
+}

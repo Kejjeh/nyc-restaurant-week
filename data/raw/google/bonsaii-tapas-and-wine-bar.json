@@ -1,0 +1,18 @@
+{
+ "slug": "bonsaii-tapas-and-wine-bar",
+ "query_name": "Bonsaii Tapas & Wine Bar",
+ "matched": {
+  "place_id": "ChIJdflBaZVZwokRJx2EmWYW0lA",
+  "name": "BONSAII Tapas & Wine Bar",
+  "address": "127 E 55th St, New York, NY 10022, USA",
+  "rating": 4.8,
+  "user_ratings_total": 835,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7600087,
+  "lng": -73.9704053
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

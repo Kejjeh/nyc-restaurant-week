@@ -1,0 +1,18 @@
+{
+ "slug": "frenchette",
+ "query_name": "Frenchette",
+ "matched": {
+  "place_id": "ChIJu7pIuopZwokRvIsndYhPg4U",
+  "name": "Frenchette",
+  "address": "241 W Broadway, New York, NY 10013, USA",
+  "rating": 4.3,
+  "user_ratings_total": 1308,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7196192,
+  "lng": -74.0056937
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

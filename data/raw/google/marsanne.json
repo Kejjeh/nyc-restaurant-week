@@ -1,0 +1,18 @@
+{
+ "slug": "marsanne",
+ "query_name": "Marsanne",
+ "matched": {
+  "place_id": "ChIJvUrPybtZwokRLpRG-xjwExQ",
+  "name": "Marsanne",
+  "address": "233 8th Ave, New York, NY 10011, USA",
+  "rating": 4.9,
+  "user_ratings_total": 1265,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7446196,
+  "lng": -73.9992322
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

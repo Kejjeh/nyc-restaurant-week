@@ -1,0 +1,18 @@
+{
+ "slug": "blackbarn",
+ "query_name": "Blackbarn",
+ "matched": {
+  "place_id": "ChIJQZSnWKZZwokRXPNOv9-qWsY",
+  "name": "BLACKBARN",
+  "address": "19 E 26th St, New York, NY 10010, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1405,
+  "business_status": "OPERATIONAL",
+  "lat": 40.743105,
+  "lng": -73.987104
+ },
+ "accepted": true,
+ "reason": "12m away",
+ "source": "textsearch",
+ "error": null
+}

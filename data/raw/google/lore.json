@@ -1,0 +1,18 @@
+{
+ "slug": "lore",
+ "query_name": "Lore",
+ "matched": {
+  "place_id": "ChIJl2K8TWdbwokRVLXghh72lXs",
+  "name": "LORE",
+  "address": "441 7th Ave, Brooklyn, NY 11215, USA",
+  "rating": 4.7,
+  "user_ratings_total": 649,
+  "business_status": "OPERATIONAL",
+  "lat": 40.663082,
+  "lng": -73.9844024
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "moono",
+ "query_name": "Moono",
+ "matched": {
+  "place_id": "ChIJaWBLA_pZwokRX2BYIIr6rwE",
+  "name": "Moono",
+  "address": "29 E 32nd St, New York, NY 10016, USA",
+  "rating": 4.4,
+  "user_ratings_total": 543,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7464411,
+  "lng": -73.98330729999999
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

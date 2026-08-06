@@ -1,0 +1,18 @@
+{
+ "slug": "casa-felix",
+ "query_name": "Casa Felix",
+ "matched": {
+  "place_id": "ChIJ0XbFCKlZwokRGE3k4difl6E",
+  "name": "Casa Felix",
+  "address": "190 7th Ave, New York, NY 10011, USA",
+  "rating": 4.7,
+  "user_ratings_total": 24,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7430866,
+  "lng": -73.9967056
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

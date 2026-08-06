@@ -1,0 +1,18 @@
+{
+ "slug": "sea-fire-grill",
+ "query_name": "The Sea Fire Grill",
+ "matched": {
+  "place_id": "ChIJpYNIR_1YwokRNMXI4Qk1lwQ",
+  "name": "Sea Fire Grill",
+  "address": "158 E 48th St Between 3rd and, The Buchanan, Lexington Ave, New York, NY 10017, USA",
+  "rating": 4.6,
+  "user_ratings_total": 1681,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7546919,
+  "lng": -73.9722216
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

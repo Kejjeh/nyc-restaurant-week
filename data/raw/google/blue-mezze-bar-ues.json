@@ -1,0 +1,18 @@
+{
+ "slug": "blue-mezze-bar-ues",
+ "query_name": "Zoì Mediterranean UES",
+ "matched": {
+  "place_id": "ChIJYwKGx6lZwokR05rPsphAWVE",
+  "name": "ZOI MEDITERRANEAN UES",
+  "address": "1480 2nd Ave, New York, NY 10075, USA",
+  "rating": 4.6,
+  "user_ratings_total": 1885,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7720721,
+  "lng": -73.9556621
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

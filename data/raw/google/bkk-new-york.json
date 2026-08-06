@@ -1,0 +1,18 @@
+{
+ "slug": "bkk-new-york",
+ "query_name": "BKK New York",
+ "matched": {
+  "place_id": "ChIJeVhpLRpZwokRWVmBc6ZWqKc",
+  "name": "BKK New York",
+  "address": "238 W 56th St, New York, NY 10019, USA",
+  "rating": 4.8,
+  "user_ratings_total": 649,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7656851,
+  "lng": -73.9827456
+ },
+ "accepted": true,
+ "reason": "15m away",
+ "source": "textsearch",
+ "error": null
+}

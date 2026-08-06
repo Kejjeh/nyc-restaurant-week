@@ -1,0 +1,18 @@
+{
+ "slug": "panda-harlem",
+ "query_name": "Panda Harlem",
+ "matched": {
+  "place_id": "ChIJUdrnWUb3wokROEn6VyMo5QM",
+  "name": "Panda Harlem",
+  "address": "2331 12th Ave, New York, NY 10027, USA",
+  "rating": 3.7,
+  "user_ratings_total": 508,
+  "business_status": "OPERATIONAL",
+  "lat": 40.8200015,
+  "lng": -73.95858799999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

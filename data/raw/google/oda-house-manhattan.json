@@ -1,0 +1,18 @@
+{
+ "slug": "oda-house-manhattan",
+ "query_name": "Oda House - Manhattan",
+ "matched": {
+  "place_id": "ChIJZzj3W8JZwokRi8KiRaRr7SU",
+  "name": "Oda House",
+  "address": "406 E 73rd St, New York, NY 10021, USA",
+  "rating": 4.6,
+  "user_ratings_total": 1820,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7680776,
+  "lng": -73.95498649999999
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

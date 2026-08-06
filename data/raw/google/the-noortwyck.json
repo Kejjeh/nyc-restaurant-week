@@ -1,0 +1,18 @@
+{
+ "slug": "the-noortwyck",
+ "query_name": "The Noortwyck",
+ "matched": {
+  "place_id": "ChIJ6wJ-in5ZwokRRuY3ZKS6BOA",
+  "name": "The Noortwyck",
+  "address": "289 Bleecker St, New York, NY 10014, USA",
+  "rating": 4.5,
+  "user_ratings_total": 420,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7321673,
+  "lng": -74.0032725
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

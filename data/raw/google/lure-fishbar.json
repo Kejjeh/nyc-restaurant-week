@@ -1,0 +1,18 @@
+{
+ "slug": "lure-fishbar",
+ "query_name": "Lure Fishbar",
+ "matched": {
+  "place_id": "ChIJgS2D-o5ZwokRgS5knl8ipzI",
+  "name": "Lure Fishbar",
+  "address": "142 Mercer St, New York, NY 10012, USA",
+  "rating": 4.4,
+  "user_ratings_total": 2228,
+  "business_status": "OPERATIONAL",
+  "lat": 40.724703,
+  "lng": -73.9983278
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

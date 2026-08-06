@@ -1,0 +1,18 @@
+{
+ "slug": "hearth",
+ "query_name": "Hearth",
+ "matched": {
+  "place_id": "ChIJQTZ0-Z1ZwokRhl9v1FaVF0A",
+  "name": "Hearth",
+  "address": "403 E 12th St, New York, NY 10009, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1029,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7300263,
+  "lng": -73.9831883
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

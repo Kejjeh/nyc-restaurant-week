@@ -1,0 +1,18 @@
+{
+ "slug": "kyma",
+ "query_name": "Kyma",
+ "matched": {
+  "place_id": "ChIJq6pu4qJZwokRARFMcQsmd6Y",
+  "name": "Kyma",
+  "address": "15 W 18th St, New York, NY 10011, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1205,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7391382,
+  "lng": -73.9928051
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

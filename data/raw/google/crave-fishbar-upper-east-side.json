@@ -1,0 +1,18 @@
+{
+ "slug": "crave-fishbar-upper-east-side",
+ "query_name": "Crave Fishbar - Upper East Side",
+ "matched": {
+  "place_id": "ChIJ39p8pu9ZwokRrVZUR4REV00",
+  "name": "Crave Fishbar Upper East Side",
+  "address": "1462 2nd Ave, New York, NY 10075, USA",
+  "rating": 4.7,
+  "user_ratings_total": 105,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7715707,
+  "lng": -73.9560109
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

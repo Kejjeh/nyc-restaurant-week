@@ -1,0 +1,18 @@
+{
+ "slug": "dear-strangers",
+ "query_name": "Dear Strangers",
+ "matched": {
+  "place_id": "ChIJY9Lf7W9ZwokR9G-2TSrck04",
+  "name": "Dear Strangers",
+  "address": "147 W 4th St, New York, NY 10012, USA",
+  "rating": 4.6,
+  "user_ratings_total": 200,
+  "business_status": "OPERATIONAL",
+  "lat": 40.731602,
+  "lng": -74.000376
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "scarpetta",
+ "query_name": "Scarpetta",
+ "matched": {
+  "place_id": "ChIJt8W7n79ZwokRsyXs3QDbE3o",
+  "name": "Scarpetta",
+  "address": "88 Madison Ave, New York, NY 10016, USA",
+  "rating": 4.6,
+  "user_ratings_total": 3309,
+  "business_status": "OPERATIONAL",
+  "lat": 40.74458180000001,
+  "lng": -73.9856202
+ },
+ "accepted": true,
+ "reason": "21m away",
+ "source": "textsearch",
+ "error": null
+}

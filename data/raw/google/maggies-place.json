@@ -1,0 +1,18 @@
+{
+ "slug": "maggies-place",
+ "query_name": "Maggie's Place",
+ "matched": {
+  "place_id": "ChIJXWx8eP5YwokRCclAhRLMks0",
+  "name": "Maggie's Place",
+  "address": "21 E 47th St, New York, NY 10017, USA",
+  "rating": 4.4,
+  "user_ratings_total": 829,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7562972,
+  "lng": -73.97711450000001
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

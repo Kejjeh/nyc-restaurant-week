@@ -1,0 +1,18 @@
+{
+ "slug": "leonetta",
+ "query_name": "Leonetta",
+ "matched": {
+  "place_id": "ChIJ9yGlMQBZwokRoPZF09LClXc",
+  "name": "Leonetta",
+  "address": "181 Lexington Ave, New York, NY 10016, USA",
+  "rating": 4.4,
+  "user_ratings_total": 307,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7445325,
+  "lng": -73.9808436
+ },
+ "accepted": true,
+ "reason": "8m away",
+ "source": "textsearch",
+ "error": null
+}

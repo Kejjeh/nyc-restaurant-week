@@ -1,0 +1,18 @@
+{
+ "slug": "dowlings-at-the-carlyle",
+ "query_name": "Dowling’s at The Carlyle",
+ "matched": {
+  "place_id": "ChIJIaES4oRZwokRELx8tCqNYOg",
+  "name": "Dowling's at The Carlyle",
+  "address": "35 E 76th St, New York, NY 10021, USA",
+  "rating": 3.7,
+  "user_ratings_total": 84,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7744222,
+  "lng": -73.9631514
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

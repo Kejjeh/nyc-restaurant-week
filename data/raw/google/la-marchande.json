@@ -1,0 +1,18 @@
+{
+ "slug": "la-marchande",
+ "query_name": "La Marchande",
+ "matched": {
+  "place_id": "ChIJm9CaESpbwokRSQJK-LcLILg",
+  "name": "La Marchande",
+  "address": "88 Wall St, New York, NY 10005, USA",
+  "rating": 4.3,
+  "user_ratings_total": 241,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7054649,
+  "lng": -74.0076406
+ },
+ "accepted": true,
+ "reason": "12m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "smith-wollensky",
+ "query_name": "Smith & Wollensky",
+ "matched": {
+  "place_id": "ChIJx-DDf4NZwokRtd57pIePpvI",
+  "name": "Smith & Wollensky",
+  "address": "797 3rd Ave, New York, NY 10022, USA",
+  "rating": 4.4,
+  "user_ratings_total": 4739,
+  "business_status": "OPERATIONAL",
+  "lat": 40.75526,
+  "lng": -73.97095
+ },
+ "accepted": true,
+ "reason": "20m away",
+ "source": "textsearch",
+ "error": null
+}

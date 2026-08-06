@@ -1,0 +1,18 @@
+{
+ "slug": "la-pecora-bianca-bryant-park",
+ "query_name": "La Pecora Bianca Bryant Park",
+ "matched": {
+  "place_id": "ChIJKykw-aZZwokRW7K0ykZUxNo",
+  "name": "La Pecora Bianca Bryant Park",
+  "address": "20 W 40th St, New York, NY 10018, USA",
+  "rating": 4.8,
+  "user_ratings_total": 8096,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7525176,
+  "lng": -73.9831529
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

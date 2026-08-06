@@ -1,0 +1,18 @@
+{
+ "slug": "tao-uptown",
+ "query_name": "Tao Uptown",
+ "matched": {
+  "place_id": "ChIJh3qVsvpYwokRVtJoHuKeQ3M",
+  "name": "TAO Uptown",
+  "address": "42 E 58th St, New York, NY 10022, USA",
+  "rating": null,
+  "user_ratings_total": null,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7626593,
+  "lng": -73.9714411
+ },
+ "accepted": true,
+ "reason": "7m away",
+ "source": "textsearch",
+ "error": null
+}

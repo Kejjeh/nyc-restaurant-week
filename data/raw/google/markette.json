@@ -1,0 +1,18 @@
+{
+ "slug": "markette",
+ "query_name": "Markette",
+ "matched": {
+  "place_id": "ChIJNdS6kwVZwokRxFgqKTkyYuk",
+  "name": "Markette",
+  "address": "326 7th Ave, New York, NY 10001, USA",
+  "rating": 4.6,
+  "user_ratings_total": 308,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7475892,
+  "lng": -73.9934928
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "quality-bistro",
+ "query_name": "Quality Bistro",
+ "matched": {
+  "place_id": "ChIJ8deyiahZwokRhlYgQNi3KjQ",
+  "name": "Quality Bistro",
+  "address": "120 W 55th St, New York, NY 10019, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1580,
+  "business_status": "OPERATIONAL",
+  "lat": 40.76320279999999,
+  "lng": -73.97916699999999
+ },
+ "accepted": true,
+ "reason": "22m away",
+ "source": "textsearch",
+ "error": null
+}

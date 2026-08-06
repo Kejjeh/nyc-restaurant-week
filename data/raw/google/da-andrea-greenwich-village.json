@@ -1,0 +1,18 @@
+{
+ "slug": "da-andrea-greenwich-village",
+ "query_name": "Da Andrea - Greenwich Village",
+ "matched": {
+  "place_id": "ChIJS1uszZRZwokRbKPTzS6hnWM",
+  "name": "Da Andrea Greenwich Village",
+  "address": "35 W 13th St, New York, NY 10011, USA",
+  "rating": 4.6,
+  "user_ratings_total": 2701,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7361918,
+  "lng": -73.9958515
+ },
+ "accepted": true,
+ "reason": "7m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "tamarind-tribeca",
+ "query_name": "Tamarind Tribeca",
+ "matched": {
+  "place_id": "ChIJ6Vva1h9awokRXw_JSQ_x6y4",
+  "name": "Tamarind Tribeca",
+  "address": "99 Hudson St, New York, NY 10013, USA",
+  "rating": 4.2,
+  "user_ratings_total": 3028,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7190883,
+  "lng": -74.00891290000001
+ },
+ "accepted": true,
+ "reason": "13m away",
+ "source": "textsearch",
+ "error": null
+}

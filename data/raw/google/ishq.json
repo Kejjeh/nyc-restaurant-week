@@ -1,0 +1,18 @@
+{
+ "slug": "ishq",
+ "query_name": "Ishq",
+ "matched": {
+  "place_id": "ChIJOdxhoDtZwokRSgA_ZpTUuhg",
+  "name": "Ishq",
+  "address": "202 Avenue A Frnt A, New York, NY 10009, USA",
+  "rating": 4.6,
+  "user_ratings_total": 531,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7293646,
+  "lng": -73.98086620000001
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

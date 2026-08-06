@@ -1,0 +1,18 @@
+{
+ "slug": "rivercrest",
+ "query_name": "Rivercrest",
+ "matched": {
+  "place_id": "ChIJcXm7DOFfwokRp1TmbCmRgmQ",
+  "name": "Rivercrest",
+  "address": "33-15 Ditmars Blvd, Astoria, NY 11105, USA",
+  "rating": 4.6,
+  "user_ratings_total": 506,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7751808,
+  "lng": -73.9089998
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

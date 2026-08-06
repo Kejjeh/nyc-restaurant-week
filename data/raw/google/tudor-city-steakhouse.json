@@ -1,0 +1,18 @@
+{
+ "slug": "tudor-city-steakhouse",
+ "query_name": "Tudor City Steakhouse",
+ "matched": {
+  "place_id": "ChIJITkCvxxZwokR7wb6MWtT7Bk",
+  "name": "Tudor City Steakhouse",
+  "address": "45 Tudor City Pl, New York, NY 10017, USA",
+  "rating": 4.8,
+  "user_ratings_total": 1843,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7492362,
+  "lng": -73.97015569999999
+ },
+ "accepted": true,
+ "reason": "21m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "david-burke-tavern",
+ "query_name": "David Burke Tavern",
+ "matched": {
+  "place_id": "ChIJdcjMFu9YwokR6w1K45p4Q7k",
+  "name": "David Burke Tavern",
+  "address": "135 E 62nd St, New York, NY 10065, USA",
+  "rating": 4.3,
+  "user_ratings_total": 692,
+  "business_status": "OPERATIONAL",
+  "lat": 40.764442,
+  "lng": -73.96708300000002
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

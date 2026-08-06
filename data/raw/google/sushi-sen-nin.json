@@ -1,0 +1,18 @@
+{
+ "slug": "sushi-sen-nin",
+ "query_name": "Sushi Sen-Nin",
+ "matched": {
+  "place_id": "ChIJOfbniQdZwokRcU0x7NuerWI",
+  "name": "Sushi Sen-Nin",
+  "address": "30 E 33rd St, New York, NY 10016, USA",
+  "rating": 4.3,
+  "user_ratings_total": 265,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7467364,
+  "lng": -73.9830144
+ },
+ "accepted": true,
+ "reason": "11m away",
+ "source": "textsearch",
+ "error": null
+}

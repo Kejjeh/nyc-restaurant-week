@@ -1,0 +1,18 @@
+{
+ "slug": "the-gallery",
+ "query_name": "The Gallery",
+ "matched": {
+  "place_id": "ChIJQxY-iqhZwokRIaCg0KpTKV0",
+  "name": "THE GALLERY by odo",
+  "address": "17 W 20th St 4th Floor, New York, NY 10011, USA",
+  "rating": 4.3,
+  "user_ratings_total": 189,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7403982,
+  "lng": -73.9921624
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

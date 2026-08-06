@@ -1,0 +1,18 @@
+{
+ "slug": "barbounia",
+ "query_name": "Barbounia",
+ "matched": {
+  "place_id": "ChIJafcWm6FZwokRAD6WiHiQdpE",
+  "name": "Barbounia",
+  "address": "250 Park Ave S, New York, NY 10003, USA",
+  "rating": 4.7,
+  "user_ratings_total": 5133,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7383263,
+  "lng": -73.9880646
+ },
+ "accepted": true,
+ "reason": "13m away",
+ "source": "textsearch",
+ "error": null
+}

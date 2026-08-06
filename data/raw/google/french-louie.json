@@ -1,0 +1,18 @@
+{
+ "slug": "french-louie",
+ "query_name": "French Louie",
+ "matched": {
+  "place_id": "ChIJgRjO3E1awokRoC9SdsHbe-w",
+  "name": "French Louie",
+  "address": "320 Atlantic Ave, Brooklyn, NY 11201, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1341,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6880126,
+  "lng": -73.988216
+ },
+ "accepted": true,
+ "reason": "7m away",
+ "source": "textsearch",
+ "error": null
+}

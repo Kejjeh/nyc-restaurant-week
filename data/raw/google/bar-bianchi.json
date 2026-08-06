@@ -1,0 +1,18 @@
+{
+ "slug": "bar-bianchi",
+ "query_name": "Bar Bianchi",
+ "matched": {
+  "place_id": "ChIJv_AHlm1ZwokRcPCZsaL2qlQ",
+  "name": "Bar Bianchi",
+  "address": "5 Avenue A, New York, NY 10009, USA",
+  "rating": 3.9,
+  "user_ratings_total": 183,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7225634,
+  "lng": -73.9864693
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

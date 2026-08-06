@@ -1,0 +1,18 @@
+{
+ "slug": "industry-kitchen",
+ "query_name": "Industry Kitchen",
+ "matched": {
+  "place_id": "ChIJcaQCwD1awokRuJEpTiEWOtw",
+  "name": "Industry Kitchen",
+  "address": "70 South St, New York, NY 10005, USA",
+  "rating": 4.3,
+  "user_ratings_total": 3680,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7048797,
+  "lng": -74.0047601
+ },
+ "accepted": true,
+ "reason": "57m away",
+ "source": "textsearch",
+ "error": null
+}

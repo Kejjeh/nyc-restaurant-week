@@ -1,0 +1,18 @@
+{
+ "slug": "masaaki",
+ "query_name": "Masaaki",
+ "matched": {
+  "place_id": "ChIJfVmUPiRhwokR7FQ4vkw7Gec",
+  "name": "Masaaki | Japanese | Omakase",
+  "address": "214-16 41st Ave, Bayside, NY 11361, USA",
+  "rating": 4.5,
+  "user_ratings_total": 504,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7635606,
+  "lng": -73.77022629999999
+ },
+ "accepted": true,
+ "reason": "8m away",
+ "source": "textsearch",
+ "error": null
+}

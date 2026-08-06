@@ -1,0 +1,18 @@
+{
+ "slug": "alice",
+ "query_name": "Alice",
+ "matched": {
+  "place_id": "ChIJDRP5JJZZwokR67scSsTR4jY",
+  "name": "Alice",
+  "address": "126 W 13th St, New York, NY 10011, USA",
+  "rating": 4.5,
+  "user_ratings_total": 801,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7371073,
+  "lng": -73.9986308
+ },
+ "accepted": true,
+ "reason": "8m away",
+ "source": "textsearch",
+ "error": null
+}

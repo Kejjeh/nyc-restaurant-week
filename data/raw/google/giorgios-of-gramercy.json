@@ -1,0 +1,18 @@
+{
+ "slug": "giorgios-of-gramercy",
+ "query_name": "Giorgio's of Gramercy",
+ "matched": {
+  "place_id": "ChIJ0f2BYaFZwokR1ZhJ5byw-co",
+  "name": "Giorgio's of Gramercy",
+  "address": "27 E 21st St, New York, NY 10010, USA",
+  "rating": 4.6,
+  "user_ratings_total": 557,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7396906,
+  "lng": -73.9887334
+ },
+ "accepted": true,
+ "reason": "9m away",
+ "source": "textsearch",
+ "error": null
+}

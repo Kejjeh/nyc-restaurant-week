@@ -1,0 +1,18 @@
+{
+ "slug": "thep",
+ "query_name": "Thep",
+ "matched": {
+  "place_id": "ChIJz6VeesBYwokRNBYu4Sar8lw",
+  "name": "THEP Thai Restaurant",
+  "address": "1439 2nd Ave, New York, NY 10021, USA",
+  "rating": 4.8,
+  "user_ratings_total": 7422,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7707714,
+  "lng": -73.9572357
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

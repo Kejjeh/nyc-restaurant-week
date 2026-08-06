@@ -1,0 +1,18 @@
+{
+ "slug": "veeray-da-dhaba",
+ "query_name": "Veeray da Dhaba",
+ "matched": {
+  "place_id": "ChIJXX9hUQxZwokRXlD5SzkLYz0",
+  "name": "Veeray da Dhaba",
+  "address": "222 1st Ave, New York, NY 10009, USA",
+  "rating": 4.5,
+  "user_ratings_total": 455,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7308311,
+  "lng": -73.9827126
+ },
+ "accepted": true,
+ "reason": "5m away",
+ "source": "textsearch",
+ "error": null
+}

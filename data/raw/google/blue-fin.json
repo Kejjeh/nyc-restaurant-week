@@ -1,0 +1,18 @@
+{
+ "slug": "blue-fin",
+ "query_name": "Blue Fin",
+ "matched": {
+  "place_id": "ChIJzz-PyFVYwokRwp5z0KduYls",
+  "name": "Blue Fin",
+  "address": "1567 Broadway, New York, NY 10036, USA",
+  "rating": 4.2,
+  "user_ratings_total": 1300,
+  "business_status": "OPERATIONAL",
+  "lat": 40.75937589999999,
+  "lng": -73.98532519999999
+ },
+ "accepted": true,
+ "reason": "24m away",
+ "source": "textsearch",
+ "error": null
+}

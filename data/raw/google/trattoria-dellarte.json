@@ -1,0 +1,18 @@
+{
+ "slug": "trattoria-dellarte",
+ "query_name": "Trattoria Dell'Arte",
+ "matched": {
+  "place_id": "ChIJNaoHnvdYwokRFxwsSD4urZg",
+  "name": "Trattoria Dell'Arte",
+  "address": "900 7th Ave, New York, NY 10106, USA",
+  "rating": 4.4,
+  "user_ratings_total": 2647,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7653677,
+  "lng": -73.9803759
+ },
+ "accepted": true,
+ "reason": "16m away",
+ "source": "textsearch",
+ "error": null
+}

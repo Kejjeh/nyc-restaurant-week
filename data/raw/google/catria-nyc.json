@@ -1,0 +1,18 @@
+{
+ "slug": "catria-nyc",
+ "query_name": "Catria Cucina and Bar",
+ "matched": {
+  "place_id": "ChIJl5YxH-5ZwokRsCiFUdJez-o",
+  "name": "Catria Cucina and Bar",
+  "address": "461 W 34th St. Frnt 1, New York, NY 10001, USA",
+  "rating": 4.4,
+  "user_ratings_total": 208,
+  "business_status": "OPERATIONAL",
+  "lat": 40.754694,
+  "lng": -73.998649
+ },
+ "accepted": true,
+ "reason": "hand-verified place_id",
+ "source": "place_id",
+ "error": null
+}

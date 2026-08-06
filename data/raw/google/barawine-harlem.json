@@ -1,0 +1,18 @@
+{
+ "slug": "barawine-harlem",
+ "query_name": "Barawine",
+ "matched": {
+  "place_id": "ChIJ_WGAABL2wokRNthCl_PuyFc",
+  "name": "Barawine",
+  "address": "200 Malcolm X Blvd, New York, NY 10027, USA",
+  "rating": 4.3,
+  "user_ratings_total": 915,
+  "business_status": "OPERATIONAL",
+  "lat": 40.8045907,
+  "lng": -73.9474438
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

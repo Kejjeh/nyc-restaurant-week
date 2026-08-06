@@ -1,0 +1,18 @@
+{
+ "slug": "del-friscos-grille",
+ "query_name": "Del Frisco's Grille",
+ "matched": {
+  "place_id": "ChIJ55dWS_lYwokRDVs8xyL3uDo",
+  "name": "Del Frisco's Grille",
+  "address": "50 Rockefeller Plaza, New York, NY 10020, USA",
+  "rating": 4.2,
+  "user_ratings_total": 2025,
+  "business_status": "OPERATIONAL",
+  "lat": 40.75965860000001,
+  "lng": -73.9783169
+ },
+ "accepted": true,
+ "reason": "11m away",
+ "source": "textsearch",
+ "error": null
+}

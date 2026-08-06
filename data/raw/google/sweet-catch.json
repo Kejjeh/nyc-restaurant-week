@@ -1,0 +1,18 @@
+{
+ "slug": "sweet-catch",
+ "query_name": "Sweet Catch",
+ "matched": {
+  "place_id": "ChIJH6P3kklbwokRis1YQwtwC20",
+  "name": "Sweet Catch BK",
+  "address": "1222 Nostrand Ave, Brooklyn, NY 11225, USA",
+  "rating": 4.7,
+  "user_ratings_total": 1855,
+  "business_status": "OPERATIONAL",
+  "lat": 40.6573744,
+  "lng": -73.9505511
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

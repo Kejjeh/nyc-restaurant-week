@@ -1,0 +1,18 @@
+{
+ "slug": "el-coco-chelsea",
+ "query_name": "El Coco - Chelsea",
+ "matched": {
+  "place_id": "ChIJG6lhiZhZwokRAcLOOYxXGws",
+  "name": "El Coco",
+  "address": "202 8th Ave, New York, NY 10011, USA",
+  "rating": 4.5,
+  "user_ratings_total": 2115,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7435248,
+  "lng": -73.9994683
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

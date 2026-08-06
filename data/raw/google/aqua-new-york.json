@@ -1,0 +1,18 @@
+{
+ "slug": "aqua-new-york",
+ "query_name": "Aqua Kyoto",
+ "matched": {
+  "place_id": "ChIJ76NniAJZwokRTEz3awt87Kg",
+  "name": "Aqua Kyoto | New York",
+  "address": "20 E 21st St, New York, NY 10010, USA",
+  "rating": 4.3,
+  "user_ratings_total": 80,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7396059,
+  "lng": -73.98921039999999
+ },
+ "accepted": true,
+ "reason": "31m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "togyushi",
+ "query_name": "Togyushi",
+ "matched": {
+  "place_id": "ChIJ2ULuztdZwokRQcLBG3VmtJY",
+  "name": "Togyushi Japanese Wagyu Steakhouse",
+  "address": "37 W 37th St, New York, NY 10018, USA",
+  "rating": 4.4,
+  "user_ratings_total": 132,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7513263,
+  "lng": -73.9850275
+ },
+ "accepted": true,
+ "reason": "52m away",
+ "source": "textsearch",
+ "error": null
+}

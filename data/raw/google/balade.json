@@ -1,0 +1,18 @@
+{
+ "slug": "balade",
+ "query_name": "Balade",
+ "matched": {
+  "place_id": "ChIJ41w8_p1ZwokRQCjZ9Jc9jY0",
+  "name": "Balade",
+  "address": "208 1st Ave, New York, NY 10009, USA",
+  "rating": 4.5,
+  "user_ratings_total": 1759,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7302839,
+  "lng": -73.9830748
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

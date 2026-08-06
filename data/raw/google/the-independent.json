@@ -1,0 +1,18 @@
+{
+ "slug": "the-independent",
+ "query_name": "The Independent",
+ "matched": {
+  "place_id": "ChIJvWtE_KhZwokR9bS5Xc9ZuPs",
+  "name": "The Independent",
+  "address": "147 W 40th St, New York, NY 10018, USA",
+  "rating": 4.5,
+  "user_ratings_total": 935,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7547596,
+  "lng": -73.98743499999999
+ },
+ "accepted": true,
+ "reason": "10m away",
+ "source": "textsearch",
+ "error": null
+}

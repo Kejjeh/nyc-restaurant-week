@@ -1,0 +1,18 @@
+{
+ "slug": "baci-and-abbracci",
+ "query_name": "Baci & Abbracci",
+ "matched": {
+  "place_id": "ChIJUwUlbGBZwokR_audEX-nM8c",
+  "name": "Baci & Abbracci",
+  "address": "204 Grand St, Brooklyn, NY 11211, USA",
+  "rating": 4.5,
+  "user_ratings_total": 445,
+  "business_status": "OPERATIONAL",
+  "lat": 40.714002,
+  "lng": -73.9603897
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

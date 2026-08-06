@@ -1,0 +1,18 @@
+{
+ "slug": "nonna-doras",
+ "query_name": "Nonna Dora's - 2nd Avenue",
+ "matched": {
+  "place_id": "ChIJfcwK4I9ZwokRB91xJVHrA4s",
+  "name": "Nonna Dora's 2nd Avenue",
+  "address": "606 2nd Ave, New York, NY 10016, USA",
+  "rating": 4.6,
+  "user_ratings_total": 778,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7442128,
+  "lng": -73.97574569999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

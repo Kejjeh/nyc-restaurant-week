@@ -1,0 +1,18 @@
+{
+ "slug": "boro-brine",
+ "query_name": "Boro Brine",
+ "matched": {
+  "place_id": "ChIJlwJDboZbwokRX5E1AviMvW8",
+  "name": "Boro Brine",
+  "address": "109 S 6th St, Brooklyn, NY 11249, USA",
+  "rating": 4.6,
+  "user_ratings_total": 167,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7108069,
+  "lng": -73.9642076
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

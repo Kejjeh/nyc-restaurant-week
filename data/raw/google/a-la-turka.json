@@ -1,0 +1,18 @@
+{
+ "slug": "a-la-turka",
+ "query_name": "A La Turka",
+ "matched": {
+  "place_id": "ChIJdTrzacBYwokR6DHjw1ICQ7k",
+  "name": "A la Turka",
+  "address": "1417 2nd Ave, New York, NY 10021, USA",
+  "rating": 4.3,
+  "user_ratings_total": 1212,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7701243,
+  "lng": -73.9577261
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "shogun-omakase",
+ "query_name": "Shogun Omakase",
+ "matched": {
+  "place_id": "ChIJKd8EGv1ZwokRtzxTHd6RpjI",
+  "name": "SHOGUN OMAKASE | Manhattan Sushi Restaurant",
+  "address": "295 Madison Ave #101G, New York, NY 10017, USA",
+  "rating": 4.7,
+  "user_ratings_total": 431,
+  "business_status": "OPERATIONAL",
+  "lat": 40.751834,
+  "lng": -73.97929119999999
+ },
+ "accepted": true,
+ "reason": "6m away",
+ "source": "textsearch",
+ "error": null
+}

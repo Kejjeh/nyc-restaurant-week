@@ -1,0 +1,18 @@
+{
+ "slug": "skewr",
+ "query_name": "Skëwr",
+ "matched": {
+  "place_id": "ChIJt28AsvdZwokRa8PvYAp3vBA",
+  "name": "Skewr",
+  "address": "127 E 27th St, New York, NY 10016, USA",
+  "rating": 4.3,
+  "user_ratings_total": 56,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7423507,
+  "lng": -73.9833905
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

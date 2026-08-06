@@ -1,0 +1,18 @@
+{
+ "slug": "meduza-mediterrania",
+ "query_name": "Mēdüzā Mediterrania",
+ "matched": {
+  "place_id": "ChIJeQGhCyJZwokRprIs5CrWkKo",
+  "name": "Mēdüzā Mediterrania New York",
+  "address": "657 Hudson St, New York, NY 10014, USA",
+  "rating": null,
+  "user_ratings_total": null,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7397483,
+  "lng": -74.00552619999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

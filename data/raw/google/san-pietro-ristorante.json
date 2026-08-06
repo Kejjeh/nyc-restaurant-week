@@ -1,0 +1,18 @@
+{
+ "slug": "san-pietro-ristorante",
+ "query_name": "San Pietro Ristorante",
+ "matched": {
+  "place_id": "ChIJA-IwpvtYwokRgeNv-rFho2U",
+  "name": "San Pietro Ristorante",
+  "address": "18 E 54th St, New York, NY 10022, USA",
+  "rating": 4.3,
+  "user_ratings_total": 233,
+  "business_status": "OPERATIONAL",
+  "lat": 40.76048340000001,
+  "lng": -73.9744425
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

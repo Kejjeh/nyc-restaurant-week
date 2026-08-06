@@ -1,0 +1,18 @@
+{
+ "slug": "anassa-taverna",
+ "query_name": "Anassa Taverna - Manhattan",
+ "matched": {
+  "place_id": "ChIJXW7C-uVYwokRmM35-dlCcss",
+  "name": "Anassa Taverna",
+  "address": "200 E 60th St, New York, NY 10022, USA",
+  "rating": 4.4,
+  "user_ratings_total": 1139,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7619626,
+  "lng": -73.9659238
+ },
+ "accepted": true,
+ "reason": "7m away",
+ "source": "textsearch",
+ "error": null
+}

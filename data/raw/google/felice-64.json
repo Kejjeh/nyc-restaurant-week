@@ -1,0 +1,18 @@
+{
+ "slug": "felice-64",
+ "query_name": "Felice 64",
+ "matched": {
+  "place_id": "ChIJa1dYp8JYwokRX2NCKS9MxvE",
+  "name": "Felice 64",
+  "address": "1166 1st Ave, New York, NY 10065, USA",
+  "rating": 4.5,
+  "user_ratings_total": 675,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7625672,
+  "lng": -73.95956389999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

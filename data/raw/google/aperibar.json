@@ -1,0 +1,18 @@
+{
+ "slug": "aperibar",
+ "query_name": "AperiBar",
+ "matched": {
+  "place_id": "ChIJZTInQIhZwokR8GBPDoHJMok",
+  "name": "AperiBar",
+  "address": "LUMA Hotel Times Square, 120 W 41st St, New York, NY 10036, USA",
+  "rating": 4.8,
+  "user_ratings_total": 1116,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7543813,
+  "lng": -73.9858102
+ },
+ "accepted": true,
+ "reason": "1m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "jacobs-pickles-upper-west-side",
+ "query_name": "Jacob's Pickles",
+ "matched": {
+  "place_id": "ChIJCehOSIRYwokRs4ijKsy1oiI",
+  "name": "Jacob's Pickles",
+  "address": "680 Columbus Ave, New York, NY 10025, USA",
+  "rating": 4.5,
+  "user_ratings_total": 7510,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7911551,
+  "lng": -73.9690457
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

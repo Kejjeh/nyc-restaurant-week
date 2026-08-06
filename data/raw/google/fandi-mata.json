@@ -1,0 +1,18 @@
+{
+ "slug": "fandi-mata",
+ "query_name": "Fandi Mata",
+ "matched": {
+  "place_id": "ChIJqSwWaP5ZwokRuHaHr43H39o",
+  "name": "Fandi Mata",
+  "address": "74 Bayard St, Brooklyn, NY 11222, USA",
+  "rating": 4.7,
+  "user_ratings_total": 4480,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7188471,
+  "lng": -73.94925309999999
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

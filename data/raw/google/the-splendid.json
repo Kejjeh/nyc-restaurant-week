@@ -1,0 +1,18 @@
+{
+ "slug": "the-splendid",
+ "query_name": "The Splendid",
+ "matched": {
+  "place_id": "ChIJhymO2k1ZwokRYUnrJb4T1o8",
+  "name": "The Splendid",
+  "address": "16 E 52nd St, New York, NY 10022, USA",
+  "rating": 4.8,
+  "user_ratings_total": 427,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7591876,
+  "lng": -73.975433
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

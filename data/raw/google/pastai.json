@@ -1,0 +1,18 @@
+{
+ "slug": "pastai",
+ "query_name": "Pastai",
+ "matched": {
+  "place_id": "ChIJ81V-dblZwokRsTrQH6-BzCk",
+  "name": "Pastai Restaurant",
+  "address": "186 9th Ave, New York, NY 10011, USA",
+  "rating": 4.3,
+  "user_ratings_total": 489,
+  "business_status": "OPERATIONAL",
+  "lat": 40.745391,
+  "lng": -74.001865
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

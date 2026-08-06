@@ -1,0 +1,18 @@
+{
+ "slug": "virgils-real-bbq-times-square",
+ "query_name": "Virgil's Real BBQ - Times Square",
+ "matched": {
+  "place_id": "ChIJNe_8fqtz5okR_V-vTEVkjqs",
+  "name": "Virgil's Real BBQ",
+  "address": "152 W 44th St, New York, NY 10036, USA",
+  "rating": 4.3,
+  "user_ratings_total": 5911,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7567595,
+  "lng": -73.9851662
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

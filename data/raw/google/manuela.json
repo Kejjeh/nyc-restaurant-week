@@ -1,0 +1,18 @@
+{
+ "slug": "manuela",
+ "query_name": "Manuela",
+ "matched": {
+  "place_id": "ChIJX-mejhxZwokRtFAXCtZVdSk",
+  "name": "Manuela",
+  "address": "130 Prince St, New York, NY 10012, USA",
+  "rating": 4.4,
+  "user_ratings_total": 271,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7253651,
+  "lng": -74.0005917
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

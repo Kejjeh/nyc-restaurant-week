@@ -1,0 +1,18 @@
+{
+ "slug": "berimbau-brazilian-kitchen-midtown",
+ "query_name": "Berimbau - Midtown",
+ "matched": {
+  "place_id": "ChIJy-iemupZwokR6hDqHU-z654",
+  "name": "Berimbau Brazilian Table - 36th Street",
+  "address": "3 W 36th St., New York, NY 10018, USA",
+  "rating": 4.7,
+  "user_ratings_total": 731,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7501458,
+  "lng": -73.9841391
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

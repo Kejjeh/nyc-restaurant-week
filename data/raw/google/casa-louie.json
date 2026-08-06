@@ -1,0 +1,18 @@
+{
+ "slug": "casa-louie",
+ "query_name": "Casa Louie",
+ "matched": {
+  "place_id": "ChIJL87sSQBZwokRKKDWlClzS_g",
+  "name": "Casa Louie",
+  "address": "455 W 37th St, New York, NY 10018, USA",
+  "rating": 4.8,
+  "user_ratings_total": 323,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7565168,
+  "lng": -73.9973261
+ },
+ "accepted": true,
+ "reason": "23m away",
+ "source": "textsearch",
+ "error": null
+}

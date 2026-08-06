@@ -1,0 +1,18 @@
+{
+ "slug": "the-flatiron-room",
+ "query_name": "The Flatiron Room - NoMad",
+ "matched": {
+  "place_id": "ChIJiXS6uaVZwokRqjgLG65i9Gk",
+  "name": "The Flatiron Room NoMad",
+  "address": "37 W 26th St, New York, NY 10010, USA",
+  "rating": 4.5,
+  "user_ratings_total": 2004,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7445519,
+  "lng": -73.99043240000002
+ },
+ "accepted": true,
+ "reason": "4m away",
+ "source": "textsearch",
+ "error": null
+}

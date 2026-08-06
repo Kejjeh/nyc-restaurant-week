@@ -1,0 +1,18 @@
+{
+ "slug": "oceans",
+ "query_name": "Oceans",
+ "matched": {
+  "place_id": "ChIJq7G-HTtZwokRkQvXiYeiuco",
+  "name": "Oceans",
+  "address": "233 Park Ave S, New York, NY 10003, USA",
+  "rating": 4.7,
+  "user_ratings_total": 850,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7375453,
+  "lng": -73.9880897
+ },
+ "accepted": true,
+ "reason": "17m away",
+ "source": "textsearch",
+ "error": null
+}

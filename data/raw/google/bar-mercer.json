@@ -1,0 +1,18 @@
+{
+ "slug": "bar-mercer",
+ "query_name": "Bar Mercer",
+ "matched": {
+  "place_id": "ChIJYzSbTY5ZwokReIFvBOGExus",
+  "name": "Bar Mercer",
+  "address": "25 W Houston St, New York, NY 10012, USA",
+  "rating": 4.6,
+  "user_ratings_total": 53,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7256816,
+  "lng": -73.99792649999999
+ },
+ "accepted": true,
+ "reason": "6m away",
+ "source": "textsearch",
+ "error": null
+}

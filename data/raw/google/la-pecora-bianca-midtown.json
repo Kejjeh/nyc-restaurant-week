@@ -1,0 +1,18 @@
+{
+ "slug": "la-pecora-bianca-midtown",
+ "query_name": "La Pecora Bianca Midtown",
+ "matched": {
+  "place_id": "ChIJWZbmVuJYwokRp2ASZt0ZtgU",
+  "name": "La Pecora Bianca Midtown",
+  "address": "950 2nd Ave, New York, NY 10022, USA",
+  "rating": 4.8,
+  "user_ratings_total": 4225,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7549194,
+  "lng": -73.9682485
+ },
+ "accepted": true,
+ "reason": "19m away",
+ "source": "textsearch",
+ "error": null
+}

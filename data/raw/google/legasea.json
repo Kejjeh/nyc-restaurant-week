@@ -1,0 +1,18 @@
+{
+ "slug": "legasea",
+ "query_name": "Legasea",
+ "matched": {
+  "place_id": "ChIJl5pBc6xZwokRyba8gBQv0F8",
+  "name": "Legasea Bar & Grill",
+  "address": "485 7th Ave, New York, NY 10018, USA",
+  "rating": 4.1,
+  "user_ratings_total": 1512,
+  "business_status": "OPERATIONAL",
+  "lat": 40.75245719999999,
+  "lng": -73.9893668
+ },
+ "accepted": true,
+ "reason": "12m away",
+ "source": "textsearch",
+ "error": null
+}

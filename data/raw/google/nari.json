@@ -1,0 +1,18 @@
+{
+ "slug": "nari",
+ "query_name": "Nari",
+ "matched": {
+  "place_id": "ChIJrcxpzy1ZwokRhoxq4eq27iA",
+  "name": "NARI",
+  "address": "43 W 54th St, New York, NY 10019, USA",
+  "rating": 4.4,
+  "user_ratings_total": 240,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7621477,
+  "lng": -73.97752489999999
+ },
+ "accepted": true,
+ "reason": "2m away",
+ "source": "textsearch",
+ "error": null
+}

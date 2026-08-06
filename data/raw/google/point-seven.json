@@ -1,0 +1,18 @@
+{
+ "slug": "point-seven",
+ "query_name": "Point Seven",
+ "matched": {
+  "place_id": "ChIJAQDAGwJZwokR3Dr0k8AY5mw",
+  "name": "Point Seven",
+  "address": "200 Park Ave, New York, NY 10166, USA",
+  "rating": 4.5,
+  "user_ratings_total": 183,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7536229,
+  "lng": -73.9771918
+ },
+ "accepted": true,
+ "reason": "54m away",
+ "source": "textsearch",
+ "error": null
+}

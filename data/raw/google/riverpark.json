@@ -1,0 +1,18 @@
+{
+ "slug": "riverpark",
+ "query_name": "Riverpark",
+ "matched": {
+  "place_id": "ChIJ5UozYw5ZwokRO4HaCJGvRPY",
+  "name": "Riverpark",
+  "address": "440-450 E 29th St, New York, NY 10016, USA",
+  "rating": 4.6,
+  "user_ratings_total": 824,
+  "business_status": "OPERATIONAL",
+  "lat": 40.739978,
+  "lng": -73.97442029999999
+ },
+ "accepted": true,
+ "reason": "61m away",
+ "source": "textsearch",
+ "error": null
+}

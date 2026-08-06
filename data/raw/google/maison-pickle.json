@@ -1,0 +1,18 @@
+{
+ "slug": "maison-pickle",
+ "query_name": "Maison Pickle",
+ "matched": {
+  "place_id": "ChIJrapahYZYwokRdCivYmoCbJ8",
+  "name": "Maison Pickle",
+  "address": "2315 Broadway, New York, NY 10024, USA",
+  "rating": 4.5,
+  "user_ratings_total": 3782,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7869104,
+  "lng": -73.9780313
+ },
+ "accepted": true,
+ "reason": "18m away",
+ "source": "textsearch",
+ "error": null
+}

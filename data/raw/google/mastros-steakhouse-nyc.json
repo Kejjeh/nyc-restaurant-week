@@ -1,0 +1,18 @@
+{
+ "slug": "mastros-steakhouse-nyc",
+ "query_name": "Mastro's Steakhouse NYC",
+ "matched": {
+  "place_id": "ChIJ8VtP4PhYwokR6uW6rOF7C4U",
+  "name": "Mastro's Steakhouse",
+  "address": "1285 6th Ave, New York, NY 10019, USA",
+  "rating": 4.5,
+  "user_ratings_total": 2704,
+  "business_status": "OPERATIONAL",
+  "lat": 40.76110389999999,
+  "lng": -73.9801635
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

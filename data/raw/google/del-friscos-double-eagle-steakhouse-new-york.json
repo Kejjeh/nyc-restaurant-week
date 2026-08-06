@@ -1,0 +1,18 @@
+{
+ "slug": "del-friscos-double-eagle-steakhouse-new-york",
+ "query_name": "Del Friscos Double Eagle Steakhouse New York",
+ "matched": {
+  "place_id": "ChIJE1bnSP9YwokRDK7Zxnt23gE",
+  "name": "Del Frisco's Double Eagle Steakhouse",
+  "address": "1221 Ave of the Americas, New York, NY 10020, USA",
+  "rating": 4.5,
+  "user_ratings_total": 5947,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7594099,
+  "lng": -73.98222
+ },
+ "accepted": true,
+ "reason": "10m away",
+ "source": "textsearch",
+ "error": null
+}

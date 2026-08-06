@@ -1,0 +1,18 @@
+{
+ "slug": "taste-of-india-ii",
+ "query_name": "Taste of India II",
+ "matched": {
+  "place_id": "ChIJ1_AfcVJJwokRqIHq3OuJwow",
+  "name": "Taste of India II",
+  "address": "287 New Dorp Ln, Staten Island, NY 10306, USA",
+  "rating": 4.4,
+  "user_ratings_total": 699,
+  "business_status": "OPERATIONAL",
+  "lat": 40.572234,
+  "lng": -74.11260899999999
+ },
+ "accepted": true,
+ "reason": "3m away",
+ "source": "textsearch",
+ "error": null
+}

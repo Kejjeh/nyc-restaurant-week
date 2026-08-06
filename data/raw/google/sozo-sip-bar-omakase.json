@@ -1,0 +1,18 @@
+{
+ "slug": "sozo-sip-bar-omakase",
+ "query_name": "SoZo Sip Bar + Omakase",
+ "matched": {
+  "place_id": "ChIJIQqfcfJZwokRMY6IZZDQW2k",
+  "name": "SoZo Sip Bar + Omakase",
+  "address": "319 Bowery, New York, NY 10003, USA",
+  "rating": 4.9,
+  "user_ratings_total": 109,
+  "business_status": "OPERATIONAL",
+  "lat": 40.725321,
+  "lng": -73.99184570000001
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "ramerino-italian-prime",
+ "query_name": "Ramerino Italian Prime",
+ "matched": {
+  "place_id": "ChIJOUC8wABZwokRwDcZR-3lHa4",
+  "name": "Ramerino - Italian Prime Restaurant",
+  "address": "16 E 39th St, New York, NY 10016, USA",
+  "rating": 4.6,
+  "user_ratings_total": 662,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7509292,
+  "lng": -73.9814711
+ },
+ "accepted": true,
+ "reason": "9m away",
+ "source": "textsearch",
+ "error": null
+}

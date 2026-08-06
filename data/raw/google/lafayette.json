@@ -1,0 +1,18 @@
+{
+ "slug": "lafayette",
+ "query_name": "Lafayette",
+ "matched": {
+  "place_id": "ChIJBVtTt5pZwokR48CgdYqHma8",
+  "name": "Lafayette Grand Café & Bakery",
+  "address": "380 Lafayette St, New York, NY 10003, USA",
+  "rating": 4.2,
+  "user_ratings_total": 5558,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7275934,
+  "lng": -73.9937017
+ },
+ "accepted": true,
+ "reason": "9m away",
+ "source": "textsearch",
+ "error": null
+}

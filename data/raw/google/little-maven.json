@@ -1,0 +1,18 @@
+{
+ "slug": "little-maven",
+ "query_name": "Little Maven",
+ "matched": {
+  "place_id": "ChIJW3LA-dxZwokR0WAavt1PXFE",
+  "name": "Little Maven",
+  "address": "30 W 18th St, New York, NY 10011, USA",
+  "rating": 4.8,
+  "user_ratings_total": 548,
+  "business_status": "OPERATIONAL",
+  "lat": 40.7390428,
+  "lng": -73.9934938
+ },
+ "accepted": true,
+ "reason": "0m away",
+ "source": "textsearch",
+ "error": null
+}

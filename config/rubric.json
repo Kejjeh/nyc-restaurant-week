@@ -1,17 +1,18 @@
 {
   "_doc": {
     "purpose": "A transparent composite grade. Every component is normalised to 0-100, weighted, and PUBLISHED alongside the total so the score can be argued with rather than taken on faith. Change the weights here and re-run src/export_site_data.py; no code edits.",
-    "missing_data_rule": "A component scores 0 only when the zero is a FACT. When the value is UNKNOWN (no Google match, no printed end date, no comparable price) the component is dropped and its weight redistributed, then the total is shrunk toward the corpus mean in proportion to what was missing -- redistribution alone rewards thin data.",
+    "missing_data_rule": "A component scores 0 only when the zero is a FACT (holds no award). When it is UNKNOWN the component is IMPUTED at the mean of that same component across every restaurant that has it -- so a missing value figure is treated as an average value figure, not as a bad one and not as a free pass. Earlier versions got this wrong twice: redistributing the weight REWARDED thin data, and then shrinking the total toward the overall mean PUNISHED it, because the overall mean (41) sits far below the mean of the component actually missing (value, 58). Imputing per component is neutral in both directions.",
     "completeness": "Each restaurant also carries the share of weight that rested on real data. A 78 built on 100% evidence is not the same claim as a 78 built on 60%.",
     "not_a_ranking_of_quality": "This grades fit against these seven axes only. It is not a claim about which food is better.",
-    "weights_rationale": "Google rating carries the most weight (30). It is the only axis reflecting thousands of actual diners rather than a handful of critics, it is the best covered at 639 of 645, and it is already confidence-weighted internally. Awards (20) are expert judgement and sparse -- 77 of 645 hold one -- so a heavier weight would turn the whole grade into an award ranking, which the sensitivity run showed it was becoming: removing awards used to churn 9 of the top 10.",
-    "weights_are_relative": "These need not sum to 100. Each restaurant's score divides by the weight actually in play for it, so the numbers are read against each other, not as percentages. They currently total 105."
+    "weights_rationale": "Tuned for the stated goal: the best dinner reachable without an awkward journey. Rating (30) and award (30) are the two independent reads on how good the food and service actually are -- one from thousands of diners, one from critics. Transit (20) is raised because the commute is a real constraint, not a nicety. Value (10) is deliberately low: Restaurant Week already fixes the price, so the gap says how good a DEAL it is, not how good a DINNER. It breaks ties rather than driving the ranking.",
+    "weights_are_relative": "These need not sum to 100. Each restaurant's score divides by the weight actually in play for it, so the numbers are read against each other, not as percentages. They currently total 105.",
+    "imputation_is_disclosed": "rubric_parts marks every imputed component, and rubric_completeness still reports the share of the score that rested on real data."
   },
   "weights": {
     "rating": 30,
-    "value": 25,
-    "award": 25,
-    "lex": 15,
+    "award": 30,
+    "lex": 20,
+    "value": 10,
     "window": 10
   },
   "award": {

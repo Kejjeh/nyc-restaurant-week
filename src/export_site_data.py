@@ -441,15 +441,33 @@ def rubric_for(r, cfg, today):
     else:
         parts["window"] = None
 
+    return parts
+
+
+def score_parts(parts, cfg, means):
+    """-> (score, published_parts, completeness).
+
+    A missing component is IMPUTED at the mean of that component across every
+    restaurant that has it. Two earlier versions got this wrong in opposite
+    directions: redistributing the weight rewarded thin data, and shrinking the
+    total toward the overall mean punished it -- the overall mean (41) sits far
+    below the mean of the component usually missing (value, 58), so a
+    restaurant was dragged down for OUR failure to find its prices. Imputing
+    per component is neutral both ways, and the imputation is disclosed.
+    """
     w = cfg["weights"]
-    live = {k: v for k, v in parts.items() if v is not None}
-    total_w = sum(w[k] for k in live)
+    keys = [k for k in parts if k in w]
+    total_w = sum(w[k] for k in keys)
     if not total_w:
         return None, parts, 0.0
-    score = sum(v * w[k] for k, v in live.items()) / total_w
-    completeness = 100.0 * total_w / sum(w[k] for k in parts)
-    return round(score, 1), {k: (round(v, 1) if v is not None else None)
-                             for k, v in parts.items()}, round(completeness, 1)
+    filled = {k: (parts[k] if parts[k] is not None else means.get(k, 50.0))
+              for k in keys}
+    score = sum(filled[k] * w[k] for k in keys) / total_w
+    known_w = sum(w[k] for k in keys if parts[k] is not None)
+    completeness = 100.0 * known_w / total_w
+    published = {k: (round(parts[k], 1) if parts[k] is not None else None)
+                 for k in keys}
+    return round(score, 1), published, round(completeness, 1)
 
 
 MONTHS = {m: i for i, ms in enumerate(
@@ -1056,29 +1074,23 @@ def build_payload():
             r["_rating_pct"] = 100.0 * below / len(scored)
         else:
             r["_rating_pct"] = None          # unknown, not bad
+    raw_parts = {}
     for r in out:
-        sc, parts, comp = rubric_for(r, rcfg, today)
-        r["rubric_raw"] = sc
+        raw_parts[r["slug"]] = rubric_for(r, rcfg, today)
+        r.pop("_rating_pct", None)
+    # Component means, over the restaurants that actually have each component.
+    means = {}
+    for k in rcfg["weights"]:
+        vals = [pp[k] for pp in raw_parts.values() if pp.get(k) is not None]
+        means[k] = sum(vals) / len(vals) if vals else 50.0
+    for r in out:
+        sc, parts, comp = score_parts(raw_parts[r["slug"]], rcfg, means)
+        r["rubric"] = sc
         r["rubric_parts"] = parts
         r["rubric_completeness"] = comp
-        r.pop("_rating_pct", None)
+        r["rubric_imputed"] = [k for k, v in parts.items() if v is None]
 
-    # Redistributing a missing component's weight across the survivors quietly
-    # REWARDS having less data: Le Pavillon outscored Cafe Boulud largely
-    # because it has no published comparable, so its strong award and transit
-    # marks carried the weight that Cafe Boulud had to share with a real value
-    # figure. So the published score is shrunk toward the corpus mean in
-    # proportion to the weight that was missing -- the same correction, and for
-    # the same reason, as the Bayesian pull applied to thin Google ratings.
-    have = [r["rubric_raw"] for r in out if r["rubric_raw"] is not None]
-    corpus_mean = sum(have) / len(have) if have else 0.0
-    for r in out:
-        sc, comp = r["rubric_raw"], r["rubric_completeness"]
-        if sc is None:
-            r["rubric"] = None
-            continue
-        k = comp / 100.0
-        r["rubric"] = round(k * sc + (1 - k) * corpus_mean, 1)
+    rubric_means = {k: round(v, 1) for k, v in means.items()}
 
     payload = {
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
@@ -1090,9 +1102,9 @@ def build_payload():
         "program_end": PROGRAM_END,
         "tag_vocabulary": sorted(rules),
         "rubric_weights": load_rubric()["weights"],
-        "rubric_mean": round(sum(r["rubric_raw"] for r in out
-                                 if r["rubric_raw"] is not None)
-                             / max(1, sum(1 for r in out if r["rubric_raw"] is not None)), 1),
+        "rubric_component_means": rubric_means,
+        "rubric_mean": round(sum(r["rubric"] for r in out if r["rubric"] is not None)
+                             / max(1, sum(1 for r in out if r["rubric"] is not None)), 1),
         "google_mean": round(google_mean, 3),
         "google_prior": GOOGLE_PRIOR,
         "restaurants": out,

@@ -658,9 +658,10 @@ function renderDetail(r) {
     s2.append(el('h4', null, `Rubric grade — ${r.rubric.toFixed(1)}`));
     s2.append(el('p', 'dnote',
       r.rubric_completeness < 100
-        ? `Built on ${r.rubric_completeness}% of the weight; the rest was unknown, so the `
-          + `score is pulled toward the ${DATA.rubric_mean} average. Unweighted it scores `
-          + `${r.rubric_raw.toFixed(1)}.`
+        ? `Built on ${r.rubric_completeness}% real data. ${(r.rubric_imputed || []).length
+            ? (r.rubric_imputed.map((k) => RUBRIC_LABEL[k] || k).join(' and ')
+               + ` unknown, so scored at the field average rather than penalised.`)
+            : ''}`
         : 'Every component had real data behind it.'));
     const tbl = el('div', 'rubricBars');
     Object.keys(DATA.rubric_weights).forEach((k) => {

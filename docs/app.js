@@ -189,7 +189,7 @@ for (const f of FACETS) if (!FILTERS[f.key]) FILTERS[f.key] = new Set();
 
 const RECOG_LABEL = { michelin: 'Michelin', james_beard: 'James Beard', nyt: 'NYT' };
 const RUBRIC_LABEL = {
-  award: 'Award value', recency: 'Award recency', rating: 'Google rating (weighted)',
+  award: 'Award value (aged)', rating: 'Google rating (weighted)',
   lex: 'Walk to the 4/5/6', value: 'Value gap % (confidence-adjusted)',
   window: 'Days left to book',
 };

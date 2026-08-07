@@ -390,12 +390,17 @@ def rubric_for(r, cfg, today):
     """-> (score, {component: value_or_None}, completeness_pct)."""
     parts = {}
 
-    # award — 0 is a fact: they hold no distinction
+    # award — the distinction held, decayed by its age. 0 is a fact: they hold
+    # none. Recency is not an axis of its own; it is a discount on the award,
+    # so a 1991 semifinalist cannot score what a 2026 one does. Michelin and
+    # the NYT 100 are annual guides and always current, so this only bites JB.
     top = r.get("recog_top")
-    parts["award"] = float(cfg["award"].get(top["tier"], 0)) if top else 0.0
-
-    # recency — only meaningful if there IS an award, else dropped
-    parts["recency"] = (float(cfg["recency"].get(top["era"], 50)) if top else None)
+    if top:
+        base = float(cfg["award"]["tiers"].get(top["tier"], 0))
+        decay = float(cfg["award"]["recency_decay"].get(top["era"], 1.0))
+        parts["award"] = base * decay
+    else:
+        parts["award"] = 0.0
 
     # rating — percentile of the WEIGHTED score, set by the caller
     parts["rating"] = r.get("_rating_pct")

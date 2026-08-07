@@ -3,32 +3,33 @@
     "purpose": "A transparent composite grade. Every component is normalised to 0-100, weighted, and PUBLISHED alongside the total so the score can be argued with rather than taken on faith. Change the weights here and re-run src/export_site_data.py; no code edits.",
     "missing_data_rule": "A component scores 0 only when the zero is a FACT. When the value is UNKNOWN (no Google match, no printed end date, no comparable price) the component is dropped and its weight redistributed, then the total is shrunk toward the corpus mean in proportion to what was missing -- redistribution alone rewards thin data.",
     "completeness": "Each restaurant also carries the share of weight that rested on real data. A 78 built on 100% evidence is not the same claim as a 78 built on 60%.",
-    "not_a_ranking_of_quality": "This grades fit against these seven axes only. It is not a claim about which food is better."
+    "not_a_ranking_of_quality": "This grades fit against these seven axes only. It is not a claim about which food is better.",
+    "weights_rationale": "Google rating carries the most weight (30). It is the only axis reflecting thousands of actual diners rather than a handful of critics, it is the best covered at 639 of 645, and it is already confidence-weighted internally. Awards (20) are expert judgement and sparse -- 77 of 645 hold one -- so a heavier weight would turn the whole grade into an award ranking, which the sensitivity run showed it was becoming: removing awards used to churn 9 of the top 10."
   },
   "weights": {
-    "award": 20,
-    "recency": 10,
-    "rating": 20,
-    "lex": 15,
+    "rating": 30,
     "value": 25,
+    "award": 20,
+    "lex": 15,
     "window": 10
   },
   "award": {
-    "_doc": "Value of the strongest distinction held. No award scores 0 -- that is a fact about the restaurant, not missing data.",
-    "Michelin star": 100,
-    "NYT 100 Best": 92,
-    "James Beard winner": 85,
-    "Michelin Bib Gourmand": 72,
-    "James Beard nominee": 60,
-    "James Beard semifinalist": 50,
-    "Michelin Plate": 40
-  },
-  "recency": {
-    "_doc": "How current that distinction is. Dropped entirely for restaurants with no award, so they are not penalised twice for the same absence.",
-    "current": 100,
-    "recent": 80,
-    "past": 55,
-    "historic": 35
+    "_doc": "Value of the strongest distinction held, DECAYED by how old it is. Recency used to be a component of its own, which asked the wrong question: recency is not a thing a restaurant has, it is a discount on the thing it has. A 1991 James Beard semifinalist and a 2026 one are not the same claim, and scoring them 50 apiece and then arguing about it in a separate 10-point row let a stale award keep most of its force. No award still scores 0 -- a fact, not missing data. Michelin and the NYT 100 are annual guides, so they are always current and the decay only ever bites James Beard.",
+    "tiers": {
+      "Michelin star": 100,
+      "NYT 100 Best": 92,
+      "James Beard winner": 85,
+      "Michelin Bib Gourmand": 72,
+      "James Beard nominee": 60,
+      "James Beard semifinalist": 50,
+      "Michelin Plate": 40
+    },
+    "recency_decay": {
+      "current": 1.0,
+      "recent": 0.9,
+      "past": 0.75,
+      "historic": 0.6
+    }
   },
   "lex": {
     "_doc": "Walk to the 4/5/6. Not being near it now scores NEUTRAL, not 0. The 4/5/6 runs Manhattan and the Bronx only, so a 0 was a fixed 15-point tax on 100% of Queens and Staten Island and 78% of Brooklyn -- a fact about the MTA, not about the restaurant. Proximity is now a bonus above neutral and distance costs nothing. If you need the Lex line as a hard requirement, the subway facet already does that exactly, and a filter beats a weighting for a constraint.",

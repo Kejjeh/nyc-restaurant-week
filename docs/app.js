@@ -1606,6 +1606,15 @@ function renderPlan() {
    detail panels you have to hold in your head. `best` marks the winning cell
    where a row HAS a winner -- and deliberately does not where it doesn't. */
 const CMP_ROWS = [
+  // First row: the composite, with the share of it that rested on real data.
+  // Shown together on purpose — a 78 built on everything and a 71 built on
+  // three quarters are not the same claim, and the winner dot would be
+  // misleading without it.
+  { k: 'Rubric grade', mono: true,
+    get: (r) => (r.rubric == null ? '—'
+      : `${r.rubric.toFixed(1)}${r.rubric_completeness < 100
+          ? ` · ${Math.round(r.rubric_completeness)}% known` : ''}`),
+    raw: (r) => r.rubric, bestRaw: 'max' },
   { k: 'Rank', get: (r) => (r.rank != null ? `#${r.rank}` : '—'), mono: true,
     best: (v, all) => v !== '—' && v === all.filter((x) => x !== '—')
       .sort((a, b) => +a.slice(1) - +b.slice(1))[0] },

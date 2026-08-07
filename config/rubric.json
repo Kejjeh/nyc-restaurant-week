@@ -4,15 +4,14 @@
     "missing_data_rule": "A component scores 0 only when the zero is a FACT (holds no award). When it is UNKNOWN the component is IMPUTED at the mean of that same component across every restaurant that has it -- so a missing value figure is treated as an average value figure, not as a bad one and not as a free pass. Earlier versions got this wrong twice: redistributing the weight REWARDED thin data, and then shrinking the total toward the overall mean PUNISHED it, because the overall mean (41) sits far below the mean of the component actually missing (value, 58). Imputing per component is neutral in both directions.",
     "completeness": "Each restaurant also carries the share of weight that rested on real data. A 78 built on 100% evidence is not the same claim as a 78 built on 60%.",
     "not_a_ranking_of_quality": "This grades fit against these seven axes only. It is not a claim about which food is better.",
-    "weights_rationale": "Tuned for the stated goal: the best dinner reachable without an awkward journey. Rating (30) and award (30) are the two independent reads on how good the food and service actually are -- one from thousands of diners, one from critics. Transit (20) is raised because the commute is a real constraint, not a nicety. Value (10) is deliberately low: Restaurant Week already fixes the price, so the gap says how good a DEAL it is, not how good a DINNER. It breaks ties rather than driving the ranking.",
-    "weights_are_relative": "These need not sum to 100. Each restaurant's score divides by the weight actually in play for it, so the numbers are read against each other, not as percentages. They currently total 105.",
+    "weights_rationale": "Tuned for the stated goal: the best dinner reachable without an awkward journey. Rating (30) and award (30) are the two independent reads on how good the food and service actually are -- one from thousands of diners, one from critics. Transit (20) because the commute is a real constraint. Value was REMOVED: see the disabled block below.",
+    "weights_are_relative": "These need not sum to 100. Each score divides by the weight in play, so the numbers are read against each other. They currently total 90, and dropping value raised every other component's share proportionally -- transit went from a fifth of the grade to 22%.",
     "imputation_is_disclosed": "rubric_parts marks every imputed component, and rubric_completeness still reports the share of the score that rested on real data."
   },
   "weights": {
     "rating": 30,
     "award": 30,
     "lex": 20,
-    "value": 10,
     "window": 10
   },
   "award": {
@@ -40,7 +39,8 @@
     "no_lex_score": 50
   },
   "value": {
-    "_doc": "Gap as a PERCENTAGE, which compares across the $30/$45/$60 tiers in a way dollars do not. Evidence is now folded in here as a CONFIDENCE MULTIPLIER rather than scored beside it: a heuristic estimate used to earn value points AND separately earn evidence points for being a heuristic, which double-counted a figure we trust less. The score is now shrunk toward neutral by how much the figure rests on -- the same correction used on thin Google ratings and on incomplete rubric rows. evidence's 10 points moved onto the component it modifies, so value carries 25.",
+    "_disabled": true,
+    "_doc": "REMOVED from weights, deliberately, and kept here so it is a one-line change to restore. Measured before removal at weight 10: dropping it entirely left the rank correlation at 0.9915 and the top 15 completely unchanged. Three reasons it could not earn its place. Only 351 of 645 had a figure at all, so 294 were imputed at a constant that discriminates nothing. Of those 351, just 14 were verified and 337 were heuristic estimates, which this project's own notes say overstate casual kitchens. And the confidence multiplier compressed estimates into a 20-80 band, capping the whole component's swing at 6 grade points against 30 for rating. There was no weight at which it was both meaningful and trustworthy. Value is not lost from the site -- it has the gap column, both gap sorts, the best-value sort and the verified-gaps preset, all of which show it honestly instead of burying a heuristic inside a composite. The grade answers WHICH DINNER, not which deal; Restaurant Week already fixes the price.",
     "zero_at_pct": 0,
     "full_at_pct": 55,
     "neutral": 50,

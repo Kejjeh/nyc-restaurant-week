@@ -4,12 +4,13 @@
     "missing_data_rule": "A component scores 0 only when the zero is a FACT. When the value is UNKNOWN (no Google match, no printed end date, no comparable price) the component is dropped and its weight redistributed, then the total is shrunk toward the corpus mean in proportion to what was missing -- redistribution alone rewards thin data.",
     "completeness": "Each restaurant also carries the share of weight that rested on real data. A 78 built on 100% evidence is not the same claim as a 78 built on 60%.",
     "not_a_ranking_of_quality": "This grades fit against these seven axes only. It is not a claim about which food is better.",
-    "weights_rationale": "Google rating carries the most weight (30). It is the only axis reflecting thousands of actual diners rather than a handful of critics, it is the best covered at 639 of 645, and it is already confidence-weighted internally. Awards (20) are expert judgement and sparse -- 77 of 645 hold one -- so a heavier weight would turn the whole grade into an award ranking, which the sensitivity run showed it was becoming: removing awards used to churn 9 of the top 10."
+    "weights_rationale": "Google rating carries the most weight (30). It is the only axis reflecting thousands of actual diners rather than a handful of critics, it is the best covered at 639 of 645, and it is already confidence-weighted internally. Awards (20) are expert judgement and sparse -- 77 of 645 hold one -- so a heavier weight would turn the whole grade into an award ranking, which the sensitivity run showed it was becoming: removing awards used to churn 9 of the top 10.",
+    "weights_are_relative": "These need not sum to 100. Each restaurant's score divides by the weight actually in play for it, so the numbers are read against each other, not as percentages. They currently total 105."
   },
   "weights": {
     "rating": 30,
     "value": 25,
-    "award": 20,
+    "award": 25,
     "lex": 15,
     "window": 10
   },

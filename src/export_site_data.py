@@ -400,23 +400,29 @@ def rubric_for(r, cfg, today):
     # rating — percentile of the WEIGHTED score, set by the caller
     parts["rating"] = r.get("_rating_pct")
 
-    # lex — no Lexington-line station within reach is a real fact about place
+    # lex — proximity is a BONUS above neutral; being off the Lexington line
+    # costs nothing. A 0 here was a fixed tax on 100% of Queens and Staten
+    # Island and 78% of Brooklyn, because the 4/5/6 does not run there: a fact
+    # about the MTA, not about the restaurant. Use the subway facet if you need
+    # the line as a hard requirement -- a filter beats a weighting for that.
+    c = cfg["lex"]
     lex = [r["subway"].get(k) for k in ("4", "5", "6") if r.get("subway")]
     lex = [x for x in lex if x is not None]
-    if lex:
-        c = cfg["lex"]
-        parts["lex"] = _ramp(min(lex), c["worst_minutes"], c["best_minutes"])
-    else:
-        parts["lex"] = 0.0
+    parts["lex"] = (_ramp(min(lex), c["worst_minutes"], c["best_minutes"])
+                    if lex else float(c["no_lex_score"]))
 
-    # value — gap PERCENT, comparable across the price tiers; unknown if absent
+    # value — gap PERCENT (comparable across the price tiers), then shrunk
+    # toward neutral by how much that figure actually rests on. Evidence used
+    # to be a component of its own, which double-counted: a heuristic estimate
+    # earned value points AND separately earned evidence points for being a
+    # heuristic. It is a confidence multiplier on the figure, not a virtue.
     c = cfg["value"]
-    parts["value"] = (_ramp(r["gap_pct"], c["zero_at_pct"], c["full_at_pct"])
-                      if r.get("gap_pct") is not None else None)
-
-    # evidence — what that value figure rests on; unknown when there is no figure
-    parts["evidence"] = (float(cfg["evidence"][r["gap_basis"]])
-                         if r.get("gap_basis") in cfg["evidence"] else None)
+    if r.get("gap_pct") is None:
+        parts["value"] = None
+    else:
+        v = _ramp(r["gap_pct"], c["zero_at_pct"], c["full_at_pct"])
+        k = float(c["confidence"].get(r.get("gap_basis"), 0.0))
+        parts["value"] = k * v + (1 - k) * float(c["neutral"])
 
     # window — days left to book. Flexibility, not urgency.
     if r.get("end_date"):

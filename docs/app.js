@@ -69,6 +69,7 @@ const FILTERS = {
   subway: new Set(),      // route ids: '4', '6', 'N', 'L' …
   outdoor: new Set(),     // 'licensed' | 'sidewalk' | 'roadway' | 'described'
   bookableBy: null,       // ISO date — keep rows still open ON this date
+  minRating: null,        // floor on the WEIGHTED Google score, not raw stars
   endingBy: null,         // ISO date — keep rows that CLOSE on/before this date
   savedOnly: false,       // your own shortlist
 };
@@ -212,6 +213,14 @@ function matches(r, exceptFacet) {
     if (!hit) return false;
   }
 
+  if (FILTERS.minRating != null) {
+    // Deliberately the opposite of bookableBy above: "an unprinted window is
+    // not a closed one", but an unrated restaurant genuinely cannot be shown
+    // to meet a rating floor. The count of rows dropped this way is surfaced
+    // on the chip so the exclusion is never silent.
+    if (!r.google || r.google.score == null) return false;
+    if (r.google.score < FILTERS.minRating) return false;
+  }
   if (FILTERS.bookableBy) {
     // Unknown end dates are KEPT (an unprinted window is not a closed one),
     // but they are visibly flagged in the row.
@@ -740,6 +749,7 @@ function openRestaurant(slug) {
   if (!RESULTS.some((x) => x.slug === slug)) {
     clearAll(true);            // the link must win over whatever was filtered
     FILTERS.bookableBy = null;
+    FILTERS.minRating = null;
   }
   EXPANDED.add(slug);
   VIEW = 'list';
@@ -852,6 +862,26 @@ function buildFacets() {
     }
     return;
   }
+  const rsec = el('div', 'facet');
+  rsec.append(el('h3', null, 'Minimum rating'));
+  rsec.append(el('p', 'facetNote',
+    'On the weighted score, so a floor of 4.4 is not met by a 4.9 resting on '
+    + '14 reviews. Restaurants with no rating are excluded while this is set.'));
+  const rwrap = el('div', 'dateFacet');
+  [null, 4.0, 4.2, 4.4, 4.6].forEach((v) => {
+    const b = el('button', 'chip', v == null ? 'Any rating' : `${v.toFixed(1)}+`);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', FILTERS.minRating === v ? 'true' : 'false');
+    if (v != null) {
+      b.append(el('span', 'c', String(ROWS.filter((r) =>
+        r.google && r.google.score != null && r.google.score >= v).length)));
+    }
+    b.addEventListener('click', () => { FILTERS.minRating = v; apply(); });
+    rwrap.append(b);
+  });
+  rsec.append(rwrap);
+  host.append(rsec);
+
   const sec = el('div', 'facet');
   sec.append(el('h3', null, 'Still bookable on'));
   const wrapEl = el('div', 'dateFacet');
@@ -980,6 +1010,12 @@ function buildActiveFilters() {
       add(f.title, labelFor(f, v), () => FILTERS[f.key].delete(v));
     });
   });
+  if (FILTERS.minRating != null) {
+    const unrated = ROWS.filter((r) => !r.google || r.google.score == null).length;
+    add('Rating', `${FILTERS.minRating.toFixed(1)}+`
+      + (unrated ? ` · ${unrated} unrated hidden` : ''),
+      () => { FILTERS.minRating = null; });
+  }
   if (FILTERS.bookableBy) {
     add('Open on', fmtDate(FILTERS.bookableBy), () => { FILTERS.bookableBy = null; });
   }
@@ -1000,6 +1036,7 @@ function buildActiveFilters() {
 function activeCount() {
   let n = FACETS.reduce((acc, f) => acc + FILTERS[f.key].size, 0);
   if (FILTERS.bookableBy) n += 1;
+  if (FILTERS.minRating != null) n += 1;
   if (FILTERS.endingBy) n += 1;
   if (FILTERS.savedOnly) n += 1;
   if (QUERY) n += 1;
@@ -1102,6 +1139,7 @@ function apply() {
 function clearAll(silent) {
   FACETS.forEach((f) => FILTERS[f.key].clear());
   FILTERS.bookableBy = null;
+  FILTERS.minRating = null;
   FILTERS.endingBy = null;
   FILTERS.savedOnly = false;
   QUERY = '';
@@ -1119,6 +1157,7 @@ function writeHash() {
   // boot resolves to today — so clearing the date filter has to be recorded,
   // or a reload silently re-applies today's date.
   p.set('by', FILTERS.bookableBy || 'any');
+  if (FILTERS.minRating != null) p.set('minr', String(FILTERS.minRating));
   if (FILTERS.endingBy) p.set('to', FILTERS.endingBy);
   if (FILTERS.savedOnly) p.set('saved', '1');
   if (VIEW !== 'list') p.set('view', VIEW);
@@ -1138,6 +1177,8 @@ function readHash() {
   });
   const by = p.get('by');
   if (by) FILTERS.bookableBy = by === 'any' ? null : by;
+  const mr = p.get('minr');
+  FILTERS.minRating = mr ? parseFloat(mr) : null;
   if (p.get('to')) FILTERS.endingBy = p.get('to');
   if (p.get('saved') === '1') FILTERS.savedOnly = true;
   if (p.get('q')) { QUERY = fold(p.get('q')); $('#q').value = p.get('q'); }

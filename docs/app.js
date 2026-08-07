@@ -188,6 +188,11 @@ const FACETS = [
 for (const f of FACETS) if (!FILTERS[f.key]) FILTERS[f.key] = new Set();
 
 const RECOG_LABEL = { michelin: 'Michelin', james_beard: 'James Beard', nyt: 'NYT' };
+const RUBRIC_LABEL = {
+  award: 'Award value', recency: 'Award recency', rating: 'Google rating (weighted)',
+  lex: 'Walk to the 4/5/6', value: 'Value gap %', evidence: 'Evidence behind the gap',
+  window: 'Days left to book',
+};
 const ERA_LABEL = { current: 'This year or last', recent: 'Last 5 years',
                     past: 'Past decade', historic: 'Over 15 years ago' };
 const MICHELIN_TIERS = ['Michelin star', 'Michelin Bib Gourmand', 'Michelin Plate'];
@@ -298,6 +303,8 @@ const SORTS = {
   // The default. Trust tier first, then size within the tier — so the ranked
   // picks and hand-verified gaps lead, and the estimates keep their own
   // ordering underneath instead of colonising the top of the page.
+  rubric_desc: (a, b) => cmpNullLast(a.rubric, b.rubric, -1)
+    || a._name.localeCompare(b._name),
   google_desc: (a, b) => cmpNullLast(a.google && a.google.score, b.google && b.google.score, -1)
     || a._name.localeCompare(b._name),
   google_raw_desc: (a, b) => cmpNullLast(a.google && a.google.rating, b.google && b.google.rating, -1)
@@ -644,6 +651,40 @@ function renderDetail(r) {
     });
     s.append(ul);
     d.append(s);
+  }
+
+  if (r.rubric != null) {
+    const s2 = el('div', 'dsec');
+    s2.append(el('h4', null, `Rubric grade — ${r.rubric.toFixed(1)}`));
+    s2.append(el('p', 'dnote',
+      r.rubric_completeness < 100
+        ? `Built on ${r.rubric_completeness}% of the weight; the rest was unknown, so the `
+          + `score is pulled toward the ${DATA.rubric_mean} average. Unweighted it scores `
+          + `${r.rubric_raw.toFixed(1)}.`
+        : 'Every component had real data behind it.'));
+    const tbl = el('div', 'rubricBars');
+    Object.keys(DATA.rubric_weights).forEach((k) => {
+      const v = r.rubric_parts[k];
+      const row = el('div', 'rbRow');
+      row.append(el('span', 'rbK', `${RUBRIC_LABEL[k] || k} ·${DATA.rubric_weights[k]}`));
+      const track = el('span', 'rbTrack');
+      if (v == null) {
+        // No fill at all. An unset width resolves to 100%, which rendered a
+        // FULL bar for a component we know nothing about -- missing data
+        // reading as a perfect score, which is the exact inversion this
+        // whole rubric is built to avoid.
+        row.classList.add('unknown');
+      } else {
+        const fill = el('span', 'rbFill', '');
+        fill.style.width = `${v}%`;
+        track.append(fill);
+      }
+      row.append(track);
+      row.append(el('span', 'rbV', v == null ? 'not known' : String(Math.round(v))));
+      tbl.append(row);
+    });
+    s2.append(tbl);
+    d.append(s2);
   }
 
   if ((r.offsite_tags || []).length) {

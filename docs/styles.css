@@ -928,3 +928,15 @@ a:hover { text-decoration-thickness: 2px; }
   background: var(--surface-2); color: var(--ink-3);
   border-color: var(--rule);
 }
+
+/* Rubric breakdown. The bars exist so the grade can be taken apart at a
+   glance -- a composite you cannot inspect is a vibe, not evidence. */
+.rubricBars { display: grid; gap: 3px; margin-top: 2px; }
+.rbRow { display: grid; grid-template-columns: minmax(9em, 14em) 1fr 4.5em; gap: 8px; align-items: center; }
+.rbK { font-size: 11.5px; color: var(--ink-2); }
+.rbTrack { height: 7px; background: var(--surface-2); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+.rbFill { display: block; height: 100%; background: var(--accent); }
+.rbV { font-family: var(--mono); font-size: 11px; color: var(--ink-2); text-align: right; }
+.rbRow.unknown .rbTrack { border-style: dashed; background: transparent; }
+.rbRow.unknown .rbFill { width: 0; }
+.rbRow.unknown .rbV { color: var(--ink-3); font-style: italic; }

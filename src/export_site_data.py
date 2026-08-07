@@ -356,6 +356,91 @@ def build_google():
     return out, mean
 
 
+# --------------------------------------------------------------------------
+# Rubric: a transparent composite grade (config/rubric.json)
+#
+# Weights and every cut-point live in config so the score can be argued with
+# rather than reverse-engineered. Each component is published next to the
+# total; a grade you cannot take apart is not evidence, it is a vibe.
+#
+# The rule that keeps it honest: a component scores 0 only when the zero is a
+# FACT (holds no award; has no 4/5/6 within a 12-minute walk). When the value
+# is merely UNKNOWN -- no Google match, no printed end date, no comparable
+# price -- the component is DROPPED and its weight redistributed. Scoring
+# unknowns as zero would punish restaurants for gaps in our own coverage,
+# which is the failure this project has spent its whole life avoiding.
+RUBRIC_CONFIG = ROOT / "config" / "rubric.json"
+
+
+def load_rubric():
+    return json.loads(RUBRIC_CONFIG.read_text(encoding="utf-8"))
+
+
+def _ramp(v, lo, hi):
+    """lo -> 0, hi -> 100, clamped. Works in either direction."""
+    if v is None:
+        return None
+    if hi == lo:
+        return 100.0
+    t = (v - lo) / (hi - lo)
+    return max(0.0, min(100.0, t * 100.0))
+
+
+def rubric_for(r, cfg, today):
+    """-> (score, {component: value_or_None}, completeness_pct)."""
+    parts = {}
+
+    # award — 0 is a fact: they hold no distinction
+    top = r.get("recog_top")
+    parts["award"] = float(cfg["award"].get(top["tier"], 0)) if top else 0.0
+
+    # recency — only meaningful if there IS an award, else dropped
+    parts["recency"] = (float(cfg["recency"].get(top["era"], 50)) if top else None)
+
+    # rating — percentile of the WEIGHTED score, set by the caller
+    parts["rating"] = r.get("_rating_pct")
+
+    # lex — no Lexington-line station within reach is a real fact about place
+    lex = [r["subway"].get(k) for k in ("4", "5", "6") if r.get("subway")]
+    lex = [x for x in lex if x is not None]
+    if lex:
+        c = cfg["lex"]
+        parts["lex"] = _ramp(min(lex), c["worst_minutes"], c["best_minutes"])
+    else:
+        parts["lex"] = 0.0
+
+    # value — gap PERCENT, comparable across the price tiers; unknown if absent
+    c = cfg["value"]
+    parts["value"] = (_ramp(r["gap_pct"], c["zero_at_pct"], c["full_at_pct"])
+                      if r.get("gap_pct") is not None else None)
+
+    # evidence — what that value figure rests on; unknown when there is no figure
+    parts["evidence"] = (float(cfg["evidence"][r["gap_basis"]])
+                         if r.get("gap_basis") in cfg["evidence"] else None)
+
+    # window — days left to book. Flexibility, not urgency.
+    if r.get("end_date"):
+        try:
+            left = (date.fromisoformat(r["end_date"]) - today).days
+        except ValueError:
+            left = None
+        c = cfg["window"]
+        parts["window"] = _ramp(max(0, left), c["zero_at_days"], c["full_at_days"]) \
+            if left is not None else None
+    else:
+        parts["window"] = None
+
+    w = cfg["weights"]
+    live = {k: v for k, v in parts.items() if v is not None}
+    total_w = sum(w[k] for k in live)
+    if not total_w:
+        return None, parts, 0.0
+    score = sum(v * w[k] for k, v in live.items()) / total_w
+    completeness = 100.0 * total_w / sum(w[k] for k in parts)
+    return round(score, 1), {k: (round(v, 1) if v is not None else None)
+                             for k, v in parts.items()}, round(completeness, 1)
+
+
 MONTHS = {m: i for i, ms in enumerate(
     [("jan", "january"), ("feb", "february"), ("mar", "march"), ("apr", "april"),
      ("may",), ("jun", "june"), ("jul", "july"), ("aug", "august"),
@@ -946,6 +1031,44 @@ def build_payload():
         })
 
     con.close()
+
+    # --- rubric: a second pass, because the rating component is a PERCENTILE
+    # and so cannot be known until every restaurant has been read.
+    rcfg = load_rubric()
+    today = date.today()
+    scored = sorted((r["google"]["score"] for r in out
+                     if r.get("google") and r["google"].get("score") is not None))
+    for r in out:
+        g = r.get("google")
+        if g and g.get("score") is not None and scored:
+            below = sum(1 for x in scored if x < g["score"])
+            r["_rating_pct"] = 100.0 * below / len(scored)
+        else:
+            r["_rating_pct"] = None          # unknown, not bad
+    for r in out:
+        sc, parts, comp = rubric_for(r, rcfg, today)
+        r["rubric_raw"] = sc
+        r["rubric_parts"] = parts
+        r["rubric_completeness"] = comp
+        r.pop("_rating_pct", None)
+
+    # Redistributing a missing component's weight across the survivors quietly
+    # REWARDS having less data: Le Pavillon outscored Cafe Boulud largely
+    # because it has no published comparable, so its strong award and transit
+    # marks carried the weight that Cafe Boulud had to share with a real value
+    # figure. So the published score is shrunk toward the corpus mean in
+    # proportion to the weight that was missing -- the same correction, and for
+    # the same reason, as the Bayesian pull applied to thin Google ratings.
+    have = [r["rubric_raw"] for r in out if r["rubric_raw"] is not None]
+    corpus_mean = sum(have) / len(have) if have else 0.0
+    for r in out:
+        sc, comp = r["rubric_raw"], r["rubric_completeness"]
+        if sc is None:
+            r["rubric"] = None
+            continue
+        k = comp / 100.0
+        r["rubric"] = round(k * sc + (1 - k) * corpus_mean, 1)
+
     payload = {
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "season_label": SEASON_LABEL,
@@ -955,6 +1078,10 @@ def build_payload():
         "book_by": BOOK_BY,
         "program_end": PROGRAM_END,
         "tag_vocabulary": sorted(rules),
+        "rubric_weights": load_rubric()["weights"],
+        "rubric_mean": round(sum(r["rubric_raw"] for r in out
+                                 if r["rubric_raw"] is not None)
+                             / max(1, sum(1 for r in out if r["rubric_raw"] is not None)), 1),
         "google_mean": round(google_mean, 3),
         "google_prior": GOOGLE_PRIOR,
         "restaurants": out,

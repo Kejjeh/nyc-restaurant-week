@@ -1,0 +1,61 @@
+{
+  "_doc": {
+    "purpose": "A transparent composite grade. Every component is normalised to 0-100, weighted, and PUBLISHED alongside the total so the score can be argued with rather than taken on faith. Change the weights here and re-run src/export_site_data.py; no code edits.",
+    "missing_data_rule": "The distinction that keeps this honest: a component scores 0 only when the zero is a FACT (no award; no 4/5/6 within a 12-minute walk). When the value is simply UNKNOWN (no Google match, no printed end date, no comparable price) the component is dropped for that restaurant and its weight is redistributed across the rest. Scoring unknowns as zero would silently punish restaurants for our own gaps in coverage.",
+    "completeness": "Each restaurant also carries the share of weight that rested on real data. A 78 built on 100% evidence is not the same claim as a 78 built on 60%.",
+    "not_a_ranking_of_quality": "This grades fit against these seven axes only. It is not a claim about which food is better."
+  },
+
+  "weights": {
+    "award":    20,
+    "recency":  10,
+    "rating":   20,
+    "lex":      15,
+    "value":    15,
+    "evidence": 10,
+    "window":   10
+  },
+
+  "award": {
+    "_doc": "Value of the strongest distinction held. No award scores 0 -- that is a fact about the restaurant, not missing data.",
+    "Michelin star": 100,
+    "NYT 100 Best": 92,
+    "James Beard winner": 85,
+    "Michelin Bib Gourmand": 72,
+    "James Beard nominee": 60,
+    "James Beard semifinalist": 50,
+    "Michelin Plate": 40
+  },
+
+  "recency": {
+    "_doc": "How current that distinction is. Dropped entirely for restaurants with no award, so they are not penalised twice for the same absence.",
+    "current": 100,
+    "recent": 80,
+    "past": 55,
+    "historic": 35
+  },
+
+  "lex": {
+    "_doc": "Walk to the 4/5/6. A restaurant with no Lexington-line station inside MAX_WALK_MIN scores 0: that is a real fact about where it is.",
+    "best_minutes": 2,
+    "worst_minutes": 12
+  },
+
+  "value": {
+    "_doc": "Gap as a PERCENTAGE, which compares across the $30/$45/$60 tiers in a way dollars do not. Unknown when no comparable was published.",
+    "zero_at_pct": 0,
+    "full_at_pct": 55
+  },
+
+  "evidence": {
+    "_doc": "How much the value figure rests on. Deliberately separate from the gap itself, so a large estimate cannot masquerade as a large verified gap.",
+    "verified": 100,
+    "estimate": 45
+  },
+
+  "window": {
+    "_doc": "Days still left to book. Flexibility, NOT urgency -- a closing deadline is time pressure, not merit, and the site already flags it separately.",
+    "zero_at_days": 0,
+    "full_at_days": 30
+  }
+}

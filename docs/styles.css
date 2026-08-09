@@ -940,3 +940,13 @@ a:hover { text-decoration-thickness: 2px; }
 .rbRow.unknown .rbTrack { border-style: dashed; background: transparent; }
 .rbRow.unknown .rbFill { width: 0; }
 .rbRow.unknown .rbV { color: var(--ink-3); font-style: italic; }
+
+/* Compare: the booking cell. The platform name sits under the button so you
+   know what you are about to open, and a restaurant with no booking link says
+   so rather than pretending its homepage is one. */
+.cmpBook { white-space: nowrap; }
+.cmpVia {
+  display: block; margin-top: 3px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .04em;
+  color: var(--ink-3); text-transform: uppercase;
+}

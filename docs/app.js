@@ -1724,18 +1724,44 @@ function renderCompare() {
   });
 
   const tr = el('tr');
-  tr.append(el('th', 'cmpKey', ''));
+  tr.append(el('th', 'cmpKey', 'Book'));
   picks.forEach((r) => {
-    const td = el('td');
-    const href = r.links && r.links.reservation;
-    if (href) {
+    const td = el('td', 'cmpBook');
+    const L = r.links || {};
+    if (L.reservation) {
+      // Name the platform: you should know whether you are about to land on
+      // OpenTable or a bespoke widget before you click.
       const a = el('a', 'linkBtn primary', 'Book');
-      a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.href = L.reservation; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.title = `Book ${r.name} — ${bookingHost(L.reservation)}`;
       td.append(a);
-    } else td.textContent = '—';
+      td.append(el('span', 'cmpVia', bookingHost(L.reservation)));
+    } else if (L.website) {
+      // 256 of 645 have no booking link at all. Sending you to the restaurant's
+      // own site is still useful, but it is NOT a reservation link and must not
+      // be dressed as one — hence the quieter button and the honest label.
+      const a = el('a', 'linkBtn', 'Restaurant site');
+      a.href = L.website; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.title = `${r.name} publishes no booking link — try their own site or call`;
+      td.append(a);
+      td.append(el('span', 'cmpVia', 'no booking link'));
+    } else {
+      td.textContent = '—';
+    }
     tr.append(td);
   });
   t.append(tr);
+}
+
+/** Which platform a reservation url lands on, for the label. */
+function bookingHost(url) {
+  const m = /^https?:\/\/(?:www\.)?([^/]+)/i.exec(url || '');
+  const h = (m ? m[1] : '').toLowerCase();
+  if (h.includes('opentable')) return 'OpenTable';
+  if (h.includes('resy')) return 'Resy';
+  if (h.includes('sevenrooms')) return 'SevenRooms';
+  if (h.includes('tocktix') || h.includes('exploretock')) return 'Tock';
+  return h.replace(/^m\./, '') || 'link';
 }
 
 /** The Compare tab only exists once there is something to compare. */

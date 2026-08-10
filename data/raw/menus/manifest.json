@@ -1397,7 +1397,7 @@
  "psaraki": {
   "url": "https://nyc-tourism-public.s3.amazonaws.com/srw26/menus/49198-Psaraki-menu.pdf",
   "file": "49198-Psaraki-menu.pdf",
-  "sha256": "85048ea6135a8d3035ae8c23a72d31fb560ecfc99b7be53f0a834f26aa172d94"
+  "sha256": "d80228082ca833bbd2aab42e838e83535a0cfc917293b62dd72272b1776c3b84"
  },
  "maison-passerelle": {
   "url": "https://nyc-tourism-public.s3.amazonaws.com/srw26/menus/49698-MaisonPasserelle-menu.pdf",
@@ -1872,7 +1872,7 @@
  "casa-felix": {
   "url": "https://nyc-tourism-public.s3.amazonaws.com/srw26/menus/51080-CasaFelix-menu.pdf",
   "file": "51080-CasaFelix-menu.pdf",
-  "sha256": "4e05d80f43a8a46ce6e7a7f5021ac24d36326f61e8a087b199ef96f71fee97de"
+  "sha256": "69744b85aa641d9d68ee072d8a33cc06c926b669e125a867814e9b0e0ad7f990"
  },
  "brooklyn-chop-house-times-square": {
   "url": "https://nyc-tourism-public.s3.amazonaws.com/srw26/menus/48324-BrooklynChopHouse-TimesSquare-menu.pdf",
@@ -2348,5 +2348,20 @@
   "url": "https://nyc-tourism-public.s3.amazonaws.com/srw26/menus/50390-YongChuan-menu.pdf",
   "file": "50390-YongChuan-menu.pdf",
   "sha256": "d6e6a3cb27bc179f603b92e9171d93e573554cd0279b87ecd29060ffe8180163"
+ },
+ "meduza-mediterrania": {
+  "url": "https://nyc-tourism-public.s3.amazonaws.com/srw26/menus/51366-MeduzaMediterrania-menu.pdf",
+  "file": "51366-MeduzaMediterrania-menu.pdf",
+  "sha256": "3464ef14331cffbea2f7786829ec6545f6c459d9a6e3c6a2eab8da7af194cbf5"
+ },
+ "strange-delight": {
+  "url": "https://nyc-tourism-public.s3.amazonaws.com/srw26/menus/51363-StrangeDelight-menu.pdf",
+  "file": "51363-StrangeDelight-menu.pdf",
+  "sha256": "0769dd27e769237cdd4b83b15f3ef11e8fea12063fbebeca5027b2f441c46b24"
+ },
+ "stk-chelsea": {
+  "url": "https://nyc-tourism-public.s3.amazonaws.com/srw26/menus/51390-STKChelsea-menu.pdf",
+  "file": "51390-STKChelsea-menu.pdf",
+  "sha256": "279aa0953232965952776f49d69b942b81382f8d0f11f70c0858c6849e4b3d5b"
  }
 }

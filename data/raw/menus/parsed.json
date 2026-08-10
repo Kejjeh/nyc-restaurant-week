@@ -59774,5 +59774,197 @@
   "courses": [],
   "items": [],
   "raw_text": "YONG CHUAN\nNYC Restaurant Week Summer 2026\nMonday\u2013Friday Dinner (cid:127) Sunday Lunch (cid:127) Sunday Dinner (cid:127) $45\nDim Sum (Pick 2)\n(cid:127) Spicy Crawfish Dumpling\n(cid:127) Black Truffle Shrimp Dumpling\n(cid:127) Crystal Shrimp & Crab Meat Dumpling\nAppetizer (Pick 1)\n(cid:127) Ningbo Grilled Vegetables\n(cid:127) Crunchy Pickled Cucumber\n(cid:127) Wonton in Chili Oil\nEntr\u00e9e (Pick 1)\n(cid:127) Peking Duck\n(cid:127) Mediterranean Yellow Croaker Fillet\n(cid:127) Wagyu Beef\nServed with Pea Shoots in Special Sauce\nChef's Rice Selection (Pick 1)\n(cid:127) Yong Chuan Fried Rice\n(cid:127) Dried Scallop & Egg White Fried Rice\n(cid:127) Steamed Jasmine Rice\n90 Clinton Street, New York, NY 10002"
+ },
+ "meduza-mediterrania": {
+  "parse_quality": "partial",
+  "courses": [],
+  "items": [],
+  "raw_text": "NNEEWW YYOORRKK\nRREESSTTAAUURRAANNTT WWEEEEKK\nTHREE COURSES | $60 PER PERSON\nA PPETI ZER\ncchhoooossee oonnee\nspiced prawns* vg\ngarlic, calabrian chili, parsley, evoo, sea salt, cracked pepper\nroasted garlic hummus vg\nfattoush v\nromaine hearts, red onion, tomato, cucumber, radish,\nza\u2019atar, toasted lebanese flatbread\nwagyu carpaccio* +17\nromaine hearts, red onion, tomato, cucumber, radish,\nza\u2019atar, toasted lebanese flatbread\nEN T R EE\ncchhoooossee oonnee\nblack truffle cacio e pepe v\nchitarra, parmesan, black pepper\ngrilled branzino\ncharred lemon, evoo, fine herbs\nchicken milanese\npanko, arugula, tomato, shaved parmesan,\nbalsamic, lemon vinaigrette\npetite filet* +20\n6 oz, truffle butter, pomme pur\u00e9e, chives\nv | vegetarian vg | vegan\n*consuming raw or undercooked meats, poultry, seafood,\nor eggs may increase your risk of foodborne illness\n**A 20% gratuity will be added to all New York Restaurant Week Diners.\nMEDUZA33.COM | @MEDUZAMEDITERRANIA\nNNEEWW YYOORRKK\nRREESSTTAAUURRAANNTT WWEEEEKK\nTHREE COURSES | $60 PER PERSON\nDES SERT\ncchhoooossee oonnee\nolive oil cake\norange, cardamom\nwild berry butter cake\nrfeuilletine crumble, vanilla ice cream\npistachio baklava\nhoneycomb tuile, frosted pistachios,\npistachio gelato\nsorbet\nseasonal flavors\nMEDUZA33.COM | @MEDUZAMEDITERRANIA"
+ },
+ "strange-delight": {
+  "parse_quality": "failed",
+  "courses": [],
+  "items": [],
+  "raw_text": ""
+ },
+ "stk-chelsea": {
+  "parse_quality": "full",
+  "courses": [
+   "Dinner",
+   "Starter",
+   "Entr\u00e9e",
+   "Dessert"
+  ],
+  "items": [
+   {
+    "course": "Dinner",
+    "dish": "$60 | SELECT 1 FROM EACH COURSE",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Starter",
+    "dish": "BURRATA",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Starter",
+    "dish": "marinated beetroot",
+    "description": "pickled red onions - basil oil - crunchy sourdough",
+    "supplement_price": null
+   },
+   {
+    "course": "Starter",
+    "dish": "TUNA TARTARE TACOS* (3)",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Starter",
+    "dish": "hass avocado",
+    "description": "taro shell - soy-honey emulsion",
+    "supplement_price": null
+   },
+   {
+    "course": "Starter",
+    "dish": "LIL\u2019 BRGS* (additional $5)",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Starter",
+    "dish": "wagyu beef",
+    "description": "special sauce - sesame seed bun",
+    "supplement_price": null
+   },
+   {
+    "course": "Starter",
+    "dish": "HALF DOZEN OYSTERS* (additional $10)",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Starter",
+    "dish": "served on the half shell over ice",
+    "description": "mignonette - cocktail sauce - lemon",
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "MERMAID SURF & TURF",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "(2) 2oz filet medallions",
+    "description": "2 grilled shrimp - bearnaise",
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "STEAKHOUSE SKIRT 8oz*",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "confit fingerling",
+    "description": "parmesan gremolata - chimichurri sauce",
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "add grilled shrimp $6 each",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "MAPLE RUBBED SALMON*",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "pickled cherry tomatoes",
+    "description": "piquillo broccolini - olive dressing",
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "WILD MUSHROOM RISOTTO",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "pecorino",
+    "description": "braised mushrooms - baby spinach - shaved black truffle",
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "SHRIMP SCAMPI",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "saut\u00e9ed shrimp",
+    "description": "linguine - tomato - garlic white wine sauce",
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "STEAK UPGRADES*",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "FILET",
+    "description": "6oz (additional $15)",
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "AUSTRALIAN WAGYU FLAT IRON 8oz (additional $22)",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "OPTIONAL SIDES (additional $10 each)",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "yukon gold mashed potatoes | sweet corn pudding | creamed spinach",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Entr\u00e9e",
+    "dish": "parmesan truffle fries | tater tots | mac & cheese",
+    "description": null,
+    "supplement_price": null
+   },
+   {
+    "course": "Dessert",
+    "dish": "CHOCOLATE CAKE",
+    "description": "chocolate sauce",
+    "supplement_price": null
+   },
+   {
+    "course": "Dessert",
+    "dish": "CHEESECAKE (additional $5)",
+    "description": "raspberry coulis - berries",
+    "supplement_price": null
+   }
+  ],
+  "raw_text": "Dinner\nRESTAURANT WEEK\n$60 | SELECT 1 FROM EACH COURSE\nStarter\nBURRATA\nmarinated beetroot - pickled red onions - basil oil - crunchy sourdough\nTUNA TARTARE TACOS* (3)\nhass avocado - taro shell - soy-honey emulsion\nLIL\u2019 BRGS* (additional $5)\nwagyu beef - special sauce - sesame seed bun\nHALF DOZEN OYSTERS* (additional $10)\nserved on the half shell over ice - mignonette - cocktail sauce - lemon\nEntr\u00e9e\nMERMAID SURF & TURF\n(2) 2oz filet medallions - 2 grilled shrimp - bearnaise\nSTEAKHOUSE SKIRT 8oz*\nconfit fingerling - parmesan gremolata - chimichurri sauce\nadd grilled shrimp $6 each\nMAPLE RUBBED SALMON*\npickled cherry tomatoes - piquillo broccolini - olive dressing\nWILD MUSHROOM RISOTTO\npecorino - braised mushrooms - baby spinach - shaved black truffle\nSHRIMP SCAMPI\nsaut\u00e9ed shrimp - linguine - tomato - garlic white wine sauce\nSTEAK UPGRADES*\nFILET - 6oz (additional $15)\nAUSTRALIAN WAGYU FLAT IRON 8oz (additional $22)\nOPTIONAL SIDES (additional $10 each)\nyukon gold mashed potatoes | sweet corn pudding | creamed spinach\nparmesan truffle fries | tater tots | mac & cheese\nDessert\nCHOCOLATE CAKE - chocolate sauce\nCHEESECAKE (additional $5) - raspberry coulis - berries\n*These items may be served raw and/or undercooked. Consuming raw or undercooked meats, poultry, seafood,\nshellfish, or eggs may increase your risk of a food borne illness especially when you have a medical condition.\n**Tax & gratuity not included"
  }
 }

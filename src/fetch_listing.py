@@ -11,11 +11,34 @@ day's snapshot (stale pages must not mix across days).
 import datetime
 import json
 
-from config import LISTING_DIR, api_post
+from config import LISTING_DIR, MIN_ROWS, SEASON, api_post
 
 PAGES = LISTING_DIR / "pages"
 PAGES.mkdir(exist_ok=True)
 STAMP_F = PAGES / "_stamp"
+
+
+def validate_listing(rows, total, season, min_rows):
+    """Refuse an unhealthy listing BEFORE it can overwrite latest.json."""
+    if total == 0:
+        raise RuntimeError("API total=0: empty listing, refusing to overwrite")
+    if len(rows) < min_rows:
+        raise RuntimeError(
+            f"Only {len(rows)} unique records vs floor {min_rows}: listing too small"
+        )
+    if len(rows) < 0.9 * total:
+        raise RuntimeError(
+            f"Only {len(rows)} unique records vs API total {total}: pagination broke?"
+        )
+    sample = [u for u in (r.get("menuFileUrl") or "" for r in rows) if u][:25]
+    if sample and not any(season in u for u in sample):
+        raise RuntimeError(
+            f"No menuFileUrl in a {len(sample)}-url sample contains {season!r}: "
+            "new season? update config/season.json"
+        )
+    if not sample:
+        # early-season listings can pre-date the menu uploads entirely
+        print(f"warning: no menuFileUrl values yet (season {season} unverified)")
 
 
 def fetch_all(verbose=True):
@@ -52,10 +75,7 @@ def fetch_all(verbose=True):
             out.append(it)
     if verbose:
         print(f"fetched {len(items)} rows, {len(out)} unique slugs, API total={total}")
-    if len(out) < 0.9 * total:
-        raise RuntimeError(
-            f"Only {len(out)} unique records vs API total {total}: pagination broke?"
-        )
+    validate_listing(out, total, SEASON, MIN_ROWS)
     return out, first["lookup"], total, stamp
 
 

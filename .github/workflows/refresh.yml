@@ -54,6 +54,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Tests
+        run: python -m pytest -q tests/
+
       # refresh.py runs the whole chain in order, single-threaded on purpose:
       # fetch_listing -> fetch_details -> download_menus -> parse_menus ->
       # build_db -> tag_dishes -> enrich_recognition -> export_site_data ->

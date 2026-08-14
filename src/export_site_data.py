@@ -26,6 +26,11 @@ import unicodedata
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+# BOOK_BY is the program's headline deadline (drives the badge); PROGRAM_END is
+# the last extension week (drives the countdown). Both live in config/season.json,
+# which is the only file a season changeover edits.
+from config import BOOK_BY, PROGRAM_END, SEASON, SEASON_LABEL, SEASON_START, SEASON_YEAR
+
 ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / "data" / "processed" / "restaurant_week.sqlite"
 TAGS_CONFIG = ROOT / "config" / "dish_tags.json"
@@ -33,11 +38,6 @@ VERIFIED = ROOT / "config" / "verified_values.json"
 SUPPRESS = ROOT / "config" / "recognition_suppress.json"
 JB_RAW = ROOT / "data" / "raw" / "recognition" / "james_beard.json"
 OUT = ROOT / "docs" / "data" / "restaurants.json"
-
-SEASON_LABEL = "Summer 2026"
-SEASON_YEAR = 2026
-BOOK_BY = "2026-08-16"      # the program's headline deadline; drives the badge
-PROGRAM_END = "2026-09-06"  # last extension week; drives the countdown
 
 # ToS guards. matched_text is stored with 60 chars of context each side (up to
 # 143 chars) and 97 of 101 item-snippets are an entire dish + description. That

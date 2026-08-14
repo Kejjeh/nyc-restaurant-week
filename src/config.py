@@ -1,4 +1,5 @@
 """Shared config for the NYC Restaurant Week pipeline."""
+import datetime
 import json
 import re
 import time
@@ -16,7 +17,34 @@ CACHE_DIR = ROOT / "data" / "cache"
 for d in (MENUS_DIR, LISTING_DIR, DETAILS_DIR, PROCESSED, CACHE_DIR):
     d.mkdir(parents=True, exist_ok=True)
 
-SEASON = "srw26"  # summer 2026; verified from live menuFileUrl values
+
+def load_season(path):
+    """Season facts from config/season.json — the one file a changeover edits."""
+    s = json.loads(Path(path).read_text(encoding="utf-8"))
+    for k in ("code", "label", "year", "start", "book_by", "end", "min_rows"):
+        if k not in s:
+            raise ValueError(f"season.json missing key: {k}")
+    if not re.fullmatch(r"srw\d{2}", s["code"]):
+        raise ValueError(f"season.json code {s['code']!r} does not match srwNN")
+    for k in ("start", "book_by", "end"):
+        try:
+            datetime.date.fromisoformat(s[k])
+        except (TypeError, ValueError):
+            raise ValueError(f"season.json {k} {s[k]!r} is not an ISO date")
+    if s["book_by"] > s["end"]:
+        raise ValueError(f"season.json book_by {s['book_by']} is after end {s['end']}")
+    return s
+
+
+_season = load_season(ROOT / "config" / "season.json")
+SEASON = _season["code"]
+SEASON_LABEL = _season["label"]
+SEASON_YEAR = _season["year"]
+SEASON_START = _season["start"]
+BOOK_BY = _season["book_by"]
+PROGRAM_END = _season["end"]
+MIN_ROWS = _season["min_rows"]
+
 API_URL = "https://program-api.nyctourism.com/restaurant-week"
 SITE = "https://www.nyctourism.com"
 LISTING_PAGE = f"{SITE}/restaurant-week/"

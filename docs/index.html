@@ -8,7 +8,7 @@
 <title>NYC Restaurant Week — value dashboard</title>
 <meta name="description" content="Personal sort/filter tool for NYC Restaurant Week Summer 2026. Not a publication.">
 <meta name="theme-color" content="#0d6a5f">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=2">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230d6a5f'/%3E%3Ctext x='8' y='12' font-family='monospace' font-size='10' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%24%3C/text%3E%3C/svg%3E">
 </head>
 <body>
@@ -86,6 +86,9 @@
 </div>
 
 <main class="wrap results">
+  <!-- The season being over is a fact about the data, not a caveat about it:
+       quiet, and deliberately without the dismiss the estimate banner has. -->
+  <div class="banner quiet" id="seasonOver" hidden></div>
   <div class="banner" id="estBanner" hidden>
     <p><strong>Estimates crowd the top.</strong> This sort mixes verified gaps with heuristic
        ones, which overstate casual restaurants. Estimates are
@@ -105,7 +108,7 @@
         <span class="dot verified"></span> solid = verified gap
         <span class="dot estimate"></span> ring = estimate
         <span class="dot none"></span> small = no comparable
-        <span class="dot urgentDot"></span> red = closing soon
+        <span id="legendUrgent"><span class="dot urgentDot"></span> red = closing soon</span>
       </span>
       <span id="mapNote"></span>
     </div>
@@ -150,7 +153,7 @@
   <div id="rows"></div>
   <button type="button" class="showMore" id="showMore" hidden></button>
   <div class="empty" id="empty" hidden>
-    <p>Nothing matches those filters.</p>
+    <p id="emptyMsg">Nothing matches those filters.</p>
     <button type="button" class="btn" id="clearBtn2">Clear filters</button>
   </div>
 </main>
@@ -168,6 +171,9 @@
   </div>
 </footer>
 
-<script src="app.js"></script>
+<!-- ?v= is bumped whenever app.js or styles.css changes. Without it a cached
+     index.html can pair with a fresh app.js — which crashes boot the moment the
+     script reaches for an element the stale document does not have. -->
+<script src="app.js?v=2"></script>
 </body>
 </html>

@@ -537,6 +537,9 @@ a:hover { text-decoration-thickness: 2px; }
   border-radius: var(--r);
 }
 .banner[hidden] { display: none; }
+/* Same shape, no alarm: a season that has ended is a statement of fact and
+   must not borrow the amber the estimate caveat earns. */
+.banner.quiet { background: var(--surface); border-color: var(--rule); }
 .banner p { margin: 0; flex: 1 1 300px; font-size: 13px; color: var(--ink-2); }
 .banner strong { color: var(--ink); }
 .banner .pill { vertical-align: baseline; }
@@ -753,6 +756,10 @@ a:hover { text-decoration-thickness: 2px; }
   font-family: var(--mono); font-size: 11px; color: var(--ink-3);
 }
 .mapLegend { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
+/* The urgency key needs ONE node to hide in the archive, but its dot and label
+   are two legend items — `contents` gives it the node without a layout box. */
+#legendUrgent { display: contents; }
+#legendUrgent[hidden] { display: none; }
 .mapLegend .dot {
   width: 9px; height: 9px; border-radius: 50%; display: inline-block;
   margin-right: 2px; vertical-align: -1px;

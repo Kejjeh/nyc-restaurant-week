@@ -15,6 +15,9 @@ const DATA_URL = 'data/restaurants.json';
 /* ---------- helpers ----------------------------------------------------- */
 
 const $ = (sel) => document.querySelector(sel);
+/* For elements added after a release: a browser holding a cached index.html
+   against a fresh app.js must degrade, not die halfway through apply(). */
+const $opt = (sel) => document.querySelector(sel) || el('span');
 const el = (tag, cls, text) => {
   const n = document.createElement(tag);
   if (cls) n.className = cls;
@@ -365,6 +368,16 @@ function urgencyHorizon() {
   return DATA.program_end && h > DATA.program_end ? DATA.program_end : h;
 }
 
+/* Where the season is, relative to now. Past program_end nothing can be booked
+   at all, and copy written for a live programme ("days left", "closing soon",
+   "no dates left") stops being true — 'archive' is what switches it. */
+function seasonPhase() {
+  const t = todayISO();
+  if (DATA.program_end && t > DATA.program_end) return 'archive';
+  if (DATA.book_by && t > DATA.book_by) return 'extensions';
+  return 'core';
+}
+
 function hasEnded(r) {
   return !!(r.end_date && r.end_date < todayISO());
 }
@@ -498,6 +511,11 @@ function renderRow(r) {
       + `${x.era ? ` · ${ERA_LABEL[x.era]}` : ''}`
       + `${x.name_match_only ? ' · name match only' : ''}`));
   });
+  // Places close for good between seasons; the listing never catches up.
+  if (r.google && r.google.closed) {
+    pills.append(pill('warn', 'permanently closed',
+      'Google reports this location as permanently closed'));
+  }
   if (r.google && r.google.rating != null) {
     const g = r.google;
     pills.append(pill('quiet',
@@ -627,6 +645,8 @@ function renderDetail(r) {
     ? r.google.rating + ' from ' + r.google.reviews.toLocaleString() + ' reviews'
       + ' \u00b7 weighted ' + r.google.score.toFixed(2)
     : null, true);
+  field(dl, 'Google status', r.google && r.google.closed
+    ? 'Reported permanently closed \u2014 the rating above is what it closed with' : null);
   field(dl, 'Outdoor seating', outdoorText(r));
   field(dl, 'Address', r.address || (r.borough ? `${r.borough} — address unavailable` : null));
   field(dl, 'Final-list rank', r.rank != null ? `#${r.rank} of 15` : null, true);
@@ -1019,6 +1039,8 @@ const PRESETS = [
   },
   {
     key: 'urgent', label: 'Closing soon',
+    // Nothing closes once everything has closed.
+    show: () => seasonPhase() !== 'archive',
     count: () => ROWS.filter(isUrgent).length,
     is: () => FILTERS.endingBy === urgencyHorizon() && FILTERS.bookableBy === todayISO(),
     set() {
@@ -1208,6 +1230,14 @@ function apply() {
   const urgent = RESULTS.filter(isUrgent).length;
   $('#urgentCount').textContent = urgent ? `· ${urgent} ending by ${fmtDate(urgencyHorizon())}` : '';
   $('#empty').hidden = RESULTS.length !== 0;
+  // A date past the last window can never match, whatever else is set, so
+  // "nothing matches those filters" would send you loosening the wrong ones.
+  const deadDate = FILTERS.bookableBy && DATA.program_end
+    && FILTERS.bookableBy > DATA.program_end;
+  $opt('#emptyMsg').textContent = deadDate
+    ? `No window reached ${fmtDate(FILTERS.bookableBy)} — the season ended `
+      + `${fmtDate(DATA.program_end)}. Clear the date filter to see the full season.`
+    : 'Nothing matches those filters.';
 
   const n = activeCount();
   const badge = $('#filterCount');
@@ -1441,14 +1471,20 @@ function renderStats() {
   const today = todayISO();
   const daysLeft = Math.max(0, Math.round(
     (Date.parse(`${DATA.program_end || '2026-09-06'}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 864e5));
-  const soon = all.filter(isUrgent).length;
+  // Past the end, both date tiles become facts about a finished season rather
+  // than a countdown: "0 days left" and "0 close by Sep 6" are each false.
+  const over = seasonPhase() === 'archive';
+  const soon = all.filter(over
+    ? (r) => r.end_date && r.end_date <= urgencyHorizon()
+    : isUrgent).length;
   const stars = all.filter((r) => (r.recognition || [])
     .some((x) => x.source === 'michelin' && /star/.test(x.level || ''))).length;
 
   const tiles = [
     { n: all.length, k: 'restaurants' },
-    { n: daysLeft, k: 'days left' },
-    { n: soon, k: `close by ${fmtDate(urgencyHorizon())}`, cls: soon ? 'crit' : null },
+    over ? { n: fmtDate(DATA.program_end), k: 'season ended' } : { n: daysLeft, k: 'days left' },
+    { n: soon, k: `${over ? 'ended' : 'close'} by ${fmtDate(urgencyHorizon())}`,
+      cls: !over && soon ? 'crit' : null },
     { n: all.filter((r) => r.gap_basis === 'verified').length, k: 'verified gaps', cls: 'value' },
     { n: stars, k: 'michelin stars' },
     { n: SAVED.size, k: 'you saved' },
@@ -1625,7 +1661,7 @@ function renderPlan() {
       });
       if (!shown.length) {
         sel.disabled = true;
-        none.textContent = 'No dates left';
+        none.textContent = seasonPhase() === 'archive' ? 'Season over' : 'No dates left';
       }
       sel.addEventListener('change', () => {
         if (sel.value) PLAN.set(r.slug, sel.value); else PLAN.delete(r.slug);
@@ -1649,8 +1685,9 @@ function renderPlan() {
   };
 
   section('Scheduled', dated);
-  section('Not yet scheduled', undated,
-    'The date list for each is limited to days it is actually open — inside its window, and not a Saturday or a Sunday it does not serve.');
+  section('Not yet scheduled', undated, seasonPhase() === 'archive'
+    ? 'The season is over, so these are what never got a date. Kept as part of the record.'
+    : 'The date list for each is limited to days it is actually open — inside its window, and not a Saturday or a Sunday it does not serve.');
 }
 
 /* ---------- compare ------------------------------------------------------ */
@@ -1914,6 +1951,9 @@ function popupFor(r) {
 
 function drawMarkers() {
   if (!MAP || !window.L) return;
+  // No marker can be red in the archive, and a key to a colour that isn't
+  // there reads as "none of these are closing soon" rather than "none can be".
+  $('#legendUrgent').hidden = seasonPhase() === 'archive';
   if (MAP_LAYER) MAP_LAYER.remove();
   MAP_LAYER = L.layerGroup().addTo(MAP);
 
@@ -2056,8 +2096,10 @@ async function boot() {
     `${ROWS.length} participants · listing snapshot ${DATA.snapshot_date || '—'} · ` +
     `verified facts hand-checked ${DATA.verified_asof || '—'} · built ${(DATA.generated_at || '').slice(0, 10)}`;
 
-  // Default view: everything still bookable today, biggest gap first.
-  FILTERS.bookableBy = todayISO();
+  // Default view: everything still bookable today, biggest gap first. In the
+  // archive that date matches nothing, so the season opens whole rather than
+  // as "0 of 636" blamed on filters nobody set.
+  if (seasonPhase() !== 'archive') FILTERS.bookableBy = todayISO();
   readHash();
 
   $('#q').addEventListener('input', (e) => { QUERY = fold(e.target.value.trim()); apply(); });
@@ -2070,6 +2112,21 @@ async function boot() {
   // Event as its `silent` argument, which is truthy, and skip the re-render.
   $('#clearBtn').addEventListener('click', () => clearAll());
   $('#clearBtn2').addEventListener('click', () => clearAll());
+
+  // Fixed for the life of the page — the phase cannot change under you, so
+  // unlike the estimate caveat this is set once and never re-evaluated.
+  if (seasonPhase() === 'archive') {
+    const over = $opt('#seasonOver');
+    const p = el('p');
+    p.append(el('strong', null, `${DATA.season_label || 'The season'} has ended.`));
+    p.append(document.createTextNode(DATA.season_start
+      ? ` The programme ran ${fmtDate(DATA.season_start)} – ${fmtDate(DATA.program_end)}.`
+      : ` The last windows closed ${fmtDate(DATA.program_end)}.`));
+    p.append(document.createTextNode(
+      ' This is the full-season archive: every participant is listed, none is still bookable.'));
+    over.append(p);
+    over.hidden = false;
+  }
 
   // The estimate caveat only matters while estimates are actually in view.
   const banner = $('#estBanner');

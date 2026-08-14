@@ -56,9 +56,21 @@ const todayISO = () => {
 
 /* Anything can write to localStorage; a corrupt value must not cost the whole
    page, which is what an unguarded parse at module scope would do. */
+/* Every localStorage touch goes through these three. Access itself can throw
+   -- a browser set to block all cookies raises on the property, not merely on
+   the call -- and Safari's private mode throws on write. Unguarded, the read
+   at boot took the whole page down and the write took the click with it: the
+   star did nothing, because persistSaved() threw before the handler could
+   repaint it. Losing persistence is the most a full disk should ever cost. */
+const recall = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
+const store = (key, value) => {
+  try { localStorage.setItem(key, value); return true; } catch { return false; }
+};
+const forget = (key) => { try { localStorage.removeItem(key); } catch { /* already gone */ } };
+
 function readJSON(key, fallback) {
   try {
-    const v = JSON.parse(localStorage.getItem(key));
+    const v = JSON.parse(recall(key));
     return v && typeof v === 'object' ? v : fallback;
   } catch { return fallback; }
 }
@@ -69,6 +81,15 @@ const addDays = (iso, n) => {
   const d = new Date(`${iso}T12:00:00Z`);
   d.setUTCDate(d.getUTCDate() + n);
   return d.toISOString().slice(0, 10);
+};
+
+/* Round-trip, not just a shape match: Date.parse accepts "2026-02-30" and
+   quietly rolls it to March 2, so the regex alone would pass a day that does
+   not exist. Reserialising is the only check that catches it. */
+const isISODate = (s) => {
+  if (typeof s !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+  const d = new Date(`${s}T12:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s;
 };
 
 /** Format an ISO date as "Aug 16" without touching timezones. */
@@ -137,9 +158,9 @@ let STATE_SEASON = LEGACY_SEASON;
 let SAVED = new Set();
 let PLAN = new Map();
 const persistSaved = () =>
-  localStorage.setItem(`rw-saved:${STATE_SEASON}`, JSON.stringify([...SAVED]));
+  store(`rw-saved:${STATE_SEASON}`, JSON.stringify([...SAVED]));
 const persistPlan = () =>
-  localStorage.setItem(`rw-plan:${STATE_SEASON}`, JSON.stringify(Object.fromEntries(PLAN)));
+  store(`rw-plan:${STATE_SEASON}`, JSON.stringify(Object.fromEntries(PLAN)));
 
 function loadState(code) {
   STATE_SEASON = code;
@@ -152,11 +173,12 @@ function loadState(code) {
    that makes this run once; an existing namespaced value is never clobbered. */
 function migrateLegacyState() {
   for (const base of ['rw-saved', 'rw-plan']) {
-    const old = localStorage.getItem(base);
+    const old = recall(base);
     if (old == null) continue;
     const key = `${base}:${LEGACY_SEASON}`;
-    if (localStorage.getItem(key) == null) localStorage.setItem(key, old);
-    localStorage.removeItem(base);
+    // Drop the legacy key only once the copy has actually landed, or a refused
+    // write would discard the shortlist it was supposed to carry over.
+    if (recall(key) != null || store(key, old)) forget(base);
   }
 }
 
@@ -399,6 +421,20 @@ const SORTS = {
   walk_asc:     (a, b) => cmpNullLast(walkMin(a), walkMin(b), 1) || a._name.localeCompare(b._name),
   name_asc:     (a, b) => a._name.localeCompare(b._name),
   rank_asc:     (a, b) => cmpNullLast(a.rank, b.rank, 1) || a._name.localeCompare(b._name),
+};
+
+/* Links come from the listing API and, for your own places, from a file you
+   type by hand -- and a bare "www.joesbar.com" in an href is a RELATIVE path,
+   so the button would quietly navigate off the dashboard to a 404 instead of
+   to the restaurant. Anything that is not an absolute http(s) URL is dropped
+   rather than rendered as a link that lies about where it goes.
+   No base is passed to URL() on purpose: with one, "www.joesbar.com" resolves
+   against this page and comes back with an http: protocol -- passing the very
+   check it needs to fail. Without one, a relative string throws, which is the
+   answer we want. */
+const isHttpURL = (u) => {
+  if (!u) return false;
+  try { return /^https?:$/.test(new URL(u).protocol); } catch { return false; }
 };
 
 /* ---------- rendering --------------------------------------------------- */
@@ -765,7 +801,7 @@ function renderDetail(r) {
       const label = `${x.tier || RECOG_LABEL[x.source] || x.source}`
         + `${x.year ? ` (${x.year})` : ''}`
         + `${x.era && x.era !== 'current' ? ` — ${ERA_LABEL[x.era].toLowerCase()}` : ''}`;
-      if (x.url) {
+      if (isHttpURL(x.url)) {
         const a = el('a', null, label);
         a.href = x.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
         li.append(a);
@@ -871,7 +907,7 @@ function renderDetail(r) {
           t.price_usd != null ? `${t.item} — $${t.price_usd}` : t.item));
       }
       if (t.snippet) li.append(el('q', null, t.snippet));
-      if (t.url) {
+      if (isHttpURL(t.url)) {
         const a = el('a', 'snipSrc', 'source');
         a.href = t.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
         li.append(a);
@@ -913,7 +949,7 @@ function renderDetail(r) {
   });
   links.append(save);
   const addLink = (href, text, primary) => {
-    if (!href) return;
+    if (!isHttpURL(href)) return;
     const a = el('a', `linkBtn${primary ? ' primary' : ''}`, text);
     a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
     links.append(a);
@@ -1442,19 +1478,46 @@ function writeHash() {
   history.replaceState(null, '', s ? `#${s}` : location.pathname + location.search);
 }
 
+/** Every value a facet could legitimately hold, from the loaded roster plus
+ *  whatever the facet seeds itself with. */
+function knownFacetValues(f) {
+  const out = new Set((f.seed ? f.seed() : []).map(String));
+  ROWS.forEach((r) => f.values(r).forEach((v) => out.add(String(v))));
+  return out;
+}
+
 function readHash() {
   const raw = location.hash.replace(/^#/, '');
   if (!raw) return;
   const p = new URLSearchParams(raw);
   FACETS.forEach((f) => {
     const v = p.get(f.key);
-    if (v) v.split('~').filter(Boolean).forEach((x) => FILTERS[f.key].add(x));
+    if (!v) return;
+    // Only values the roster can actually produce. An unknown one used to be
+    // accepted, so a mistyped or last-season value added a chip that could
+    // match nothing and the page read "0 of 636" -- blaming a filter for a
+    // value that does not exist. Seeded values count as known even at zero
+    // rows: a configured dish tag nothing matched is still a real choice.
+    const known = knownFacetValues(f);
+    v.split('~').forEach((x) => { if (known.has(x)) FILTERS[f.key].add(x); });
   });
+  // Everything below arrives as user-editable text -- a forwarded link, a
+  // truncated paste, a hand-edit -- so a value that cannot be read is IGNORED
+  // rather than coerced, leaving the page as though the token were absent.
+  // Coercing was never harmless: `by=garbage` compared lexically against every
+  // end_date, filtered the whole roster out, announced that the season had
+  // ended, and left the date control blank, because a type=date input silently
+  // refuses a value it cannot parse -- so nothing on screen could clear it.
   const by = p.get('by');
-  if (by) FILTERS.bookableBy = by === 'any' ? null : by;
-  const mr = p.get('minr');
-  FILTERS.minRating = mr ? parseFloat(mr) : null;
-  if (p.get('to')) FILTERS.endingBy = p.get('to');
+  if (by === 'any') FILTERS.bookableBy = null;
+  else if (isISODate(by)) FILTERS.bookableBy = by;
+  // parseFloat('abc') is NaN, which is != null and so counted as an active
+  // filter, printed a "Rating NaN+" chip, and compared false against every
+  // score -- silently dropping every unrated restaurant.
+  const mr = Number(p.get('minr'));
+  FILTERS.minRating = p.get('minr') && Number.isFinite(mr) && mr >= 0 && mr <= 5
+    ? mr : null;
+  if (isISODate(p.get('to'))) FILTERS.endingBy = p.get('to');
   if (p.get('saved') === '1') FILTERS.savedOnly = true;
   if (p.get('q')) { QUERY = fold(p.get('q')); $('#q').value = p.get('q'); }
   // Object.hasOwn, not truthiness: "sort=constructor" inherits from
@@ -1903,7 +1966,7 @@ function renderPlan() {
       }
       row.append(pick);
 
-      if (r.links && r.links.reservation) {
+      if (r.links && isHttpURL(r.links.reservation)) {
         const a = el('a', 'linkBtn primary', 'Book');
         a.href = r.links.reservation; a.target = '_blank'; a.rel = 'noopener noreferrer';
         row.append(a);
@@ -2066,7 +2129,7 @@ function renderCompare() {
   picks.forEach((r) => {
     const td = el('td', 'cmpBook');
     const L = r.links || {};
-    if (L.reservation) {
+    if (isHttpURL(L.reservation)) {
       // Name the platform: you should know whether you are about to land on
       // OpenTable or a bespoke widget before you click.
       const a = el('a', 'linkBtn primary', 'Book');
@@ -2074,7 +2137,7 @@ function renderCompare() {
       a.title = `Book ${r.name} — ${bookingHost(L.reservation)}`;
       td.append(a);
       td.append(el('span', 'cmpVia', bookingHost(L.reservation)));
-    } else if (L.website) {
+    } else if (isHttpURL(L.website)) {
       // 256 of 645 have no booking link at all. Sending you to the restaurant's
       // own site is still useful, but it is NOT a reservation link and must not
       // be dressed as one — hence the quieter button and the honest label.
@@ -2193,7 +2256,7 @@ function popupFor(r) {
             : `Runs through ${fmtDate(r.end_date)}`));
 
   const acts = el('div', 'acts');
-  if (r.links && r.links.reservation) {
+  if (r.links && isHttpURL(r.links.reservation)) {
     const a = el('a', 'primary', 'Book');
     a.href = r.links.reservation; a.target = '_blank'; a.rel = 'noopener noreferrer';
     acts.append(a);
@@ -2306,14 +2369,14 @@ function setView(v) {
 /* ---------- theme ------------------------------------------------------- */
 
 function initTheme() {
-  const saved = localStorage.getItem('rw-theme');
+  const saved = recall('rw-theme');
   if (saved) document.documentElement.dataset.theme = saved;
   $('#themeToggle').addEventListener('click', () => {
     const cur = document.documentElement.dataset.theme
       || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     const next = cur === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
-    localStorage.setItem('rw-theme', next);
+    store('rw-theme', next);
     if (MAP) { paintTiles(); drawMarkers(); }   // tiles + marker colours are themed
   });
 }
@@ -2512,9 +2575,9 @@ async function boot() {
   const banner = $('#estBanner');
   // Read the flag on every apply(), not once at boot — capturing it in a const
   // meant the next filter/sort/keystroke un-dismissed the banner.
-  const isDismissed = () => localStorage.getItem('rw-banner') === 'off';
+  const isDismissed = () => recall('rw-banner') === 'off';
   $('#dismissBanner').addEventListener('click', () => {
-    localStorage.setItem('rw-banner', 'off');
+    store('rw-banner', 'off');
     banner.hidden = true;
   });
   $('#verifiedOnly').addEventListener('click', () => {
@@ -2599,6 +2662,11 @@ async function boot() {
     if (code && SEASON && code !== SEASON.code) { switchSeason(code); return; }
     const want = wantedView();
     clearAll(true);
+    // The same default boot applies, for the same reason: an absent `by` is
+    // "no state yet", not "cleared" -- every URL the page writes says `any`
+    // explicitly. Without this, one hand-written link gave 635 rows opened in
+    // a fresh tab and 636 typed into the bar of the page already showing.
+    if (seasonPhase() !== 'archive') FILTERS.bookableBy = todayISO();
     readHash();
     VIEW = want;          // so the writeHash() inside apply() preserves it
     apply();

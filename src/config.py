@@ -19,7 +19,7 @@ for d in (MENUS_DIR, LISTING_DIR, DETAILS_DIR, PROCESSED, CACHE_DIR):
 
 
 def load_season(path):
-    """Season facts from config/season.json — the one file a changeover edits."""
+    """Season facts from config/season.json -- the one file a changeover edits."""
     s = json.loads(Path(path).read_text(encoding="utf-8"))
     for k in ("code", "label", "year", "start", "book_by", "end", "min_rows"):
         if k not in s:

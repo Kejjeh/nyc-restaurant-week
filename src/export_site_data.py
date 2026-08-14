@@ -1,8 +1,9 @@
 """Export the dashboard payload: docs/data/restaurants.json.
 
-Usage: python src/export_site_data.py [--check] [--quiet]
+Usage: python src/export_site_data.py [--check] [--quiet] [--allow-shrink]
   --check  build and validate the payload, print the report, write nothing
   --quiet  suppress the per-section summary
+  --allow-shrink  write even when the roster lost more than a fifth of its rows
 
 ToS (nyctourism.com: personal/noncommercial, no republication). This exporter
 emits DERIVED/FACTUAL fields only. It must never write `menus.raw_text`, a
@@ -23,7 +24,7 @@ import sqlite3
 import sys
 import tempfile
 import unicodedata
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 # BOOK_BY is the program's headline deadline (drives the badge); PROGRAM_END is
@@ -386,6 +387,16 @@ def _ramp(v, lo, hi):
     return max(0.0, min(100.0, t * 100.0))
 
 
+def scoring_day(today=None, program_end=PROGRAM_END):
+    """The day the window component counts down from, clamped to PROGRAM_END.
+
+    Past the last extension week the countdown is over for every restaurant
+    alike, so freezing it there costs nothing live and buys determinism: a
+    post-season re-export must not silently reshuffle every published grade.
+    """
+    return min(today or date.today(), date.fromisoformat(program_end))
+
+
 def rubric_for(r, cfg, today):
     """-> (score, {component: value_or_None}, completeness_pct)."""
     parts = {}
@@ -526,8 +537,13 @@ def jload(raw, default=None):
 # end dates
 # --------------------------------------------------------------------------
 
-def end_date_from_weeks(weeks):
-    """Last week label -> ISO end date. 'Week 7 (Sept 1 - Sept 6)' -> 2026-09-06."""
+def end_date_from_weeks(weeks, year=SEASON_YEAR):
+    """Last week label -> ISO end date. 'Week 7 (Sept 1 - Sept 6)' -> 2026-09-06.
+
+    The label carries a month and a day but never a year, so `year` has to come
+    from the season -- a winter roster stamped with the summer year lands in the
+    past and renders every restaurant closed.
+    """
     if not weeks:
         return None
     label = str(weeks[-1])
@@ -542,9 +558,32 @@ def end_date_from_weeks(weeks):
     if not month:
         return None
     try:
-        return date(SEASON_YEAR, month, int(m.group("d"))).isoformat()
+        return date(year, month, int(m.group("d"))).isoformat()
     except ValueError:
         return None
+
+
+# A restaurant may leave the program early, so the window opens well before the
+# headline deadline; 60 days covers every pre-BOOK_BY week a season can have.
+END_WINDOW_LEAD_DAYS = 60
+
+
+def assert_end_dates_in_window(rows, book_by, program_end):
+    """Every non-null end_date must land in [book_by - 60 days, program_end].
+
+    A date outside that window means the roster and config/season.json disagree
+    about which season this is -- which is exactly what a stale SEASON_YEAR
+    produces, silently, on every row.
+    """
+    lo = (date.fromisoformat(book_by)
+          - timedelta(days=END_WINDOW_LEAD_DAYS)).isoformat()
+    bad = [(r["slug"], r["end_date"]) for r in rows
+           if r.get("end_date") and not lo <= r["end_date"] <= program_end]
+    if bad:
+        raise SystemExit(
+            f"END DATE OUT OF SEASON [{lo} .. {program_end}] -- season.json stale?"
+            "\n  " + "\n  ".join(f"{s}: {d}" for s, d in bad[:20]))
+    return True
 
 
 # --------------------------------------------------------------------------
@@ -1061,10 +1100,12 @@ def build_payload():
 
     con.close()
 
+    assert_end_dates_in_window(out, BOOK_BY, PROGRAM_END)
+
     # --- rubric: a second pass, because the rating component is a PERCENTILE
     # and so cannot be known until every restaurant has been read.
     rcfg = load_rubric()
-    today = date.today()
+    today = scoring_day()
     scored = sorted((r["google"]["score"] for r in out
                      if r.get("google") and r["google"].get("score") is not None))
     for r in out:
@@ -1096,8 +1137,8 @@ def build_payload():
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "season_label": SEASON_LABEL,
         "snapshot_date": con_snapshot(),
-        "verified_asof": json.loads(VERIFIED.read_text(encoding="utf-8"))
-            ["_doc"]["provenance"].split()[1],
+        "verified_asof": verified_asof(json.loads(VERIFIED.read_text(encoding="utf-8"))
+                                       ["_doc"]["provenance"]),
         "book_by": BOOK_BY,
         "program_end": PROGRAM_END,
         "tag_vocabulary": sorted(rules),
@@ -1110,6 +1151,21 @@ def build_payload():
         "restaurants": out,
     }
     return payload, stats, tags_dropped, recog_dropped
+
+
+VERIFIED_ASOF_RE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
+
+
+def verified_asof(provenance):
+    """The transcription date out of _doc.provenance, found by shape not by
+    position -- the sentence is prose, and rewording it used to silently change
+    a published date rather than fail."""
+    m = VERIFIED_ASOF_RE.search(provenance or "")
+    if not m:
+        raise SystemExit(
+            "verified_values.json _doc.provenance carries no ISO date "
+            "(YYYY-MM-DD); verified_asof cannot be published without one.")
+    return m.group(0)
 
 
 def con_snapshot():
@@ -1144,25 +1200,52 @@ def assert_tos_clean(payload):
 
     walk(payload, "$")
 
+    # Both snippet sources face the same length and overlap bar. They are
+    # checked SEPARATELY because they quote different documents -- the RW menu
+    # PDF and the restaurant's own website -- so a run shared across the two is
+    # not a contiguous passage of either.
     for r in payload["restaurants"]:
-        seen = []
-        for t in r["tags"]:
-            snip = t.get("snippet")
-            if not snip:
-                continue
-            if len(snip) > SNIPPET_PAD * 2 + 60:
-                problems.append(f"{r['slug']}: snippet too long ({len(snip)})")
-            if any(_overlaps(snip, s) for s in seen):
-                problems.append(f"{r['slug']}: overlapping snippets survived")
-            seen.append(snip)
+        for field in ("tags", "offsite_tags"):
+            seen = []
+            for t in r.get(field, []):
+                snip = t.get("snippet")
+                if not snip:
+                    continue
+                if len(snip) > SNIPPET_PAD * 2 + 60:
+                    problems.append(
+                        f"{r['slug']}: {field} snippet too long ({len(snip)})")
+                if any(_overlaps(snip, s) for s in seen):
+                    problems.append(
+                        f"{r['slug']}: overlapping {field} snippets survived")
+                seen.append(snip)
     if problems:
         raise SystemExit("ToS CHECK FAILED:\n  " + "\n  ".join(problems[:20]))
     return True
 
 
+SHRINK_FLOOR = 0.80
+
+
+def assert_not_shrunk(old_count, new_count, allow=False):
+    """Refuse to replace a published roster with one under 80% of its size.
+
+    A half-fetched listing or a partly built DB produces a perfectly valid
+    payload that is simply too small, and the weekly job would commit it without
+    a murmur. --allow-shrink is the deliberate override for the season that
+    really did lose that many.
+    """
+    if allow or not old_count or new_count >= old_count * SHRINK_FLOOR:
+        return True
+    raise SystemExit(
+        f"REFUSING TO SHRINK the payload: {old_count} -> {new_count} restaurants"
+        f" ({new_count / old_count:.0%} of what is published)."
+        " Re-run the fetch, or pass --allow-shrink if the drop is real.")
+
+
 def main():
     check = "--check" in sys.argv
     quiet = "--quiet" in sys.argv
+    allow_shrink = "--allow-shrink" in sys.argv
 
     payload, stats, tags_dropped, recog_dropped = build_payload()
     assert_tos_clean(payload)
@@ -1172,16 +1255,18 @@ def main():
     # `generated_at` is a wall-clock stamp, so a naive write would make the
     # payload differ on every run and the weekly Actions job would commit churn
     # forever. Rewrite only when something OTHER than the stamp changed.
-    unchanged = False
+    unchanged, old_n = False, 0
     if OUT.exists():
         try:
             old = json.loads(OUT.read_text(encoding="utf-8"))
+            old_n = len(old.get("restaurants", []))
             unchanged = ({k: v for k, v in old.items() if k != "generated_at"}
                          == {k: v for k, v in payload.items() if k != "generated_at"})
         except (ValueError, OSError):
             unchanged = False
 
     if not check and not unchanged:
+        assert_not_shrunk(old_n, len(payload["restaurants"]), allow_shrink)
         OUT.parent.mkdir(parents=True, exist_ok=True)
         # build in a temp dir then copy (some mounted filesystems break unlink)
         tmp = Path(tempfile.mkdtemp()) / OUT.name

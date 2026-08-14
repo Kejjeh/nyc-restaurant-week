@@ -25,6 +25,13 @@ def load_json(path, default):
     except (OSError, json.JSONDecodeError):
         return default
 
+
+def prune(parsed, manifest_slugs):
+    """Progress is a skip list, so a slug the downloader dropped has to leave it —
+    otherwise last season's parse is kept forever."""
+    return {s: v for s, v in parsed.items() if s in manifest_slugs}
+
+
 COURSE_PAT = re.compile(
     r"^\s*(first course|second course|third course|starters?|appetizers?|"
     r"to start|entr[ée]es?|mains?|main course|desserts?|dolci|postres|"
@@ -97,7 +104,7 @@ def grade(text, courses, items):
 def main():
     manifest = json.loads((MENUS_DIR / "manifest.json").read_text())
     progress = MENUS_DIR / "parsed-progress.json"
-    out = load_json(progress, {})
+    out = prune(load_json(progress, {}), set(manifest))
     n = 0
     for slug, meta in manifest.items():
         if slug in out:

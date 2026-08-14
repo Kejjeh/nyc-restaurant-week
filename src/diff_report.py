@@ -9,6 +9,12 @@ def index(snap):
     return {it["slug"]: it for it in snap["items"]}
 
 
+def season_boundary(old, new):
+    """A roster replaced in both directions is a changeover, not a diff: every
+    slug would read DROPPED/added and every shortlist alert would be a lie."""
+    return len(old - new) > len(old) / 2 and len(new - old) > len(new) / 2
+
+
 def main():
     snaps = sorted(LISTING_DIR.glob("snapshot-*.json"))
     if len(snaps) < 2:
@@ -16,6 +22,12 @@ def main():
         return 0
     old_p, new_p = snaps[-2], snaps[-1]
     old, new = index(json.loads(old_p.read_text())), index(json.loads(new_p.read_text()))
+    added = sorted(set(new) - set(old))
+    dropped = sorted(set(old) - set(new))
+    if season_boundary(set(old), set(new)):
+        print(f"season boundary — diff suppressed "
+              f"(roster replaced: {len(dropped)} dropped, {len(added)} added)")
+        return 0
     # shortlist call-out first: any change touching config/shortlist.json slugs
     # parents: [0]=data/raw, [1]=data, [2]=repo root. parents[1] resolved to
     # data/config/shortlist.json, which never exists, so the whole SHORTLIST
@@ -42,8 +54,6 @@ def main():
         else:
             print("  none — shortlist unchanged")
         print("#" * 60)
-    added = sorted(set(new) - set(old))
-    dropped = sorted(set(old) - set(new))
     print(f"# Diff: {old_p.name} -> {new_p.name}")
     print(f"added ({len(added)}):")
     for s in added:
@@ -74,6 +84,7 @@ def main():
         print(f"menu PDFs changed content ({len(changed)}):")
         for s in changed:
             print(f"  ~ {s}")
+        # quirk: a read-only report writes state, so a second run always shows 0 changed
         hist.write_text(json.dumps(cur, indent=1))
     return 0
 

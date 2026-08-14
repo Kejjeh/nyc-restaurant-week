@@ -1,36 +1,36 @@
 {
-  "_doc": {
-    "purpose": "Recognition rows that ARE in the DB (auto-accepted at match time) but are demonstrably WRONG. The exporter drops these from the published badges. This is separate from data/processed/recognition_review.json, which holds matches that were never accepted and still await a human ruling.",
-    "why_a_config": "src/build_db.py destroys and recreates the DB on every refresh, so recognition.id values are NOT stable across runs. Suppression is therefore keyed on (slug, source, matched_name), which is stable.",
-    "review_status": "PROPOSED by the dashboard build on 2026-08-01, pending the owner's ruling. Each entry states the mechanism, not just the conclusion. Setting `active: false` restores the badges without touching code.",
-    "root_cause": "norm_name() in src/enrich_recognition.py strips a stopword list before comparing names. Where stripping collapses two different restaurants onto the same string, the match is spurious yet still scores 0.9 with notes ' [exact name]'. match_confidence 0.9 therefore does NOT imply the names resemble each other."
+ "_doc": {
+  "purpose": "Recognition rows that ARE in the DB (auto-accepted at match time) but are demonstrably WRONG. The exporter drops these from the published badges. This is separate from data/processed/recognition_review.json, which holds matches that were never accepted and still await a human ruling.",
+  "why_a_config": "src/build_db.py destroys and recreates the DB on every refresh, so recognition.id values are NOT stable across runs. Suppression is therefore keyed on (slug, source, matched_name), which is stable.",
+  "review_status": "PROPOSED by the dashboard build on 2026-08-01, pending the owner's ruling. Each entry states the mechanism, not just the conclusion. Setting `active: false` restores the badges without touching code.",
+  "root_cause": "HISTORIC. norm_name() in src/enrich_recognition.py used to strip venue types (bar, cafe, brasserie, trattoria...) before comparing, so two different restaurants could collapse onto one string -- or onto the EMPTY string -- and still score 0.9 with notes ' [exact name]'. Fixed 2026-08-05: venue types no longer strip, an empty normalisation falls back to the unstripped name, and check_norm_name() asserts both directions on every run. The entries retired that day are kept as the record. What remains is the case normalisation can never fix: a genuine namesake, where two different restaurants really do share a name."
+ },
+ "suppress": [
+  {
+   "slug": "osteria-brooklyn",
+   "source": "james_beard",
+   "matched_name": "Brasserie",
+   "rows": 8,
+   "active": false,
+   "reason": "norm_name() strips the stopwords 'osteria', 'brooklyn' AND 'brasserie', so both 'Osteria Brooklyn' and 'Brasserie' normalise to the EMPTY STRING. osteria-brooklyn is the only one of the 648 participants that normalises to '', so it absorbed all 8 James Beard awards belonging to the Seagram Building's Brasserie (winner, 2000). None of these awards belong to Osteria Brooklyn. Fixed at source: norm_name no longer strips venue types, so this row is never produced. Kept inactive as the record of why, and enrich_recognition.check_norm_name() now fails the run if the collapse ever returns.",
+   "retired": "2026-08-05"
   },
-  "suppress": [
-    {
-      "slug": "osteria-brooklyn",
-      "source": "james_beard",
-      "matched_name": "Brasserie",
-      "rows": 8,
-      "active": false,
-      "reason": "norm_name() strips the stopwords 'osteria', 'brooklyn' AND 'brasserie', so both 'Osteria Brooklyn' and 'Brasserie' normalise to the EMPTY STRING. osteria-brooklyn is the only one of the 648 participants that normalises to '', so it absorbed all 8 James Beard awards belonging to the Seagram Building's Brasserie (winner, 2000). None of these awards belong to Osteria Brooklyn. Fixed at source: norm_name no longer strips venue types, so this row is never produced. Kept inactive as the record of why, and enrich_recognition.check_norm_name() now fails the run if the collapse ever returns.",
-      "retired": "2026-08-05"
-    },
-    {
-      "slug": "cafe-boulud",
-      "source": "james_beard",
-      "matched_name": "Bar Boulud",
-      "rows": 2,
-      "active": false,
-      "reason": "norm_name() strips both 'bar' and 'cafe', collapsing 'Bar Boulud' and 'Cafe Boulud' onto 'boulud'. These two nominations (2009, 2014) belong to Bar Boulud, a different Dinex room. Cafe Boulud's own six James Beard rows (matched_name 'Cafe Boulud') are genuine and are NOT suppressed, nor is its Michelin 1 star. Fixed at source: norm_name no longer strips venue types, so this row is never produced. Kept inactive as the record of why, and enrich_recognition.check_norm_name() now fails the run if the collapse ever returns.",
-      "retired": "2026-08-05"
-    },
-    {
-      "slug": "recette",
-      "source": "james_beard",
-      "matched_name": "Recette",
-      "active": true,
-      "reason": "Namesake, not the same restaurant. The 2011/2012 awards belong to Jesse Schenker's Recette, a New American restaurant at 328 W 12th St in the West Village that closed around 2015. The participant here is a French bistro at 103 Havemeyer St in Williamsburg; recettebrooklyn.com describes a French restaurant and never mentions Schenker or the awards. JBF's own records put both awards in Manhattan, which is what surfaced it.",
-      "checked": "2026-08-05"
-    }
-  ]
+  {
+   "slug": "cafe-boulud",
+   "source": "james_beard",
+   "matched_name": "Bar Boulud",
+   "rows": 2,
+   "active": false,
+   "reason": "norm_name() strips both 'bar' and 'cafe', collapsing 'Bar Boulud' and 'Cafe Boulud' onto 'boulud'. These two nominations (2009, 2014) belong to Bar Boulud, a different Dinex room. Cafe Boulud's own six James Beard rows (matched_name 'Cafe Boulud') are genuine and are NOT suppressed, nor is its Michelin 1 star. Fixed at source: norm_name no longer strips venue types, so this row is never produced. Kept inactive as the record of why, and enrich_recognition.check_norm_name() now fails the run if the collapse ever returns.",
+   "retired": "2026-08-05"
+  },
+  {
+   "slug": "recette",
+   "source": "james_beard",
+   "matched_name": "Recette",
+   "active": true,
+   "reason": "Namesake, not the same restaurant. The 2011/2012 awards belong to Jesse Schenker's Recette, a New American restaurant at 328 W 12th St in the West Village that closed around 2015. The participant here is a French bistro at 103 Havemeyer St in Williamsburg; recettebrooklyn.com describes a French restaurant and never mentions Schenker or the awards. JBF's own records put both awards in Manhattan, which is what surfaced it.",
+   "checked": "2026-08-05"
+  }
+ ]
 }

@@ -378,9 +378,11 @@ def build_google():
 # The rule that keeps it honest: a component scores 0 only when the zero is a
 # FACT (holds no award; has no 4/5/6 within a 12-minute walk). When the value
 # is merely UNKNOWN -- no Google match, no printed end date, no comparable
-# price -- the component is DROPPED and its weight redistributed. Scoring
-# unknowns as zero would punish restaurants for gaps in our own coverage,
-# which is the failure this project has spent its whole life avoiding.
+# price -- the component is IMPUTED at its own mean and the imputation is
+# published (see score_parts, which records why redistributing the weight was
+# tried and rejected). Scoring unknowns as zero would punish restaurants for
+# gaps in our own coverage, which is the failure this project has spent its
+# whole life avoiding.
 RUBRIC_CONFIG = ROOT / "config" / "rubric.json"
 
 

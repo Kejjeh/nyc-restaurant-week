@@ -12,10 +12,13 @@ it is ever contradicted, revert to private and re-read "ToS rules" below.
 `data/raw/menus/*.pdf` is gitignored and 0 PDFs are tracked — keep it that way.
 Menus are linked to the official S3 URL, never copied.
 
-Local dataset + pipeline tracking all **648** participants in NYC Restaurant Week
+Local dataset + pipeline tracking all **636** participants in NYC Restaurant Week
 Summer 2026 (Jul 20–Aug 16, extension weeks through Sep 6; Saturdays excluded,
 Sundays optional per restaurant). Built to re-run weekly. This README is the full
 context for operating the repo — no session memory is assumed.
+
+Season facts live in exactly one file, `config/season.json`. Nothing else in the
+repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ## Sources & how discovery works
 
@@ -26,6 +29,10 @@ context for operating the repo — no session memory is assumed.
 - Addresses: scraped per restaurant from `nyctourism.com/restaurant-week/{slug}/`
   RSC payload (cached in `data/raw/details/`).
 - Menu PDFs: public S3 bucket `nyc-tourism-public.s3.amazonaws.com/srw26/menus/`.
+- Subway: MTA station locations from NY Open Data (`39hk-dx4f`, public domain).
+- Outdoor dining: NYC DOT licensed setups from NY Open Data (`fpeh-f7ci`).
+- Google ratings: Places API, keyed (never committed). Restaurants' own sites are
+  crawled for prices (`price_sweep`) and menu terms (`menu_term_sweep`).
 - Politeness: global ≤1 req/sec throttle (`config.throttle()`), browser UA.
   robots.txt allows everything used (`/*.json$` is disallowed; the pipeline
   deliberately avoids `_next/data` routes).
@@ -33,32 +40,90 @@ context for operating the repo — no session memory is assumed.
 ## How to run
 
 ```
-pip install -r requirements.txt        # pdfplumber, playwright
+pip install -r requirements.txt        # pdfplumber, playwright, pytest
+python -m pytest -q tests/             # 46 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
 
-`refresh.py` runs in order: `fetch_listing` (dated snapshot →
+`refresh.py` runs, in order: `fetch_listing` (dated snapshot →
 `data/raw/listing/snapshot-YYYY-MM-DD.json`; per-page cache makes it resumable) →
 `fetch_details` (new slugs only) → `download_menus` (skips cached) →
 `parse_menus` (resumable) → `build_db` (rebuilds SQLite + CSV; reloads
 `price_sweep` from cached sweep files) → `tag_dishes` → `enrich_recognition`
-(re-matches from `data/raw/recognition/*.json`) → `export_site_data` →
-`diff_report`.
+(re-matches from `data/raw/recognition/*.json`) → `fetch_outdoor_dining --refresh`
+→ `fetch_google_ratings` (**only when `GOOGLE_PLACES_KEY` is in the env — it is
+not in CI**) → `export_site_data` → `export_places` → `diff_report`.
 
 `export_site_data` MUST stay after both `tag_dishes` and `enrich_recognition`:
 `build_db` drops and recreates the DB, wiping the tag and recognition tables.
+`export_places` MUST stay after `export_site_data`: it imports the exporter's
+enrichment and shrinks its Google scores toward the *roster* mean.
 
 **Diff report** compares the two latest snapshots: a `SHORTLIST ALERTS` block
 first (any change to `config/shortlist.json` restaurants' meal types, weeks, or
 menu URL — booking-relevant), then program-wide added/dropped restaurants, field
-changes, and menu-PDF content changes by sha256.
+changes, and menu-PDF content changes by sha256. If the roster was replaced in
+*both* directions (more than half dropped and more than half added),
+`season_boundary()` prints one line and suppresses the whole diff: at a
+changeover every slug reads DROPPED and every shortlist alert is a lie.
 
 **On a fresh clone**, `data/raw/menus/*.pdf` are absent (gitignored);
-`download_menus.py` re-fetches all ~470 at ≤1 req/sec (~10 min) on first run.
+`download_menus.py` re-fetches all 473 at ≤1 req/sec (~10 min) on first run.
 Everything else needed to rebuild the DB is committed.
 
-Other tools:
+### Tests
+
+`python -m pytest -q tests/` — 46 tests, no network, run in CI *before* the
+crawl so a broken guard fails in seconds instead of after ten minutes of polite
+fetching. They cover the things that only bite at a season boundary and would
+otherwise be discovered live: season config validation, the listing guards, the
+export transition guards, the menu cache key, parsed-progress pruning, the diff
+boundary, the seasons registry, Google matching, and places.
+
+On Windows pytest prints a `PermissionError: [WinError 5] ... pytest-current`
+from an `atexit` callback *after* the run reports success. It is temp-dir
+cleanup, not a test failure — the exit code is 0.
+
+### Guards — the pipeline refuses bad data rather than publishing it
+
+Every one of these exists because the failure it catches is silent: the run
+succeeds, the payload is well-formed, and the site is wrong.
+
+- `fetch_listing.validate_listing()` — refuses `total=0`; refuses a listing with
+  fewer unique rows than `season.json` `min_rows` (400); keeps the pagination
+  check (unique rows ≥ 90% of the API total); and **the season tripwire**: if no
+  `menuFileUrl` in a 25-URL sample contains the season code, it raises and tells
+  you to update `config/season.json`. A listing with no menu URLs at all only
+  warns — early-season rosters pre-date the menu uploads.
+- `export_site_data.assert_end_dates_in_window()` — every non-null `end_date`
+  must land in `[book_by − 60 days, program_end]`. A date outside that window is
+  what a stale season year looks like from the data side.
+- `assert_not_shrunk()` — refuses to replace a published roster with one under
+  80% of its size; `--allow-shrink` is the deliberate override. Measured against
+  the season file, never against the legacy copy.
+- `scoring_day()` — the rubric's window component counts down from
+  `min(today, PROGRAM_END)`, so a post-season re-export cannot silently reshuffle
+  every published grade.
+- `verified_asof()` — pulls the transcription date out of
+  `verified_values.json` `_doc.provenance` **by regex, not by word position**;
+  rewording the sentence used to change a published date instead of failing.
+- `assert_tos_clean()` — banned keys anywhere in the payload, plus snippet length
+  and overlap over **both** `tags` and `offsite_tags` (the off-site snippets were
+  never checked before).
+- `enrich_recognition.check_norm_name()` — case tables asserting which names must
+  collapse together and which must stay apart, run at the top of every execution.
+- `download_menus` caches on **the URL that produced the file**, not its
+  basename: S3 basenames repeat across seasons, so a returning restaurant's new
+  menu would have been served from last summer's cache. A failed refetch keeps
+  the good manifest entry (a fetch error used to render downstream as
+  "image-only PDF"), and departed slugs are pruned instead of emitting orphan
+  `menus` rows forever. `parse_menus` prunes parsed-progress to the manifest.
+- `.github/workflows/refresh.yml` fails the run if a menu PDF would be staged or
+  if `git ls-files` finds one tracked.
+
+### Other tools
+
 - `python src/hours_lookup.py <slug-or-name> [--refresh]` — on-demand opening
   hours for ONE restaurant (own-site JSON-LD, then text heuristics), cached in
   `data/cache/hours.json`. Deliberately never run in bulk.
@@ -66,28 +131,163 @@ Other tools:
 - `price_sweep.py --shard=i/k` / `price_rescue.py [--render] --shard=i/k` —
   one-off website price crawls (rescue's `--render` mode needs
   `playwright install chromium`). Results cache per slug in `data/raw/pricesweep/`.
+- `python src/menu_term_sweep.py [--shard i/k] [--report]` — see "Off-site menu
+  terms" below.
+- `python src/fetch_google_ratings.py [--shard i/k] [--force] [--report]` — see
+  "Google ratings".
+- `python src/fetch_subway.py` — one-time MTA station pull; NOT re-run by
+  `refresh.py`.
+- `python src/fetch_outdoor_dining.py --refresh` — DOT licence register; IS
+  re-run weekly, because licences are issued and expire continuously.
+- `python src/places_cli.py add "Name" ["address hint"] | list | remove <slug>` —
+  see "My list".
 
 ### Dish tags
 
 `config/dish_tags.json` maps tag → regex rules with per-rule confidence.
 **Adding a tag = one config entry + `python src/tag_dishes.py`** (no code edits).
 Both structured `menu_items` and `menus.raw_text` are scanned so partial parses
-are covered; every hit stores the matched snippet for auditing. Seeded tags:
-snails (`lumache` = low confidence — usually the pasta shape), braised, confit.
+are covered; every hit stores the matched snippet for auditing. Current
+vocabulary: `braised`, `confit`, `raw tuna`, `snails` (`lumache` = low
+confidence — usually the pasta shape; `wagyu toro` is excluded because it is
+beef).
 
-### Season config (winter 2027 changeover)
+### Off-site menu terms
 
-All season facts live in `src/config.py`: `SEASON = "srw26"` (S3 menu prefix —
-VERIFY from live `menuFileUrl` values, don't assume the next prefix), API URL slug
-`restaurant-week` (unchanged across seasons). For a new season: update `SEASON`,
-clear/rotate `data/raw/listing/` snapshots (diffs across seasons are meaningless),
-reset `config/shortlist.json`, expect new week labels in `restaurantInclusionWeek`.
-The API key survives seasons and self-rediscovers if rotated.
+`config/offsite_tags.json` + `src/menu_term_sweep.py` are the same idea aimed at
+a different document. `tag_dishes` reads the Restaurant Week prix-fixe PDF; some
+dishes are essentially never on a $45–60 prix fixe — a seafood tower is an à la
+carte raw-bar item — so searching RW menus for them returns nothing. These terms
+are searched against **the restaurant's own website** instead (own domain plus
+PDFs it links to; delivery aggregators are hard-blocked).
+
+**A hit means "they serve it". It does NOT mean "it is in Restaurant Week."**
+That distinction is load-bearing and has to survive into the UI: off-site tags
+are a separate facet, never merged into the RW dish tags.
+
+`config/offsite_verified.json` holds 56 hand checks (2026-08-05, read off each
+restaurant's own posted menu) that beat the sweep **in both directions**:
+`yes` (32) promotes the tag to confidence `verified` with the actual item and
+price, `no` (24) removes it entirely. The removals matter more than the
+promotions — the sweep can only see that a raw bar exists, and a raw bar is not
+a tower.
+
+### Google ratings
+
+`src/fetch_google_ratings.py` → `data/raw/google/{slug}.json` (committed; the key
+is not). One Text Search per uncached restaurant, so re-runs cost nothing and
+only `--force` re-bills. **Matching is the hard part, not fetching**: a name is
+not an identifier, and Text Search put "53" 621 m from the real restaurant. Every
+result is checked against the coordinates and name already held, and a failure is
+recorded as UNMATCHED with its reason rather than accepted.
+`config/google_place_ids.json` holds 14 hand-pinned `place_id`s that skip the
+geometry test — a pinned id *is* the verification.
+
+The published `score` is a Bayesian shrinkage toward the corpus mean,
+`(v·R + m·C)/(v + m)` with `m = 150`, because a 4.9 from 14 reviews is not
+comparable to a 4.7 from 3,999. `m` was chosen against the actual distribution
+(10th percentile = 188 reviews), so most restaurants stay essentially themselves
+while the handful under 100 reviews get pulled meaningfully toward the middle.
+The raw rating and the review count are both published alongside it — the
+weighting exists to make sorting honest, not to hide the input.
+
+### The rubric grade
+
+`config/rubric.json` defines a transparent composite, published **with its parts**
+so it can be argued with rather than taken on faith. Change the weights there and
+re-run `src/export_site_data.py`; no code edits.
+
+| component | weight | what it measures |
+|---|---|---|
+| `rating` | 30 | percentile of the weighted Google score |
+| `award` | 30 | strongest distinction held, decayed by its age |
+| `lex` | 20 | walk to the 4/5/6 (no line nearby scores a neutral 50, not 0) |
+| `window` | 10 | days left to book — flexibility, not urgency |
+
+**The weights total 90, deliberately.** Each score divides by the weight actually
+in play, so the numbers are read against each other; dropping a component raises
+every other one's share proportionally rather than leaving a hole.
+
+**`value` was removed after a sensitivity test**, and the disabled block is kept
+in the config so restoring it is a one-line change. At weight 10 it moved
+nothing: rank correlation 0.9915 without it, top 15 unchanged. Only 351 of 645
+restaurants had a figure at all, just 14 of those were verified, and the
+confidence multiplier compressed estimates into a 20–80 band. There was no weight
+at which it was both meaningful and trustworthy. Value is not lost from the site —
+the gap column, both gap sorts, the best-value sort and the verified-gaps preset
+all show it honestly instead of burying a heuristic inside a composite. **The
+grade answers WHICH DINNER, not which deal**; Restaurant Week already fixes price.
+
+**Missing components are IMPUTED at that component's own mean**, never zeroed and
+never dropped. A 0 is published only when the zero is a *fact* (holds no award).
+Two earlier versions got this wrong in opposite directions: redistributing the
+weight rewarded thin data, and shrinking the total toward the overall mean
+punished it. Every imputation is disclosed — `rubric_parts` marks it and
+`rubric_completeness` reports the share of the score that rested on real data.
+
+## Season changeover (winter 2027)
+
+Ordered. This is the section that will actually be used in January.
+
+1. **Edit `config/season.json` — and nothing else.** `code`, `label`, `year`,
+   `start`, `book_by`, `end`, `min_rows`. `src/config.py` loads and validates it
+   at import (code must match `srwNN`; the three dates must be ISO; `book_by`
+   must not be after `end`). **Verify `code` against a live `menuFileUrl` value —
+   never assume the next prefix.** If you get it wrong the crawl fails loudly:
+   the season tripwire in `validate_listing()` refuses a listing whose menu URLs
+   don't carry the code.
+2. **Rotate `data/raw/listing/` snapshots.** Cross-season diffs are meaningless.
+   `diff_report` will detect the boundary and suppress the diff for one run
+   anyway, but stale snapshots keep polluting it afterwards.
+3. **Reset `config/shortlist.json` and `config/verified_values.json`.** Both are
+   season-specific by nature: last season's booking targets and last season's
+   hand-transcribed windows are not facts about the new roster.
+   `verified_values.json` `_doc.provenance` must carry a fresh ISO date or the
+   export refuses to run.
+4. **Menus need no manual step.** `download_menus` keys its cache on the URL, so a
+   returning restaurant's new menu is fetched rather than served from the old
+   one; the manifest and parsed-progress self-prune to the live roster.
+5. **Re-enable the cron** in `.github/workflows/refresh.yml` if it has been
+   paused by then (see "Automation" below).
+6. **Google ratings for new restaurants.** `refresh.py` skips
+   `fetch_google_ratings.py` unless `GOOGLE_PLACES_KEY` is in the env, and the
+   workflow does not currently pass one. So either add a `GOOGLE_PLACES_KEY`
+   Actions secret and wire it into the workflow env, or run
+   `python src/fetch_google_ratings.py` locally and commit the resulting
+   `data/raw/google/*.json`. **Skipping this is not neutral**: an unrated
+   restaurant has its `rating` component — 30 of the 90 available grade points —
+   imputed at the corpus mean.
+7. **Archives and saved state need nothing.** The exporter writes
+   `docs/data/seasons/<code>.json` and merges one entry into
+   `docs/data/seasons.json`, copying every other season through untouched; the
+   frontend namespaces `localStorage` per season code.
+8. Expect new week labels in `restaurantInclusionWeek`. The API URL slug
+   (`restaurant-week`) is unchanged across seasons, and the API key survives
+   seasons and self-rediscovers if rotated.
+
+## Automation
+
+`.github/workflows/refresh.yml` — **the Monday 07:00 ET cron is currently ACTIVE**
+(`cron: '0 11 * * 1'`; GitHub cron is UTC-only and ignores DST, and the season
+ends well inside EDT). Plus `workflow_dispatch` with a `force_menus` input.
+Concurrency group `rw-refresh` with `cancel-in-progress: false`, so two refreshes
+can never crawl nyctourism at once and blow the ≤1 req/sec limit.
+
+The job restores a PDF-only cache (`data/raw/menus/*.pdf` — never the whole
+directory, which would restore stale copies over the three tracked JSON files),
+runs the tests, runs `refresh.py`, builds a job summary that leads with the
+shortlist alerts, runs the PDF guard, and commits with rebase-and-retry.
+
+**Planned, NOT YET DONE:** final refresh around **Sep 5–6**, after which the
+`schedule:` block gets commented out and only `workflow_dispatch` remains.
+Two reasons: GitHub silently auto-disables scheduled workflows after 60 days of
+repo inactivity, and an explicit pause with a comment is self-documenting where a
+silent disable is not. Re-enabling it is step 5 of the changeover.
 
 ## Database schema (`data/processed/restaurant_week.sqlite`)
 
-**restaurants** (648 rows) — one per participant
-- `slug` PK · `name` · `borough` · `neighborhood` · `address` (NULL for 4, see caveats) · `lat`/`lng`
+**restaurants** (636 rows) — one per participant
+- `slug` PK · `name` · `borough` · `neighborhood` · `address` (NULL for 2, see caveats) · `lat`/`lng`
 - `cuisines` JSON array (listing tags minus neighborhood)
 - `price_tiers` JSON array, e.g. `["$30","$45"]`
 - `meal_periods` JSON array of lunch/dinner/brunch (derived)
@@ -95,47 +295,53 @@ The API key survives seasons and self-rediscovers if rotated.
 - `weeks` JSON array, verbatim week labels; last element ⇒ end week
 - `sunday_participation` 0/1 (derived: any "Sunday" meal type)
 - `menu_url` — **the EMPTY STRING `''` (never NULL) when the restaurant publishes
-  no RW menu PDF — 178 rows.** `WHERE menu_url IS NULL` matches ZERO rows; use
+  no RW menu PDF — 175 rows.** `WHERE menu_url IS NULL` matches ZERO rows; use
   `menu_url = ''`, or branch on whether a `menus` row exists. · `website`
 - `reservation_partner`/`reservation_partner_id`/`reservation_link` (link built for OpenTable only)
 - `listing_url` · `summary` · `collections` JSON · `snapshot_date`
 
-**menus** (470 rows) — one per downloaded RW menu PDF. **No row for a restaurant
-= no menu published (178).** 
+**menus** (473 rows) — one per downloaded RW menu PDF. **No row for a restaurant
+= no menu published (175).** 12 rows currently belong to slugs that left the
+program on the Aug 10 snapshot; the prune landed 2026-08-14 and clears them on
+the next refresh.
 - `restaurant_slug` FK · `menu_url` · `pdf_file` · `sha256`
 - `parse_quality`: `full` (≥2 course sections + ≥4 dishes extracted — trust
-  `menu_items`) / `partial` (text extracted, structure unclear — use `raw_text`)
-  / `failed` (PDF exists but is image-only or corrupt — 54 rows; OCR deferred)
+  `menu_items`, 240 rows) / `partial` (text extracted, structure unclear — use
+  `raw_text`, 178) / `failed` (PDF exists but is image-only or corrupt — 55 rows;
+  OCR deferred)
 - `raw_text` — full extracted text. **Never publish this** (ToS).
 
-**menu_items** (9,233) — structured dishes from `full` parses
+**menu_items** (9,261) — structured dishes from `full` parses
 - `menu_id` FK · `course` · `dish` · `description` · `supplement_price` · `position`
 
-**menu_item_tags** (304) — dish-tag hits
+**menu_item_tags** (440) — dish-tag hits across 163 restaurants
 - `restaurant_slug` · `menu_id` · `menu_item_id` (NULL = hit came from raw_text)
 - `tag` · `confidence` high/low · `matched_text` (snippet, audit + display-safe
-  short quote) · `source` item/raw_text
+  short quote) · `source` item (137) / raw_text (303)
 
-**recognition** (195) — external recognition matched to participants
+**recognition** (184 rows, 77 restaurants) — external recognition matched to
+participants
 - `restaurant_slug` · `source` michelin/james_beard/nyt · `level` — only **7**
   strings actually occur: michelin `1 star`(6)/`bib_gourmand`(13)/
-  `recommended`(38, = Michelin's "The Plate"); james_beard `winner`(30)/
-  `nominee`(56)/`semifinalist`(46); nyt `nyt_100_best`(6). `2 stars` and
+  `recommended`(38, = Michelin's "The Plate"); james_beard `winner`(22)/
+  `nominee`(54)/`semifinalist`(46); nyt `nyt_100_best`(5). `2 stars` and
   `nyt_starred_review` exist in the RAW files but no such restaurant
   participates — don't assume they render, don't crash if a future snapshot
   adds them.
 - `year` · `source_url` · `matched_name` · `notes`
-- `match_confidence`: 1.0 = exact name + street-number match; 0.9 = exact unique
-  name, no address available (ALL james_beard rows — JBF publishes no addresses);
-  0.8 = fuzzy name + address. Ambiguous cases were NOT inserted — they're in
+- `match_confidence`: 1.0 = exact name + street-number match (55 rows); 0.9 =
+  exact unique name, no address available (129 rows — ALL james_beard, since JBF
+  publishes no addresses); 0.8 = fuzzy name ≥0.92 + address (defined in code, 0
+  rows currently). Below 0.8 is never inserted — those go to
   `data/processed/recognition_review.json` (see caveats).
 - Raw source data: `data/raw/recognition/*.json` (committed — not regenerable by
   the pipeline; JB award names live only there).
 
 **price_sweep** (600) — automated website price triage
-- `restaurant_slug` · `comparable_3course` (median-stack estimate, $) ·
-  `gaps` JSON `{"$45": 14, ...}` (comparable minus RW tier) · `confidence`
-  high/medium/low/none · `pages_fetched` · `n_prices` · `error` · `swept_date`
+- `restaurant_slug` · `comparable_3course` (median-stack estimate, $, present on
+  370 rows) · `gaps` JSON `{"$45": 14, ...}` (comparable minus RW tier) ·
+  `confidence` high(289)/medium(66)/low(182)/none(63) · `pages_fetched` ·
+  `n_prices` · `error` · `swept_date`
 - `comparable_basis` = `'heuristic'` on every row: **triage-grade, never
   verified**. Known biases: understates expensive kitchens (mains capped at $70),
   overstates casual formats. Hand-verified findings live in `reports/`, not here.
@@ -144,17 +350,66 @@ The API key survives seasons and self-rediscovers if rotated.
 
 - `rw-final-bookings.md` — **the decision doc**: 15 ranked bookings with
   own-site-verified windows, gaps, booking links, BOOK-BY flags. Supersedes the
-  value report for decisions.
+  value report for decisions. The 2026-08-14 addendum records the Aug 10 mass
+  extension (Aug-31 enders collapsed 267 → 32 while Sep-6 enders grew 163 → 401,
+  roster 645 → 636) and the expiry status of each of the 15.
 - `rw-summer-2026-value-report.md` — archive: full value analysis, traps,
   evidence grades ([A] own menu … [D] uncorroborated), 3 addenda, source tables.
 
 ## Dashboard (`docs/`, served by GitHub Pages)
 
-Static sort/filter dashboard over the 648 participants. No backend, no build
-step: `docs/index.html` + `docs/app.js` + `docs/styles.css` read
-`docs/data/restaurants.json`. Preview locally with
+Static sort/filter dashboard over the 636 participants. No backend, no build
+step: `docs/index.html` + `docs/app.js` + `docs/styles.css`. Preview locally with
 `python -m http.server 8137 --directory docs` (a `file://` open will NOT work —
 the payload is fetched).
+
+**Assets are versioned** — `index.html` loads `app.js?v=N` and `styles.css?v=N`.
+**Bump the number whenever you change either file. This is commit discipline,
+not a nicety.** A browser holding a cached `index.html` against a fresh `app.js` was
+crashing `apply()` partway through, leaving the rows rendered but silently
+costing the filter panel, the quick views and the view switcher. `$opt()` is the
+other half of that fix: elements a stale `index.html` may not have degrade to a
+throwaway node instead of throwing.
+
+`?today=YYYY-MM-DD` freezes "today" for debugging phases and countdowns. The page
+is `noindex` and personal; this is a debug affordance, not a feature.
+
+### Seasons
+
+The payload lives at `docs/data/seasons/<code>.json`, indexed by
+`docs/data/seasons.json`. The frontend loads the registry, then picks the season
+named by `#season=`, else the `live` one, else the newest by end date; with more
+than one season the masthead label becomes a switcher. A run speaks only for its
+own code — every other registry entry is copied through untouched, so a winter
+build cannot rewrite the summer archive.
+
+`docs/data/restaurants.json` is still written as a **TEMPORARY** fallback for
+pages holding a cached `index.html` that boots the old way. It goes when it is
+provably unread.
+
+Saved lists and plans are namespaced `rw-saved:<code>` / `rw-plan:<code>`, with a
+one-time migration of the legacy unnamespaced keys into `srw26`. Without this,
+switching seasons showed phantom saves for slugs the other roster never had.
+
+### Season phase
+
+`seasonPhase()` returns `core` (through `book_by`), `extensions`, or `archive`
+(past `program_end`, or the registry says archived — a stale `archived` stamp
+cannot be wrong in that direction, since a season never un-ends).
+
+In `archive` the "still bookable today" date filter is **not applied**. It used to
+be, which meant that after Sep 6 every window had passed, all 636 rows were
+filtered out, and the page blamed the reader's filters for the season ending. The
+archive shows the whole season with a banner naming the run's start and end.
+`Closing soon` disappears, the stats countdown states the end date instead of
+counting, its companion tile counts what DID end rather than a truthful-but-
+useless zero, and Plan reads as a record of the season.
+
+Urgency is a **live 7-day window from today** (clamped to `program_end`), not
+frozen at `book_by` — frozen, every closed restaurant kept shouting BOOK BY after
+the date passed.
+
+### Navigating it
 
 The default sort is **Best value — verified first**: ranked picks, then
 hand-verified gaps, then estimates, with gap size ordering rows *within* each
@@ -162,49 +417,69 @@ tier. The raw `Gap $ — high to low` sort is still there as an explicit choice,
 and the estimate caveat banner appears only on that one, because that is the
 sort where heuristics lead. Rationale: a verified $18 is a better thing to show
 first than a heuristic $79 computed from a scraped price list at a restaurant's
-cheapest tier.
+cheapest tier. Other sorts include rubric grade, Google weighted, Google raw
+stars, distinction, subway walk and final-list rank.
 
-**Compare** (a tab that appears once you have saved two or more) puts your
-saved restaurants side by side — attributes down the side, restaurants across,
-with a dot on the better value in rows that have one. Ties share the dot, and a
-row where everything ties gets no dot at all.
-
-Navigating it: **quick views** (★ Saved / The 15 / Closing soon / Verified gaps
-/ Sunday / Michelin) each set filters *and* sort in one tap and are toggles —
-tapping the active one returns you to everything. Applied filters show as
-removable chips, so you never have to open the panel to see what's on. **★ Save**
-(in each row's detail) keeps your own shortlist in `localStorage`, separate from
-the curated ranking; the Saved view only appears once you've saved something.
+**Quick views** (★ Saved / My list / The 15 / Closing soon / Verified gaps /
+4/5/6 / Sunday / Michelin / Top awards) each set filters *and* sort in one tap
+and are toggles — tapping the active one returns you to everything. `Michelin`
+names all three Michelin rungs because the recognition facet holds tiers now;
+`Top awards` exists because a bare Michelin chip is mostly The Plate. Applied
+filters show as removable chips, so you never have to open the panel to see
+what's on. **★ Save** (in each row's detail) keeps your own shortlist in
+`localStorage`, separate from the curated ranking; the Saved view only appears
+once you've saved something.
 
 Only the search box, Filters and Sort are sticky — pinning the quick views and
 counts too left 43% of a phone screen for content. Rows render 50 at a time
-(auto-loading on scroll, `Show more` as the keyboard path), keeping the page
-~1,600 DOM nodes instead of ~14,500. Sorting by end date groups rows under
-closing-date headings. The filter panel has a **find-a-filter** box that
-searches all groups at once, and long facets (76 neighborhoods, 56 cuisines)
+(auto-loading on scroll, `Show more` as the keyboard path), keeping the page to
+roughly a tenth of the DOM a full render would build. Sorting by end date groups
+rows under closing-date headings. The filter panel has a **find-a-filter** box
+that searches all groups at once, and long facets (77 neighborhoods, 56 cuisines)
 collapse to the 12 most populated with a `Show N more`. `/` focuses search,
 `Esc` clears it or closes the panel. Filter state lives in the URL hash, so any
 view can be bookmarked.
 
-**Four views.** `List` · `Map` · `Stats` (headline tiles + four click-to-filter
-SVG charts, no charting library, describing the whole programme) · `Plan`.
+**Five views.** `List` · `Map` · `Stats` (headline tiles + four click-to-filter
+SVG charts — closing dates, gap basis, borough, cuisine — no charting library,
+describing the whole programme) · `Plan` · `Compare`.
+
+**Compare** (a tab that appears once you have saved two or more, capped at 6
+columns) puts your saved restaurants side by side — attributes down the side,
+restaurants across, with a dot on the better value in rows that have one. Ties
+share the dot, and a
+row where everything ties gets no dot at all. The `Book` row names the platform
+you are about to land on (OpenTable / Resy / SevenRooms / Tock). **251 of the 636
+publish no booking link at all**; those get a quieter `Restaurant site` button
+labelled "no booking link" rather than being hidden — a link to their own site is
+useful, but it is not a reservation and must not be dressed as one.
 
 **Plan** turns the ★ shortlist into dated bookings. Each restaurant's date
 picker offers ONLY days it can actually serve you: inside its window, never a
-Saturday unless it carries the `saturday_service` flag, and a Sunday only where
-Sunday service is established (so Mark's Off Madison offers none despite the
-API's Sunday claim, while Café Boulud is the only one of the shortlist offering
-Saturdays). Assignments live in `localStorage`, and an assignment that becomes
-impossible is dropped on the next render.
+Saturday unless it carries the `saturday_service` flag (4 do), and a Sunday only
+where Sunday service is established (so Mark's Off Madison offers none despite
+the API's Sunday claim). Assignments live in `localStorage`. **A date that has
+passed is no longer deleted** — it renders as `went here — <date>`, because a
+plan you executed is a record, not an error. Anything else that has become
+impossible says why.
 
 **Subway proximity.** `python src/fetch_subway.py` pulls MTA station locations
 once from NY Open Data (public domain, dataset `39hk-dx4f`) into
 `data/raw/subway/stations.json` — committed, and deliberately NOT re-fetched by
 `refresh.py`. The exporter attaches, per restaurant, every route within a
-12-minute walk plus the nearest station. Drives a `Subway line` facet, a
-`4/5/6` quick view (340 restaurants), and a `Subway walk` sort that measures to
-whichever lines you've selected. Distances are straight-line × 1.3 at 80 m/min
-— an approximation, labelled `~` in the UI, not a routing engine.
+12-minute walk plus the nearest station (616 of 636 have one). Drives a
+`Subway line` facet, a `4/5/6` quick view (336 restaurants), and a `Subway walk`
+sort that measures to whichever lines you've selected. Distances are
+straight-line × 1.3 at 80 m/min — an approximation, labelled `~` in the UI, not a
+routing engine.
+
+**Outdoor dining.** `src/fetch_outdoor_dining.py` pulls the DOT licence register
+(dataset `fpeh-f7ci`) and the exporter matches it by name + house number +
+distance: 137 restaurants are in the register (sidewalk and/or roadway), 20 more
+are only *described* as having outdoor seating in their marketing copy, and 479
+are unknown. The register is the only defensible basis for the filter — the
+listing API carries no such field, and inferring from the marketing summaries
+would mostly be inferring from whether a copywriter felt like mentioning a patio.
 
 **Map view** (the `Map` button) plots the current filtered set, colour-coded by
 gap basis with closing-soon in red; markers follow the filters, popups link
@@ -218,17 +493,55 @@ straight to booking, and `Details` jumps back to that row in the list.
 > working. A self-contained map would need committed borough geometry and would
 > still have no streets, which is most of what makes a map useful here.
 
-`src/export_site_data.py` builds the payload (`--check` validates and prints
-without writing). It merges, in this precedence order:
+### My list (restaurants that are not in Restaurant Week)
+
+Half of what you want a where-to-eat list for is restaurants no programme covers.
+`config/places.json` holds them (add by hand, or
+`python src/places_cli.py add "Le Bernardin"` which resolves the name through the
+same Text Search machinery and asks for a y/n before writing — there is no
+coordinate of our own to corroborate against, so the human confirmation IS the
+verification). `src/export_places.py` writes `docs/data/places.json`.
+
+Rows arrive in the **same shape** a participant does, so the frontend needs no
+second vocabulary, and carry `source: "mine"`. They get the enrichment that is
+not programme-specific — coordinates, the subway walk, and the same Bayesian
+score shrunk toward the same roster mean, **imported from the exporter rather
+than reimplemented** so a place and a participant are never scored two ways.
+Every Restaurant Week field is `null`: no price, no gap, no window, no rubric,
+no rank. Inventing any of it would be a lie about the programme. They filter as
+`My list`, sort last where they have no figure, never touch the stats, and in
+Plan they carry no window, so the note stops promising a Saturday rule that does
+not apply to them. The ToS guard runs over this payload too.
+
+### The payload
+
+`src/export_site_data.py` builds it (`--check` validates and prints without
+writing). It merges, in this precedence order:
 
 1. **`config/verified_values.json`** — hand-verified facts transcribed from
    `reports/rw-final-bookings.md` and the caveat list below. The restaurant's
-   own printed materials always win over the listing API. 23 entries: the 15
-   ranked bookings plus 8 verified caveat rows.
+   own printed materials always win over the listing API. **47 entries.**
 2. **listing API fields** from `restaurants` (end date parsed from the last
-   `weeks` label).
+   `weeks` label, with the year taken from `config/season.json` — the label
+   carries a month and a day but never a year).
 3. **`price_sweep`** — heuristic only, always rendered as an "estimate", never
    allowed to populate a verified field.
+
+Top-level keys: `generated_at` · `season_label` · `season_code` · `season_start` ·
+`snapshot_date` · `verified_asof` · `book_by` · `program_end` · `tag_vocabulary` ·
+`rubric_weights` · `rubric_component_means` · `rubric_mean` · `google_mean` ·
+`google_prior` · `restaurants`.
+
+Per-row, beyond the obvious identity/price/window fields: `google`
+(`{rating, reviews, score, place_id, matched_name, basis, closed}` — `basis`
+`place_id` means a human pinned it, `textsearch` means it was accepted on
+coordinates, and the UI must not overstate the difference) · `rubric`,
+`rubric_parts`, `rubric_completeness`, `rubric_imputed` · `offsite_tags` ·
+`outdoor` (`{sidewalk, roadway, licensed, described, licence_name, dist_m}`) ·
+`recog_top`, `recog_rank`, `recog_eras` · `verdict` / `verdict_note` ·
+`end_date_source` / `end_date_api` and `sunday_source` / `sunday_api`, which keep
+the API's claim next to the verified one rather than overwriting it · `flags` ·
+`grade` · `subway` / `subway_nearest`.
 
 `config/recognition_suppress.json` drops recognition rows that are in the DB but
 demonstrably wrong (see caveats). Set `active: false` to restore them.
@@ -238,44 +551,50 @@ export rather than publish a banned field. Menu text may leave only as dish-tag
 snippets, and the rule is: **at most 5% of a menu's extracted text, or 40
 characters, whichever is greater**, re-centred on the matched keyword (never
 right-truncated), with overlapping and adjacent snippets pruned so they cannot
-be stitched back into a passage. The published payload carries no `raw_text`,
-no `menu_items`, and no dish/description fields.
+be stitched back into a passage. The exporter enforces a deliberately tighter
+4.5% / 36 chars so an independent auditor measuring at the stated rule always
+passes with margin. The published payload carries no `raw_text`, no `menu_items`,
+and no dish/description fields.
 
-Coverage today: 648 rows · 14 verified gaps · 345 estimates · 289 with no
-comparable (left blank — never backfilled) · 120 restaurants with dish tags ·
-78 with recognition badges. Payload ~780 KB raw, ~76 KB gzipped.
+Coverage today (`python src/export_site_data.py --check`): 636 rows · 14 verified
+gaps · 336 estimates · 286 with no comparable (left blank — never backfilled) ·
+15 ranked picks · 195 ending by Aug 16 · 631 mappable · 616 within 12 min of a
+station · 629 Google-rated (mean 4.491★) · 31 restaurants with off-site tags
+(644 slugs swept) · 161 with dish tags (251 snippets pruned) · 76 with
+recognition badges (3 rows suppressed) · 137 licensed outdoor. Payload
+1,162,721 bytes raw, ~142 KB gzipped.
 
 ## Data caveats (read before trusting anything)
 
-- **4 restaurants have NULL address**: alta-calidad, casa-brazilian, catria-nyc,
-  wagamama — their nyctourism detail pages 404/500 server-side.
-- **17 pending recognition matches** in `data/processed/recognition_review.json`
-  (Masa, Roberta's, Tonchin, Ci Siamo, Madre, Lola's, Bar 'Cino, Arcadia, Mắm) —
-  awaiting a human ruling; none touch the final-bookings shortlist. Do not
-  auto-accept.
-- **10 recognition rows in the DB are FALSE POSITIVES** (distinct from the 17
-  pending above — these were auto-accepted at match time). `norm_name()` in
-  `enrich_recognition.py` strips a stopword list before comparing, and where
-  stripping collapses two different restaurants onto one string the match still
-  scores 0.9 with notes `' [exact name]'`. So **0.9 + "[exact name]" does NOT
-  mean the names resemble each other.** Confirmed cases: `osteria-brooklyn`
-  absorbed all 8 James Beard awards belonging to the Seagram Building's
-  *Brasserie* (both normalise to the EMPTY STRING); `cafe-boulud` absorbed 2
-  nominations belonging to *Bar Boulud* (both normalise to `boulud`). Listed in
-  `config/recognition_suppress.json` and excluded from the dashboard; the DB is
-  untouched. **A real fix belongs in `norm_name()`** — it will re-occur on every
-  `enrich_recognition` run.
-- **`config/shortlist.json` ranks 3–5 disagree with the decision doc.** The
-  report ranks David Burke Tavern 3, Zuma 4, Casa Lever 5; `shortlist.json` has
-  Casa Lever 3, David Burke Tavern 4, Zuma 5. The other 12 match. The dashboard
-  uses the REPORT order (it is the decision doc and supersedes). Reconcile the
-  two files when convenient.
-- **~240 restaurants have no price comparable** (publish no prices anywhere).
+- **2 restaurants have NULL address**: `alta-calidad`, `catria-nyc` — their
+  nyctourism detail pages 404/500 server-side. (`casa-brazilian` and `wagamama`
+  carried this until they left the program.)
+- **14 pending recognition matches** in `data/processed/recognition_review.json`
+  (Masa, Roberta's, Tonchin, Ci Siamo, Madre, Carlo Mirarchi ×2, Max Sussman,
+  Masa Takayama, Anne Rosenzweig ×4, Mắm) — scored below the acceptance
+  threshold or name-matched with a contradicting address, awaiting a human
+  ruling. None touch the final-bookings shortlist. Do not auto-accept.
+- **The `norm_name()` false-positive bug is FIXED** (2026-08-05). Historically,
+  `norm_name()` stripped venue types alongside genuine qualifiers, so
+  "Bar Boulud" and "Café Boulud" both collapsed to `boulud` and
+  "Osteria Brooklyn" lost both its words and collapsed onto "Brasserie" — 10 rows
+  of James Beard awards attached to the wrong restaurants, at confidence 0.9 with
+  notes `' [exact name]'`, re-created on every weekly run. Venue types are no
+  longer stripped (they are precisely what separates a restaurant from its
+  sibling), a name made only of qualifiers falls back to its unstripped form
+  instead of the empty string, and `check_norm_name()` runs a table of
+  must-collapse / must-stay-apart pairs at the top of every execution. The two
+  suppression entries are retired in place (`retired: 2026-08-05`) as the record
+  of why. **One suppression is still active**: `recette`, 3 James Beard rows that
+  belong to Jesse Schenker's Recette in the West Village (closed ~2015), not to
+  the French bistro of the same name in Williamsburg. That is a genuine namesake
+  and no amount of normalisation can fix it.
+- **286 restaurants have no price comparable** (publish no prices anywhere).
   HARD RULE: never backfill from delivery aggregators — markup distortion makes
   them worse than an honest blank. The gap stays a gap.
-- **~290 comparables are heuristic-only** (`price_sweep`, `comparable_basis=
+- **336 comparables are heuristic-only** (`price_sweep`, `comparable_basis =
   'heuristic'`) — nothing downstream may present them as verified.
-- **OCR of the 54 image-only menus: deferred**, not attempted.
+- **OCR of the 55 image-only menus: deferred**, not attempted.
 - **Listing-vs-restaurant contradictions** (restaurant's own print wins; found by
   two independent own-site passes, Aug 1): Zuma ends Aug 16 (API: Sep 6) ·
   Lincoln Tue–Sat only, ends Aug 15 or 16 (sources 1 day apart), no Sunday
@@ -283,19 +602,24 @@ comparable (left blank — never backfilled) · 120 restaurants with dish tags �
   LUNCH-only, $60 = 2 courses (API implies $60 dinner) · Four Twenty Five
   extended to Sep 6 · Tudor City's site shows stale winter pages; its $30 lunch
   exists only in the API — dropped from bookings · Mark's Off Madison has no
-  Sunday-dinner service (API flags Sunday) · Café Boulud RW posting resolved (JS-rendered page): $60 3-course, Mon–Thu 6–9 + Fri–Sat 5–9:30 — printed Saturday RW service; no Sunday · Momofuku Noodle Bar's $45 tier
-  is a weekend lunch; ends Aug 30 · Code Red SETTLED at $50 by live page read (API $45 wrong; $60 stale metadata) · David Burke Tavern Jul 21–Aug 16 (own nav says 8/14);
+  Sunday-dinner service (API flags Sunday) · Café Boulud RW posting resolved
+  (JS-rendered page): $60 3-course, Mon–Thu 6–9 + Fri–Sat 5–9:30 — printed
+  Saturday RW service; no Sunday · Momofuku Noodle Bar's $45 tier is a weekend
+  lunch; ends Aug 30 · Code Red SETTLED at $50 by live page read (API $45 wrong;
+  $60 stale metadata) · David Burke Tavern Jul 21–Aug 16 (own nav says 8/14);
   Sunday dinner unprinted · 53's $45 RW Sunday brunch vs their standing $78 dim
   sum — confirm at booking · Chito Gvrito and Playa Betty's print SATURDAY
   service despite the program-wide Saturday exclusion.
-- Season windows vary by restaurant (Aug 15/16/30/31, Sep 1/6/7 all observed).
+- Season windows vary by restaurant. After the Aug 10 mass extension the field
+  is 401 × Sep 6, 191 × Aug 16, 32 × Aug 31, 7 × Aug 23, and single rows on
+  Aug 3/14/15 and Sep 5.
 - **3 restaurants geocode outside New York.** `dubuhaus` and `musaek` (both
   6 E. 32nd St., Manhattan) resolve to Oakland CA, and `the-kunjip`
   (32 W. 32nd St.) to San Angelo TX — bad lat/lng in the nyctourism detail
   pages, not a parsing error. `sane_coords()` in `export_site_data.py` nulls
   any point outside a five-borough bounding box, so the map neither misplaces
   them nor lets one bad point wreck its auto-fit. With the 2 NULL-address rows
-  that leaves 640 of 645 mappable.
+  that leaves 631 of 636 mappable.
 
 ## ToS rules — HARD REQUIREMENTS for any output built from this repo
 
@@ -305,17 +629,22 @@ extracted menu TEXT is acceptable; **hosting the exact PDFs is not**.
 1. **NEVER host, mirror, re-upload or commit the menu PDFs.** This is the only
    hard prohibition NYC Tourism named. `data/raw/menus/*.pdf` stays gitignored;
    menus are linked via the official S3 URL (`restaurants.menu_url`). Verify
-   with `git ls-files | grep -c '\.pdf$'` — it must print 0.
+   with `git ls-files | grep -c '\.pdf$'` — it must print 0. The weekly workflow
+   checks this too and fails the run rather than commit one.
 2. Rate limits stay at **≤1 req/sec** against nyctourism hosts and the S3
-   bucket for any future crawl (`config.throttle()`). Do not parallelise.
+   bucket for any future crawl (`config.throttle()`). Do not parallelise. The
+   workflow's `concurrency` group exists so two runs cannot violate this
+   between processes.
 3. Personal/noncommercial use. `docs/` keeps `<meta name="robots" content=
    "noindex">` — this is a personal tool, not a publication.
-4. The dashboard payload (`docs/data/restaurants.json`) still ships
-   **derived/factual fields only** and carries no `raw_text`, no `menu_items`
-   and no dish/description fields. That is now a design choice for payload size
-   and honesty rather than a ToS requirement, and `assert_tos_clean()` in
-   `src/export_site_data.py` still enforces it. Menu text appears only as short
-   keyword-centred snippets (≤5% of a menu, or 40 chars, whichever is greater).
+4. The dashboard payloads (`docs/data/seasons/*.json`, `docs/data/places.json`,
+   and the temporary `docs/data/restaurants.json`) ship **derived/factual fields
+   only** and carry no `raw_text`, no `menu_items` and no dish/description
+   fields. That is now a design choice for payload size and honesty rather than
+   a ToS requirement, and `assert_tos_clean()` in `src/export_site_data.py`
+   still enforces it over all of them. Menu text appears only as short
+   keyword-centred snippets (≤5% of a menu, or 40 chars, whichever is greater),
+   and the same bar applies to the off-site website snippets.
 
 Superseded: before 2026-08-02 this section required the repo to stay private
 because `menus.raw_text` lives in the committed SQLite. That requirement is
@@ -326,16 +655,33 @@ lifted by the NYC Tourism conversation above; rule 1 is not.
 ```
 src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             parse_menus, build_db, tag_dishes, enrich_recognition,
-            export_site_data, diff_report, refresh, hours_lookup, price_sweep,
-            price_rescue)
-config/     dish_tags.json (tag rules) · shortlist.json (15 booking targets) ·
-            verified_values.json (hand-verified facts, merged over the API) ·
-            recognition_suppress.json (known-bad recognition matches)
-docs/       the dashboard (index.html, app.js, styles.css, data/restaurants.json)
-.github/    workflows/refresh.yml — Monday 07:00 ET cron + manual dispatch
+            fetch_outdoor_dining, fetch_google_ratings, export_site_data,
+            export_places, diff_report, refresh)
+            one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
+            price_rescue, menu_term_sweep, places_cli)
+tests/      46 pytest tests, no network; run in CI before the crawl
+config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
+            rubric.json      composite-grade weights + cut-points
+            dish_tags.json   RW-menu tag rules
+            offsite_tags.json / offsite_verified.json  own-website terms + 56 hand checks
+            google_place_ids.json  14 hand-pinned place_ids
+            places.json      restaurants of my own, not in the programme
+            shortlist.json   15 booking targets, in decision-doc rank order
+            verified_values.json   hand-verified facts, merged over the API
+            recognition_suppress.json  known-bad recognition matches
+            secrets.example.py     (secrets.py is gitignored)
+docs/       the dashboard (index.html, app.js, styles.css)
+            data/seasons/<code>.json  per-season payloads
+            data/seasons.json         registry
+            data/places.json          my list
+            data/restaurants.json     TEMPORARY legacy fallback
+.github/    workflows/refresh.yml — Monday 07:00 ET cron (ACTIVE) + manual dispatch
 data/raw/   listing snapshots+page cache · details (addresses) · recognition
             (Michelin/JB/NYT source data) · pricesweep (heuristic crawl cache) ·
-            menus/manifest.json + parsed.json (PDFs themselves are gitignored)
+            menusweep (own-website term crawl) · google (ratings cache) ·
+            subway (stations) · outdoor (DOT licences) · menus/manifest.json +
+            manifest_history.json + parsed.json + parsed-progress.json
+            (the PDFs themselves are gitignored)
 data/processed/  restaurant_week.sqlite · restaurants.csv ·
                  recognition_review.json (pending human rulings)
 reports/    final bookings (decision doc) + value report (archive)

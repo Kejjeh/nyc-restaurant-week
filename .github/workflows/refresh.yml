@@ -59,9 +59,11 @@ jobs:
 
       # refresh.py runs the whole chain in order, single-threaded on purpose:
       # fetch_listing -> fetch_details -> download_menus -> parse_menus ->
-      # build_db -> tag_dishes -> enrich_recognition -> export_site_data ->
-      # diff_report. Do NOT parallelise any of it against nyctourism or the S3
-      # bucket; the throttle in src/config.py is a ToS requirement.
+      # build_db -> tag_dishes -> enrich_recognition -> fetch_outdoor_dining ->
+      # (fetch_google_ratings, only with a key) -> export_site_data ->
+      # export_places -> diff_report. Do NOT parallelise any of it against
+      # nyctourism or the S3 bucket; the throttle in src/config.py is a ToS
+      # requirement.
       - name: Run refresh
         id: refresh
         run: |

@@ -73,3 +73,25 @@ Cosme ($60, Sun ✓, save up to $38 but floor is 16%) · Gramercy Tavern Dining 
 
 ## Booking strategy
 Six carry 🔴 Aug 16 deadlines (Yingtao, 53, DBT, Zuma, PAK, Quality Meats + Lincoln) — with Saturdays excluded there are only ~13 eligible days left; book those first, today if possible. The Sep 6 runners (Hawksmoor, Four Twenty Five, Victor's, Casa Lever*, GT/Modern on the bubble) can fill Aug 17–Sep 6 weekdays when tables are uncontested. Saturday exceptions if needed: Chito Gvrito, Playa Betty's (+ Café Boulud's printed Fri–Sat service — confirm). Sunday plan: 53 brunch → Four Twenty Five or Zuma dinner.
+
+## Addendum — 2026-08-14 (Aug 10 listing snapshot)
+
+**Status of the 15, two days before the core deadline.** Seven expire within 3 days:
+David Burke Tavern (#3) ends **TODAY Aug 14** (own nav said 8/14 all along); Lincoln
+(#10) ends Aug 15 (sources still 1 day apart); Yingtao, 53, Zuma, Park Ave Kitchen and
+Quality Meats end Aug 16. The other eight now all run to **Sep 6** — including three
+this report recorded with shorter/unprinted windows: **Mark's Off Madison, Café Boulud
+and Frenchette each extended to Sep 6** in the Aug 10 listing (API values; their sites
+still don't print an end date — the usual caveat applies).
+
+**Program-wide mass extension.** The Aug 10 refresh moved most of the field to the
+final extension week: Aug-31 enders collapsed 267 → 32 while Sep-6 enders grew
+163 → 401. Roster 645 → 636 (10 dropped — akoya, aperibar, bottino, catch-nyc,
+dinosaur-bar-b-que, ino, limani, malvan, michaels-restaurant, yoon-haeundae-galbi —
+1 added: stk-chelsea). None of the dropped touch the 15.
+
+**Post-Aug-16 play.** The booking-strategy paragraph above is now moot for the 🔴 six;
+what remains is the Sep-6 cohort (Casa Lever, Mark's Off Madison, Hawksmoor, Café
+Boulud, Four Twenty Five, Frenchette, Victor's, Code Red) plus the bubble's Sep-6
+runners (Gramercy Tavern lunch, Bar Room at The Modern, When in Bangkok) —
+uncontested weekday tables through Sep 6, Sundays per each entry's flags.

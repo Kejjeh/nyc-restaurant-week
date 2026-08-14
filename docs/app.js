@@ -264,8 +264,7 @@ for (const f of FACETS) if (!FILTERS[f.key]) FILTERS[f.key] = new Set();
 const RECOG_LABEL = { michelin: 'Michelin', james_beard: 'James Beard', nyt: 'NYT' };
 const RUBRIC_LABEL = {
   award: 'Award value (aged)', rating: 'Google rating (weighted)',
-  lex: 'Walk to the 4/5/6', value: 'Value gap % (confidence-adjusted)',
-  window: 'Days left to book',
+  lex: 'Walk to the 4/5/6', window: 'Days left to book',
 };
 const ERA_LABEL = { current: 'This year or last', recent: 'Last 5 years',
                     past: 'Past decade', historic: 'Over 15 years ago' };
@@ -440,8 +439,9 @@ function isUrgent(r) {
   return !!(r.end_date && r.end_date >= todayISO() && r.end_date <= urgencyHorizon());
 }
 
+/* Spans, not divs: this cell is rendered inside the row's <button> header. */
 function renderGapCell(r) {
-  const cell = el('div', 'gapCell');
+  const cell = el('span', 'gapCell');
   // Your own place was never priced against a Restaurant Week menu, so it has
   // no gap — and "no comparable" would be answering a question never asked
   // of it. The cell stays empty and keeps the column aligned.
@@ -449,8 +449,8 @@ function renderGapCell(r) {
   if (r.gap_basis === 'estimate') cell.classList.add('est');
 
   if (r.gap_usd == null) {
-    cell.append(el('div', 'gapNone', '—'));
-    cell.append(el('div', 'gapLabel', 'no comparable'));
+    cell.append(el('span', 'gapNone', '—'));
+    cell.append(el('span', 'gapLabel', 'no comparable'));
     return cell;
   }
 
@@ -461,16 +461,16 @@ function renderGapCell(r) {
 
   let usd = money(Math.abs(r.gap_usd));
   if (r.gap_usd_high != null && r.gap_usd_high !== r.gap_usd) usd += `–${Math.abs(r.gap_usd_high)}`;
-  cell.append(el('div', 'gapUsd', (over ? '+' : '') + usd));
+  cell.append(el('span', 'gapUsd', (over ? '+' : '') + usd));
 
   if (r.gap_pct != null) {
     let pct = `${Math.abs(r.gap_pct)}%`;
     if (r.gap_pct_high != null && r.gap_pct_high !== r.gap_pct) {
       pct = `${Math.abs(r.gap_pct)}–${Math.abs(r.gap_pct_high)}%`;
     }
-    cell.append(el('div', 'gapPct', pct + (over ? ' MORE' : ' off')));
+    cell.append(el('span', 'gapPct', pct + (over ? ' MORE' : ' off')));
   }
-  cell.append(el('div', 'gapLabel', r.gap_basis === 'estimate' ? 'estimate' : 'verified'));
+  cell.append(el('span', 'gapLabel', r.gap_basis === 'estimate' ? 'estimate' : 'verified'));
   return cell;
 }
 
@@ -481,18 +481,22 @@ function renderRow(r) {
   const urgent = isUrgent(r);
   if (urgent) row.classList.add('urgent');
 
+  // Everything inside a <button> is spans, never divs: flow content in a button
+  // is invalid, and the assistive tech that tolerates it flattens the whole
+  // header into one unpunctuated run. The grid/flex CSS blockifies them anyway,
+  // so this is a change of element, not of layout.
   const head = el('button', 'rowHead');
   head.type = 'button';
   head.setAttribute('aria-expanded', EXPANDED.has(r.slug) ? 'true' : 'false');
 
-  const main = el('div', 'rowMain');
+  const main = el('span', 'rowMain');
 
-  const nameLine = el('div', 'nameLine');
+  const nameLine = el('span', 'nameLine');
   if (r.rank != null) nameLine.append(el('span', 'rankBadge', `#${r.rank}`));
   nameLine.append(el('span', 'rname', r.name));
   main.append(nameLine);
 
-  const meta = el('div', 'metaLine');
+  const meta = el('span', 'metaLine');
   const bits = [];
   if (r.neighborhood) bits.push(r.neighborhood);
   else if (r.borough) bits.push(r.borough);
@@ -517,7 +521,7 @@ function renderRow(r) {
   }
   main.append(meta);
 
-  const pills = el('div', 'pills');
+  const pills = el('span', 'pills');
   if (SAVED.has(r.slug)) pills.append(pill('saved', '★ saved'));
   if (isMine(r)) {
     // No window, so nothing here is urgent, ended, or a missing end date —
@@ -601,8 +605,19 @@ function renderRow(r) {
   head.addEventListener('click', () => toggleDetail(r, row, head));
   row.append(head);
 
-  if (EXPANDED.has(r.slug)) row.append(renderDetail(r));
+  if (EXPANDED.has(r.slug)) row.append(openDetail(r, head));
   return row;
+}
+
+/* The detail is a SIBLING of the button that discloses it, so aria-expanded
+   alone leaves no trail from one to the other. The pointer is set only while
+   the panel exists — toggleDetail removes the node rather than hiding it, and
+   aria-controls must never name an id that is not in the document. */
+function openDetail(r, head) {
+  const d = renderDetail(r);
+  d.id = `detail-${r.slug}`;
+  head.setAttribute('aria-controls', d.id);
+  return d;
 }
 
 function toggleDetail(r, row, head) {
@@ -612,9 +627,10 @@ function toggleDetail(r, row, head) {
     const d = row.querySelector('.detail');
     if (d) d.remove();
     head.setAttribute('aria-expanded', 'false');
+    head.removeAttribute('aria-controls');
   } else {
     EXPANDED.add(r.slug);
-    row.append(renderDetail(r));
+    row.append(openDetail(r, head));
     head.setAttribute('aria-expanded', 'true');
   }
 }
@@ -1015,10 +1031,14 @@ function buildFacets() {
     // turned off. Searching or expanding reveals the rest.
     const CAP = 12;
     const capped = !FACET_FIND && !EXPANDED_FACETS.has(f.key) && entries.length > CAP + 3;
-    const hiddenCount = capped ? entries.length - CAP : 0;
+    let hiddenCount = 0;
     if (capped) {
       const keep = entries.slice(0, CAP);
       const sel = entries.slice(CAP).filter(([v]) => FILTERS[f.key].has(v));
+      // Selected values past the cap are put back, so they are no longer among
+      // the hidden — counting before the concat promised more than "Show more"
+      // could deliver.
+      hiddenCount = entries.length - CAP - sel.length;
       entries = keep.concat(sel);
     }
 
@@ -1039,7 +1059,7 @@ function buildFacets() {
     box.append(chips);
     sec.append(box);
     if (hiddenCount > 0) {
-      const more = el('button', 'moreLink', `Show all ${entries.length + hiddenCount - (entries.length - CAP)} …`);
+      const more = el('button', 'moreLink');
       more.textContent = `Show ${hiddenCount} more`;
       more.type = 'button';
       more.addEventListener('click', () => { EXPANDED_FACETS.add(f.key); buildFacets(); });
@@ -1084,6 +1104,15 @@ function buildFacets() {
   const input = el('input');
   input.type = 'date';
   input.id = 'bookableBy';
+  // The <h3> above names this group, not the control — without a label of its
+  // own the input announces as a bare "date".
+  const lab = el('label', 'sr-only', 'Still bookable on');
+  lab.htmlFor = input.id;
+  wrapEl.append(lab);
+  // Bounded by the season itself: no window opens before it starts or survives
+  // the programme's end, so a date outside them can only return a wrong answer.
+  if (DATA.season_start) input.min = DATA.season_start;
+  if (DATA.program_end) input.max = DATA.program_end;
   if (FILTERS.bookableBy) input.value = FILTERS.bookableBy;
   input.addEventListener('change', () => { FILTERS.bookableBy = input.value || null; apply(); });
   wrapEl.append(input);
@@ -1354,6 +1383,29 @@ function apply() {
   writeHash();
 }
 
+/* Typing is the only control that fires per keystroke, and every keystroke ran
+   the whole of apply(): re-filter 636 rows, re-count nineteen facets against
+   nineteen separate passes, rebuild ~100 chips. "steakhouse" cost ten of them.
+   Coalesce a burst into the one pass its last letter deserves.
+   The facet counts still have to be rebuilt: matches() tests QUERY ahead of the
+   facet loop and `exceptFacet` excludes only a facet's OWN selection, so every
+   chip count is query-dependent — leaving them behind would make each one a
+   claim about a result set that is no longer on screen. */
+const QUERY_WAIT = 130;
+let QUERY_T = 0;
+function queueQuery() {
+  clearTimeout(QUERY_T);
+  QUERY_T = setTimeout(() => {
+    // Read the box rather than the keystroke that queued this. Escape, Clear
+    // filters and a season switch all empty the box and set QUERY themselves,
+    // and a stale letter landing behind them would leave the two disagreeing.
+    const q = fold($('#q').value.trim());
+    if (q === QUERY) return;
+    QUERY = q;
+    apply();
+  }, QUERY_WAIT);
+}
+
 /** `silent` resets state without re-rendering — presets clear then set, and
  *  would otherwise render an empty intermediate view. */
 function clearAll(silent) {
@@ -1440,11 +1492,26 @@ function tip(host) {
   };
 }
 
+/** Every bar is a filter control, and the stats note promises as much ("Click
+ *  any bar to filter the list by it") — so each one has to be reachable and
+ *  activatable without a mouse, and has to say what it is when it gets there.
+ *  Focus goes on the invisible hit target, which is what the stylesheet's
+ *  `.barHit:focus-visible + .bar` rule lights up. */
+function barButton(node, label, activate) {
+  node.setAttribute('role', 'button');
+  node.setAttribute('tabindex', '0');
+  node.setAttribute('aria-label', label);
+  node.addEventListener('keydown', (e) => {
+    // Space would scroll the page away from the chart unless it is claimed here
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+  });
+}
+
 /** Vertical bars — closings per date. Urgent dates take the status colour. */
-function barsVertical(host, data, onPick) {
+function barsVertical(host, data, onPick, label) {
   host.textContent = '';
   const W = 560, H = 190, padL = 26, padR = 8, padT = 16, padB = 30;
-  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img' });
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': label });
   const max = Math.max(...data.map((d) => d.n), 1);
   const bw = (W - padL - padR) / data.length;
   const t = tip(host);
@@ -1471,10 +1538,10 @@ function barsVertical(host, data, onPick) {
     ax.textContent = d.label;
     svg.append(ax);
 
+    const text = `${d.n} close ${d.label}${d.urgent ? ' · book first' : ''}`;
     const over = (e) => {
       const r = host.getBoundingClientRect();
-      t.show(`${d.n} close ${d.label}${d.urgent ? ' · book first' : ''}`,
-        e.clientX - r.left, e.clientY - r.top);
+      t.show(text, e.clientX - r.left, e.clientY - r.top);
     };
     [hit, bar].forEach((n) => {
       n.addEventListener('mousemove', over);
@@ -1482,16 +1549,23 @@ function barsVertical(host, data, onPick) {
       n.addEventListener('click', () => onPick(d));
       n.style.cursor = 'pointer';
     });
+    barButton(hit, text, () => onPick(d));
+    // The bar's reading is in the tooltip, so focus has to surface it too.
+    hit.addEventListener('focus', () => {
+      const r = host.getBoundingClientRect(), b = bar.getBoundingClientRect();
+      t.show(text, b.left + b.width / 2 - r.left, b.top - r.top);
+    });
+    hit.addEventListener('blur', () => t.hide());
   });
   host.append(svg);
 }
 
 /** Horizontal bars — magnitude by category, single hue. */
-function barsHorizontal(host, data, onPick) {
+function barsHorizontal(host, data, onPick, label) {
   host.textContent = '';
   const rowH = 26, padL = 116, padR = 44;
   const W = 560, H = data.length * rowH + 6;
-  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img' });
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': label });
   const max = Math.max(...data.map((d) => d.n), 1);
   const t = tip(host);
 
@@ -1511,9 +1585,10 @@ function barsHorizontal(host, data, onPick) {
     val.textContent = d.n;
     svg.append(name, val);
 
+    const text = `${d.label} · ${d.n}`;
     const over = (e) => {
       const r = host.getBoundingClientRect();
-      t.show(`${d.label} · ${d.n}`, e.clientX - r.left, e.clientY - r.top);
+      t.show(text, e.clientX - r.left, e.clientY - r.top);
     };
     [hit, bar].forEach((n) => {
       n.addEventListener('mousemove', over);
@@ -1521,6 +1596,12 @@ function barsHorizontal(host, data, onPick) {
       n.addEventListener('click', () => onPick(d));
       n.style.cursor = 'pointer';
     });
+    barButton(hit, text, () => onPick(d));
+    hit.addEventListener('focus', () => {
+      const r = host.getBoundingClientRect(), b = bar.getBoundingClientRect();
+      t.show(text, b.left + b.width / 2 - r.left, b.top - r.top);
+    });
+    hit.addEventListener('blur', () => t.hide());
   });
   host.append(svg);
 }
@@ -1528,11 +1609,11 @@ function barsHorizontal(host, data, onPick) {
 /** One stacked bar — part-to-whole, with direct labels so the segments never
  *  depend on colour alone (verified green vs estimate amber are close under
  *  protanopia). 2px surface gaps separate the fills. */
-function stackedBar(host, segs, onPick) {
+function stackedBar(host, segs, onPick, label) {
   host.textContent = '';
   const W = 560, H = 46, GAP = 2;
   const total = segs.reduce((a, s) => a + s.n, 0) || 1;
-  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img' });
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': label });
   let x = 0;
   segs.forEach((s, i) => {
     const w = Math.max(2, (W * s.n) / total - (i < segs.length - 1 ? GAP : 0));
@@ -1541,6 +1622,8 @@ function stackedBar(host, segs, onPick) {
       rx: i === 0 || i === segs.length - 1 ? 4 : 0,
     });
     r.addEventListener('click', () => onPick(s));
+    // No hit rect here — the segment is its own target, so it carries focus.
+    barButton(r, `${s.n} ${s.label} · ${Math.round((s.n / total) * 100)}%`, () => onPick(s));
     svg.append(r);
 
     if (w > 42) {
@@ -1615,10 +1698,17 @@ function renderStats() {
   const dates = Object.keys(byDate).sort().map((d) => ({
     key: d, label: fmtDate(d), n: byDate[d], urgent: d >= todayISO() && d <= urgencyHorizon(),
   }));
+  // A chart is a picture of a number, so its accessible name has to carry the
+  // number — read aloud, "When restaurants stop serving" alone says nothing.
+  const withEnd = dates.reduce((a, d) => a + d.n, 0);
+  const peak = dates.reduce((a, d) => (d.n > a.n ? d : a), dates[0]);
   barsVertical($('#chartClose .plot'), dates, (d) => jump(() => {
     // both bounds on the same day == "closes exactly then"
     FILTERS.bookableBy = d.key; FILTERS.endingBy = d.key; SORT = 'gap_usd_desc';
-  }));
+  }), peak
+    ? `When restaurants stop serving: ${peak.n} of ${withEnd} close ${peak.label}, `
+      + `over ${dates.length} closing date${dates.length === 1 ? '' : 's'}`
+    : 'When restaurants stop serving: no end dates in this season');
 
   // value basis
   const basis = [
@@ -1626,21 +1716,35 @@ function renderStats() {
     { key: 'estimate', label: 'estimated', n: all.filter((r) => r.gap_basis === 'estimate').length },
     { key: 'none', label: 'no comparable', n: all.filter((r) => !r.gap_basis).length },
   ];
-  stackedBar($('#chartBasis .plot'), basis, (s) => jump(() => FILTERS.basis.add(s.key)));
+  stackedBar($('#chartBasis .plot'), basis, (s) => jump(() => FILTERS.basis.add(s.key)),
+    `What the value figures rest on: of ${all.length}, `
+    + basis.map((s) => `${s.n} ${s.label}`).join(', '));
+  // The caption's ratio is the headline of this chart and moves with the data —
+  // hand-verifying one more restaurant must not leave a stale figure printed.
+  const verified = basis[0].n;
+  $opt('#basisRatio').textContent = verified
+    ? `only 1 in ${Math.round(all.length / verified)} is hand-verified`
+    : 'none is hand-verified yet';
+
+  const listOf = (d) => d.map((x) => `${x.label} ${x.n}`).join(', ');
 
   // borough
   const byB = {};
   all.forEach((r) => { if (r.borough) byB[r.borough] = (byB[r.borough] || 0) + 1; });
-  barsHorizontal($('#chartBorough .plot'),
-    Object.entries(byB).sort((a, b) => b[1] - a[1]).map(([k, n]) => ({ key: k, label: k, n })),
-    (d) => jump(() => FILTERS.borough.add(d.key)));
+  const boroughs = Object.entries(byB).sort((a, b) => b[1] - a[1]).map(([k, n]) => ({ key: k, label: k, n }));
+  barsHorizontal($('#chartBorough .plot'), boroughs,
+    (d) => jump(() => FILTERS.borough.add(d.key)),
+    `Where they are: of ${all.length}, ${listOf(boroughs)}`);
 
   // cuisines
   const byC = {};
   all.forEach((r) => (r.cuisines || []).forEach((c) => { byC[c] = (byC[c] || 0) + 1; }));
-  barsHorizontal($('#chartCuisine .plot'),
-    Object.entries(byC).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([k, n]) => ({ key: k, label: k, n })),
-    (d) => jump(() => FILTERS.cuisine.add(d.key)));
+  const cuisines = Object.entries(byC).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([k, n]) => ({ key: k, label: k, n }));
+  // Restaurants carry more than one cuisine, so these do NOT sum to the total —
+  // the name says "of N cuisines", never "of N restaurants".
+  barsHorizontal($('#chartCuisine .plot'), cuisines,
+    (d) => jump(() => FILTERS.cuisine.add(d.key)),
+    `Most common cuisines: the top ${cuisines.length} of ${Object.keys(byC).length} — ${listOf(cuisines)}`);
 }
 
 /* ---------- plan --------------------------------------------------------- */
@@ -1764,6 +1868,7 @@ function renderPlan() {
 
       const pick = el('div', 'planPick');
       const sel = el('select', 'planSel');
+      sel.dataset.slug = r.slug;
       sel.setAttribute('aria-label', `Date for ${r.name}`);
       const none = el('option', null, when ? 'Unschedule' : 'Pick a date…');
       none.value = '';
@@ -1786,6 +1891,11 @@ function renderPlan() {
         if (sel.value) PLAN.set(r.slug, sel.value); else PLAN.delete(r.slug);
         persistPlan();
         renderPlan();
+        // Dating a restaurant moves it between sections, and the rebuild throws
+        // away the very control you were using. Put focus back on its
+        // replacement, or every pick drops you to the top of the document.
+        const again = host.querySelector(`.planSel[data-slug="${CSS.escape(r.slug)}"]`);
+        if (again) again.focus();
       });
       pick.append(sel);
       if (options.length) {
@@ -1881,13 +1991,20 @@ const CMP_ROWS = [
     : r.menu_state === 'image_only' ? 'Image-only PDF' : 'None') },
 ];
 
-function renderCompare() {
-  const picks = ROWS.filter((r) => SAVED.has(r.slug))
-    .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99) || a._name.localeCompare(b._name))
-    .slice(0, 6);
+const CMP_MAX = 6;   // more columns than this and the table stops being readable
 
+function renderCompare() {
+  const saved = ROWS.filter((r) => SAVED.has(r.slug))
+    .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99) || a._name.localeCompare(b._name));
+  const picks = saved.slice(0, CMP_MAX);
+
+  // Saying "your 6 saved restaurants" over a capped slice quietly loses the
+  // 7th: name both numbers, and which ones these are.
+  const lead = saved.length > picks.length
+    ? `The top ${picks.length} of your ${saved.length} saved restaurants, by rank, side by side. `
+    : `Your ${picks.length} saved restaurant${picks.length === 1 ? '' : 's'}, side by side. `;
   $('#cmpNote').textContent = picks.length
-    ? `Your ${picks.length} saved restaurant${picks.length === 1 ? '' : 's'}, side by side. `
+    ? lead
       + 'A dot marks the better value in rows where there is one. '
       + '"?" on a date means the restaurant does not print it.'
     : 'Nothing saved yet — open a restaurant and press ★ Save to compare it here.';
@@ -2035,11 +2152,21 @@ function loadLeaflet() {
   return MAP_LOADING;
 }
 
-const markerColour = (r) =>
-  isUrgent(r) ? getComputedStyle(document.documentElement).getPropertyValue('--crit')
-    : r.gap_basis === 'verified' ? getComputedStyle(document.documentElement).getPropertyValue('--value')
-    : r.gap_basis === 'estimate' ? getComputedStyle(document.documentElement).getPropertyValue('--warn')
-    : getComputedStyle(document.documentElement).getPropertyValue('--ink-3');
+/* A custom-property read resolves the document's style, and asking per marker
+   made that 630 reads per redraw — on every apply() while the map is open.
+   The four colours cannot change mid-redraw, so a redraw reads them once; a
+   theme change repaints, which reads them again. */
+const markerPalette = () => {
+  const cs = getComputedStyle(document.documentElement);
+  const v = (name) => cs.getPropertyValue(name).trim();
+  return { crit: v('--crit'), value: v('--value'), warn: v('--warn'), none: v('--ink-3') };
+};
+
+const markerColour = (r, pal) =>
+  isUrgent(r) ? pal.crit
+    : r.gap_basis === 'verified' ? pal.value
+    : r.gap_basis === 'estimate' ? pal.warn
+    : pal.none;
 
 function popupFor(r) {
   const box = el('div', 'mapPop');
@@ -2056,9 +2183,14 @@ function popupFor(r) {
       + (r.gap_basis === 'estimate' ? '  (est.)' : '');
     box.append(g);
   }
+  // Same three states the row pill uses: a marker that is red for urgency must
+  // not describe itself as merely running through a date.
   box.append(el('div', 'meta',
     isMine(r) ? 'On your own list — not a Restaurant Week participant'
-      : r.end_date ? `Runs through ${fmtDate(r.end_date)}` : 'No end date published'));
+      : !r.end_date ? 'No end date published'
+        : hasEnded(r) ? `Ended ${fmtDate(r.end_date)}`
+          : isUrgent(r) ? `Book by ${fmtDate(r.end_date)}`
+            : `Runs through ${fmtDate(r.end_date)}`));
 
   const acts = el('div', 'acts');
   if (r.links && r.links.reservation) {
@@ -2089,9 +2221,10 @@ function drawMarkers() {
   if (MAP_LAYER) MAP_LAYER.remove();
   MAP_LAYER = L.layerGroup().addTo(MAP);
 
+  const pal = markerPalette();
   const pts = RESULTS.filter((r) => r.lat != null && r.lng != null);
   pts.forEach((r) => {
-    const c = markerColour(r).trim();
+    const c = markerColour(r, pal);
     // Verified green and estimate amber are ΔE 4.7 apart under protanopia —
     // indistinguishable by colour alone. The list encodes basis in FORM too
     // (dashed underline + "estimate"), so the map does the same: a solid disc
@@ -2330,6 +2463,12 @@ async function boot() {
   initTheme();
   migrateLegacyState();
 
+  // A megabyte of season comes down before there is a single row to draw, and
+  // until it lands the page is a masthead over nothing — which reads as broken
+  // rather than as busy. The first apply() clears this by emptying #rows; the
+  // failure path below has to clear it itself.
+  $('#rows').append(el('div', 'empty', 'Loading the season…'));
+
   SEASONS = await loadRegistry();
   SEASON = SEASONS.length
     ? chooseSeason(SEASONS, new URLSearchParams(location.hash.replace(/^#/, '')).get('season'))
@@ -2338,6 +2477,7 @@ async function boot() {
   try {
     DATA = await fetchJSON(url);
   } catch (err) {
+    $('#rows').textContent = '';
     $('#rows').append(Object.assign(el('div', 'empty'), { textContent:
       `Could not load ${url} — ${err.message}. Run: python src/export_site_data.py` }));
     return;
@@ -2357,7 +2497,7 @@ async function boot() {
   if (seasonPhase() !== 'archive') FILTERS.bookableBy = todayISO();
   readHash();
 
-  $('#q').addEventListener('input', (e) => { QUERY = fold(e.target.value.trim()); apply(); });
+  $('#q').addEventListener('input', queueQuery);
   $('#facetFind').addEventListener('input', (e) => {
     FACET_FIND = fold(e.target.value.trim());
     buildFacets();          // panel only — the result set is unchanged
@@ -2428,7 +2568,10 @@ async function boot() {
 
   // --- keyboard ----------------------------------------------------------
   addEventListener('keydown', (e) => {
-    const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName);
+    // null whenever the document itself is not focused — reading .tagName off
+    // it throws, and the throw kills every other key on the page.
+    const focused = document.activeElement;
+    const typing = !!focused && /^(INPUT|SELECT|TEXTAREA)$/.test(focused.tagName);
     if (e.key === '/' && !typing) { e.preventDefault(); $('#q').focus(); return; }
     if (e.key === 'Escape') {
       if (typing && $('#q').value) { QUERY = ''; $('#q').value = ''; apply(); }

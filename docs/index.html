@@ -2,13 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- Must stay ahead of every link/script below, or they are fetched before the
+     policy exists. Everything here is same-origin except the map, which is only
+     ever loaded on demand: Leaflet 1.9.4 from unpkg, raster tiles from CARTO's
+     a/b/c hosts — Leaflet's default {s} set, so a fourth would have to be added
+     here as well as to TILES. There is no inline script or style on the page,
+     so neither directive needs 'unsafe-inline'; the few inline styles the code
+     does set are CSSOM property writes, which CSP does not police. -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'none';
+  script-src 'self' https://unpkg.com;
+  style-src 'self' https://unpkg.com;
+  img-src 'self' data: https://a.basemaps.cartocdn.com https://b.basemaps.cartocdn.com https://c.basemaps.cartocdn.com;
+  connect-src 'self';
+  base-uri 'none';
+  form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <meta name="referrer" content="no-referrer">
 <title>NYC Restaurant Week — value dashboard</title>
 <meta name="description" content="Personal sort/filter tool for NYC Restaurant Week Summer 2026. Not a publication.">
-<meta name="theme-color" content="#0d6a5f">
-<link rel="stylesheet" href="styles.css?v=3">
+<!-- Only the OS preference can move this; the in-page theme toggle cannot. The
+     light value is the accent, the dark one is the dark masthead surface. A
+     browser that ignores `media` takes the first, which is what it took before. -->
+<meta name="theme-color" content="#0d6a5f" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151d1c" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="styles.css?v=4">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230d6a5f'/%3E%3Ctext x='8' y='12' font-family='monospace' font-size='10' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%24%3C/text%3E%3C/svg%3E">
 </head>
 <body>
@@ -21,6 +40,20 @@
     <button type="button" class="themeToggle" id="themeToggle" aria-label="Switch colour theme">Theme</button>
   </div>
 </header>
+
+<!-- Every row, chart and filter on this page is built from JSON at runtime;
+     there is no server-rendered fallback to degrade to. Say so, rather than
+     leaving a working page frame above a permanently empty list. -->
+<noscript>
+  <div class="wrap">
+    <div class="banner">
+      <p><strong>This page needs JavaScript.</strong> It is a client-side tool: the
+         restaurant list, the filters and the charts are all assembled in the browser
+         from a JSON file, so with scripting off there is nothing below but an empty
+         frame. The underlying data lives in <code>docs/data/</code> in the repository.</p>
+    </div>
+  </div>
+</noscript>
 
 <div class="controls">
   <div class="wrap">
@@ -125,7 +158,9 @@
         <div class="plot"></div>
       </figure>
       <figure class="chart" id="chartBasis">
-        <figcaption>What the value figures rest on<span>only 1 in 45 is hand-verified</span></figcaption>
+        <!-- the ratio is written by renderStats: it moves every time another
+             restaurant is hand-checked, and a printed one would go stale -->
+        <figcaption>What the value figures rest on<span id="basisRatio"></span></figcaption>
         <div class="plot"></div>
       </figure>
       <figure class="chart" id="chartBorough">
@@ -174,6 +209,6 @@
 <!-- ?v= is bumped whenever app.js or styles.css changes. Without it a cached
      index.html can pair with a fresh app.js — which crashes boot the moment the
      script reaches for an element the stale document does not have. -->
-<script src="app.js?v=4"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>

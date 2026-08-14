@@ -463,7 +463,6 @@ a:hover { text-decoration-thickness: 2px; }
   background: var(--surface-2);
   font-size: 13.5px;
 }
-.detail[hidden] { display: none; }
 
 .dgrid {
   display: grid; gap: 9px 18px;
@@ -668,8 +667,13 @@ a:hover { text-decoration-thickness: 2px; }
 .bar.urgent{ fill: var(--crit); }
 .bar:hover { filter: brightness(1.15); }
 .barHit    { fill: transparent; cursor: pointer; }
+/* The hit rect is invisible, so a focus ring drawn on it lands nowhere useful:
+   the ring goes on the rect, and the bar beside it brightens to say which one
+   the keyboard is on. Requires .barHit to be the bar's immediate sibling. */
 .barHit:hover + .bar, .barHit:focus-visible + .bar { filter: brightness(1.15); }
+.barHit:focus-visible { outline-offset: -2px; }
 .seg       { cursor: pointer; }
+.seg:focus-visible { filter: brightness(1.15); }
 .seg.verified { fill: var(--value); }
 .seg.estimate { fill: var(--warn); }
 .seg.none     { fill: var(--ink-3); }

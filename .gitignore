@@ -1,5 +1,6 @@
 data/raw/menus/*.pdf
 data/cache/
+*.sqlite-journal
 __pycache__/
 venv/
 .venv/

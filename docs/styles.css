@@ -709,6 +709,11 @@ a:hover { text-decoration-thickness: 2px; }
   margin-top: 5px; font-family: var(--mono); font-size: 11px;
   color: var(--warn); font-weight: 600;
 }
+/* A meal already eaten — a record, so it stays quiet rather than warning. */
+.planPast {
+  margin-top: 5px; font-family: var(--mono); font-size: 11px;
+  color: var(--ink-3);
+}
 .planPick { display: flex; flex-direction: column; gap: 2px; }
 .planSel {
   font: inherit; font-size: 13.5px; padding: 7px 9px;

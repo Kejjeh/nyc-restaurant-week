@@ -32,9 +32,30 @@ const fold = (s) =>
     .replace(/[“”]/g, '"')
     .toLowerCase();
 
+/* Debug-only: ?today=YYYY-MM-DD freezes "today" — this is a noindex personal
+   tool, and every date-dependent behaviour must be checkable at any date. */
+const TODAY_OVERRIDE = (/[?&]today=(\d{4}-\d{2}-\d{2})\b/.exec(location.search) || [])[1] || null;
 const todayISO = () => {
+  if (TODAY_OVERRIDE) return TODAY_OVERRIDE;
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
+/* Anything can write to localStorage; a corrupt value must not cost the whole
+   page, which is what an unguarded parse at module scope would do. */
+function readJSON(key, fallback) {
+  try {
+    const v = JSON.parse(localStorage.getItem(key));
+    return v && typeof v === 'object' ? v : fallback;
+  } catch { return fallback; }
+}
+
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const dowOf = (iso) => new Date(`${iso}T12:00:00Z`).getUTCDay();
+const addDays = (iso, n) => {
+  const d = new Date(`${iso}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
 };
 
 /** Format an ISO date as "Aug 16" without touching timezones. */
@@ -88,7 +109,7 @@ const RESULTS_TOP = () => {
 
 /* Your own shortlist, kept in this browser. The dataset ships a curated
    ranking, but choosing what to actually book is a separate, personal pass. */
-const SAVED = new Set(JSON.parse(localStorage.getItem('rw-saved') || '[]'));
+const SAVED = new Set(readJSON('rw-saved', []));
 const persistSaved = () =>
   localStorage.setItem('rw-saved', JSON.stringify([...SAVED]));
 let SORT = 'best';   // trust-weighted; see SORTS.best
@@ -336,8 +357,20 @@ function pill(cls, text, title) {
   return p;
 }
 
+/* Urgency is "closing within a week from wherever we are now", not "on or
+   before the program's headline date". Frozen against book_by, every closed
+   restaurant would keep shouting BOOK BY once that date passed. */
+function urgencyHorizon() {
+  const h = addDays(todayISO(), 7);
+  return DATA.program_end && h > DATA.program_end ? DATA.program_end : h;
+}
+
+function hasEnded(r) {
+  return !!(r.end_date && r.end_date < todayISO());
+}
+
 function isUrgent(r) {
-  return !!(DATA.book_by && r.end_date && r.end_date <= DATA.book_by);
+  return !!(r.end_date && r.end_date >= todayISO() && r.end_date <= urgencyHorizon());
 }
 
 function renderGapCell(r) {
@@ -417,6 +450,9 @@ function renderRow(r) {
       r.end_date_source === 'conflict'
         ? 'Two verified sources disagree — the earlier date is shown'
         : `RW window ends ${fmtDate(r.end_date)}`));
+  } else if (hasEnded(r)) {
+    pills.append(pill('quiet', `ended ${fmtDate(r.end_date)}`,
+      'This restaurant’s Restaurant Week window has closed'));
   } else if (r.end_date) {
     pills.append(pill('quiet', `thru ${fmtDate(r.end_date)}`,
       r.end_date_source === 'printed' ? 'End date printed by the restaurant'
@@ -508,7 +544,7 @@ function field(dl, label, value, mono) {
 }
 
 const FLAG_TEXT = {
-  book_by_aug16: 'Ends Aug 16 or sooner — book first',
+  book_by_aug16: () => `Ends ${fmtDate(DATA.book_by)} or sooner — book first`,
   end_date_unprinted: 'Restaurant prints no end date',
   end_date_conflict: 'Verified sources disagree on the end date',
   saturday_service: 'Prints SATURDAY service — an exception to the program-wide Saturday exclusion',
@@ -520,6 +556,10 @@ const FLAG_TEXT = {
   ambiguous_entity: 'Two participants share this name — caveat cannot be attributed',
   two_course_tier: 'This tier buys TWO courses, not three',
 };
+
+/** Flag copy, resolved late so season dates come from the payload, not source. */
+const flagText = (f) =>
+  (typeof FLAG_TEXT[f] === 'function' ? FLAG_TEXT[f]() : FLAG_TEXT[f]);
 
 function renderDetail(r) {
   const d = el('section', 'detail');
@@ -538,9 +578,11 @@ function renderDetail(r) {
   }
   (r.flags || []).forEach((f) => {
     if (!FLAG_TEXT[f]) return;
-    if (f === 'book_by_aug16') return; // already a pill on the row
+    // The headline-deadline flag is already a pill on the row while it is live,
+    // and says nothing once that deadline is behind us.
+    if (f === 'book_by_aug16') return;
     const n = el('div', 'note warn');
-    n.append(document.createTextNode(FLAG_TEXT[f]));
+    n.append(document.createTextNode(flagText(f)));
     d.append(n);
   });
 
@@ -795,6 +837,11 @@ function openRestaurant(slug) {
   }
   EXPANDED.add(slug);
   VIEW = 'list';
+  // Drop `r` from the hash: writeHash() refuses to run while it is there, so
+  // leaving it would freeze filter/sort/view state for the rest of the session.
+  const p = new URLSearchParams(location.hash.replace(/^#/, ''));
+  p.delete('r');
+  history.replaceState(null, '', p.toString() ? `#${p}` : location.pathname + location.search);
   apply();
   // it may sit past the first page of 50 — keep rendering until it exists
   let guard = 0;
@@ -972,9 +1019,13 @@ const PRESETS = [
   },
   {
     key: 'urgent', label: 'Closing soon',
-    count: () => ROWS.filter((r) => r.end_date && r.end_date <= DATA.book_by).length,
-    is: () => FILTERS.endingBy === DATA.book_by,
-    set() { FILTERS.endingBy = DATA.book_by; SORT = 'end_asc'; },
+    count: () => ROWS.filter(isUrgent).length,
+    is: () => FILTERS.endingBy === urgencyHorizon() && FILTERS.bookableBy === todayISO(),
+    set() {
+      FILTERS.bookableBy = todayISO();
+      FILTERS.endingBy = urgencyHorizon();
+      SORT = 'end_asc';
+    },
   },
   {
     key: 'verified', label: 'Verified gaps',
@@ -1096,9 +1147,11 @@ function groupHeader(key) {
   if (key === 'none') {
     h.append(el('h2', null, 'No end date published'));
   } else {
-    const urgent = DATA.book_by && key <= DATA.book_by;
+    const ended = key < todayISO();
+    const urgent = !ended && key <= urgencyHorizon();
     if (urgent) h.classList.add('urgent');
-    h.append(el('h2', null, `${urgent ? 'Closes' : 'Runs through'} ${fmtDate(key)}`));
+    h.append(el('h2', null,
+      `${ended ? 'Closed' : urgent ? 'Closes' : 'Runs through'} ${fmtDate(key)}`));
   }
   h.append(el('span', 'n', `${n} restaurant${n === 1 ? '' : 's'}`));
   return h;
@@ -1153,7 +1206,7 @@ function apply() {
   $('#shown').textContent = RESULTS.length;
   $('#total').textContent = ROWS.length;
   const urgent = RESULTS.filter(isUrgent).length;
-  $('#urgentCount').textContent = urgent ? `· ${urgent} ending by ${fmtDate(DATA.book_by)}` : '';
+  $('#urgentCount').textContent = urgent ? `· ${urgent} ending by ${fmtDate(urgencyHorizon())}` : '';
   $('#empty').hidden = RESULTS.length !== 0;
 
   const n = activeCount();
@@ -1388,14 +1441,14 @@ function renderStats() {
   const today = todayISO();
   const daysLeft = Math.max(0, Math.round(
     (Date.parse(`${DATA.program_end || '2026-09-06'}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 864e5));
-  const soon = all.filter((r) => r.end_date && r.end_date <= DATA.book_by).length;
+  const soon = all.filter(isUrgent).length;
   const stars = all.filter((r) => (r.recognition || [])
     .some((x) => x.source === 'michelin' && /star/.test(x.level || ''))).length;
 
   const tiles = [
     { n: all.length, k: 'restaurants' },
     { n: daysLeft, k: 'days left' },
-    { n: soon, k: `close by ${fmtDate(DATA.book_by)}`, cls: 'crit' },
+    { n: soon, k: `close by ${fmtDate(urgencyHorizon())}`, cls: soon ? 'crit' : null },
     { n: all.filter((r) => r.gap_basis === 'verified').length, k: 'verified gaps', cls: 'value' },
     { n: stars, k: 'michelin stars' },
     { n: SAVED.size, k: 'you saved' },
@@ -1415,7 +1468,7 @@ function renderStats() {
   const byDate = {};
   all.forEach((r) => { if (r.end_date) byDate[r.end_date] = (byDate[r.end_date] || 0) + 1; });
   const dates = Object.keys(byDate).sort().map((d) => ({
-    key: d, label: fmtDate(d), n: byDate[d], urgent: d <= DATA.book_by,
+    key: d, label: fmtDate(d), n: byDate[d], urgent: d >= todayISO() && d <= urgencyHorizon(),
   }));
   barsVertical($('#chartClose .plot'), dates, (d) => jump(() => {
     // both bounds on the same day == "closes exactly then"
@@ -1453,17 +1506,9 @@ function renderStats() {
    a restaurant prints otherwise, and a Sunday is only offered where Sunday
    service is established. */
 
-const PLAN = new Map(Object.entries(JSON.parse(localStorage.getItem('rw-plan') || '{}')));
+const PLAN = new Map(Object.entries(readJSON('rw-plan', {})));
 const persistPlan = () =>
   localStorage.setItem('rw-plan', JSON.stringify(Object.fromEntries(PLAN)));
-
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const dowOf = (iso) => new Date(`${iso}T12:00:00Z`).getUTCDay();
-const addDays = (iso, n) => {
-  const d = new Date(`${iso}T12:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + n);
-  return d.toISOString().slice(0, 10);
-};
 
 /** Why a given date is or isn't bookable — the reason is shown, not just the
  *  verdict, because several of these come from contested source data. */
@@ -1505,12 +1550,9 @@ function renderPlan() {
     return;
   }
 
-  // drop stale assignments (a date that has since become impossible)
-  saved.forEach((r) => {
-    const d = PLAN.get(r.slug);
-    if (d && dateIssue(r, d)) PLAN.delete(r.slug);
-  });
-  persistPlan();
+  /* Assignments are never dropped here. A date that has passed is a meal you
+     went to, not stale state, and deleting it on render silently destroyed the
+     only record of it. Impossible-but-future dates keep their reason instead. */
 
   const dated = saved.filter((r) => PLAN.get(r.slug))
     .sort((a, b) => PLAN.get(a.slug).localeCompare(PLAN.get(b.slug)));
@@ -1555,6 +1597,14 @@ function renderPlan() {
       if (when && counts[when] > 1) {
         main.append(el('div', 'planWarn', `Two bookings on ${fmtDate(when)}`));
       }
+      // A booked date that has passed reads as history; anything else that has
+      // become impossible says WHY, which is what dateIssue() was written for.
+      const issue = when && dateIssue(r, when);
+      if (issue === 'in the past') {
+        main.append(el('div', 'planPast', `went here — ${fmtDate(when)}`));
+      } else if (issue) {
+        main.append(el('div', 'planWarn', `${fmtDate(when)} is ${issue}`));
+      }
       row.append(main);
 
       const pick = el('div', 'planPick');
@@ -1564,13 +1614,16 @@ function renderPlan() {
       none.value = '';
       sel.append(none);
       const options = validDates(r);
-      options.forEach((d) => {
+      // An assignment outside the offerable set still has to appear, or the
+      // control would misreport what is actually booked.
+      const shown = when && !options.includes(when) ? [when, ...options] : options;
+      shown.forEach((d) => {
         const o = el('option', null, `${DAYS[dowOf(d)]} ${fmtDate(d)}`);
         o.value = d;
         if (d === when) o.selected = true;
         sel.append(o);
       });
-      if (!options.length) {
+      if (!shown.length) {
         sel.disabled = true;
         none.textContent = 'No dates left';
       }

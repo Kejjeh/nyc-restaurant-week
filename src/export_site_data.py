@@ -324,37 +324,48 @@ GOOGLE = ROOT / "data" / "raw" / "google"
 GOOGLE_PRIOR = 150
 
 
+def bayesian_score(rating, reviews, mean, prior=GOOGLE_PRIOR):
+    """A rating shrunk toward the roster mean, worth `prior` reviews of doubt."""
+    return (reviews * rating + prior * mean) / (reviews + prior)
+
+
+def rated(rec):
+    """The matched block of an accepted record that carries a rating, else None."""
+    m = rec.get("matched") or {}
+    return m if rec.get("accepted") and m.get("rating") is not None else None
+
+
+def google_row(rec, mean):
+    """One cached Google record -> the published block, or None when unrated."""
+    m = rated(rec)
+    if m is None:
+        return None
+    r, v = float(m["rating"]), int(m.get("user_ratings_total") or 0)
+    return {
+        "rating": round(r, 2),
+        "reviews": v,
+        "score": round(bayesian_score(r, v, mean), 3),
+        "place_id": m.get("place_id"),
+        "matched_name": clean(m.get("name")),
+        # 'place_id' means a human pinned it; 'textsearch' means it was
+        # accepted on coordinates, which the UI should not overstate.
+        "basis": rec.get("source") or "textsearch",
+        "closed": m.get("business_status") not in (None, "OPERATIONAL"),
+    }
+
+
 def build_google():
     """slug -> {rating, reviews, score, ...}. Unmatched restaurants get nothing
     rather than a zero, exactly like every other unknown here."""
     if not GOOGLE.exists():
         return {}, 0.0
-    raw = {}
-    for f in sorted(GOOGLE.glob("*.json")):
-        rec = json.loads(f.read_text(encoding="utf-8"))
-        m = rec.get("matched") or {}
-        if not rec.get("accepted") or m.get("rating") is None:
-            continue
-        raw[rec["slug"]] = (float(m["rating"]), int(m.get("user_ratings_total") or 0),
-                            m, rec)
-    if not raw:
+    recs = [json.loads(f.read_text(encoding="utf-8"))
+            for f in sorted(GOOGLE.glob("*.json"))]
+    recs = [rec for rec in recs if rated(rec)]
+    if not recs:
         return {}, 0.0
-    mean = sum(r for r, _, _, _ in raw.values()) / len(raw)
-    out = {}
-    for slug, (r, v, m, rec) in raw.items():
-        score = (v * r + GOOGLE_PRIOR * mean) / (v + GOOGLE_PRIOR)
-        out[slug] = {
-            "rating": round(r, 2),
-            "reviews": v,
-            "score": round(score, 3),
-            "place_id": m.get("place_id"),
-            "matched_name": clean(m.get("name")),
-            # 'place_id' means a human pinned it; 'textsearch' means it was
-            # accepted on coordinates, which the UI should not overstate.
-            "basis": rec.get("source") or "textsearch",
-            "closed": m.get("business_status") not in (None, "OPERATIONAL"),
-        }
-    return out, mean
+    mean = sum(float(rated(rec)["rating"]) for rec in recs) / len(recs)
+    return {rec["slug"]: google_row(rec, mean) for rec in recs}, mean
 
 
 # --------------------------------------------------------------------------
@@ -1136,6 +1147,11 @@ def build_payload():
     payload = {
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "season_label": SEASON_LABEL,
+        # the code identifies which season this payload IS, so a reader that
+        # holds several can tell them apart; start lets the archive state name
+        # the whole run rather than only the day it stopped
+        "season_code": SEASON,
+        "season_start": SEASON_START,
         "snapshot_date": con_snapshot(),
         "verified_asof": verified_asof(json.loads(VERIFIED.read_text(encoding="utf-8"))
                                        ["_doc"]["provenance"]),
@@ -1204,7 +1220,7 @@ def assert_tos_clean(payload):
     # checked SEPARATELY because they quote different documents -- the RW menu
     # PDF and the restaurant's own website -- so a run shared across the two is
     # not a contiguous passage of either.
-    for r in payload["restaurants"]:
+    for r in payload.get("restaurants", payload.get("places", [])):
         for field in ("tags", "offsite_tags"):
             seen = []
             for t in r.get(field, []):
@@ -1242,6 +1258,70 @@ def assert_not_shrunk(old_count, new_count, allow=False):
         " Re-run the fetch, or pass --allow-shrink if the drop is real.")
 
 
+# --------------------------------------------------------------------------
+# Seasons registry
+#
+# One payload per season under docs/data/seasons/, indexed by docs/data/seasons.json.
+# A run speaks only for its OWN code: every other entry is copied through
+# untouched, so the Winter build cannot quietly rewrite the Summer archive.
+# --------------------------------------------------------------------------
+
+REGISTRY_KEYS = ("code", "label", "year", "start", "book_by", "end")
+SEASON_FACTS = {"code": SEASON, "label": SEASON_LABEL, "year": SEASON_YEAR,
+                "start": SEASON_START, "book_by": BOOK_BY, "end": PROGRAM_END}
+
+
+def season_paths(out=None):
+    """(season payload, registry), derived from OUT so redirecting it moves all three."""
+    d = (out or OUT).parent
+    return d / "seasons" / f"{SEASON}.json", d / "seasons.json"
+
+
+def rel(path):
+    """Repo-relative when it can be, absolute when the path is a test's tmp dir."""
+    try:
+        return str(Path(path).relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
+def jfile(path, default=None):
+    """Parsed JSON, or `default` when the file is missing or unreadable."""
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return default
+
+
+def _unstamped(d):
+    return {k: v for k, v in d.items() if k != "generated_at"}
+
+
+def write_if_changed(path, obj, text):
+    """-> True when written. `generated_at` is a wall-clock stamp, so comparing
+    with it would rewrite every file on every run and the weekly Actions job
+    would commit churn forever."""
+    old = jfile(path)
+    if isinstance(old, dict) and _unstamped(old) == _unstamped(obj):
+        return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    # build in a temp dir then copy (some mounted filesystems break unlink)
+    tmp = Path(tempfile.mkdtemp()) / path.name
+    tmp.write_text(text, encoding="utf-8")
+    shutil.copyfile(tmp, path)
+    return True
+
+
+def update_registry(existing, facts, today):
+    """Merge one season's entry into the registry, newest end date first."""
+    day = today.isoformat() if hasattr(today, "isoformat") else str(today)
+    entry = {k: facts[k] for k in REGISTRY_KEYS}
+    entry["status"] = "archived" if day > facts["end"] else "live"
+    entry["file"] = f"seasons/{facts['code']}.json"
+    others = [e for e in (existing or []) if e.get("code") != facts["code"]]
+    return sorted([*others, entry], key=lambda e: (e["end"], e["code"]), reverse=True)
+
+
 def main():
     check = "--check" in sys.argv
     quiet = "--quiet" in sys.argv
@@ -1251,27 +1331,27 @@ def main():
     assert_tos_clean(payload)
 
     text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    season_out, registry_out = season_paths()
+    registry = update_registry((jfile(registry_out) or {}).get("seasons"),
+                               SEASON_FACTS, date.today())
+    reg_obj = {"seasons": registry}
+    reg_text = json.dumps(reg_obj, ensure_ascii=False, indent=1) + "\n"
 
-    # `generated_at` is a wall-clock stamp, so a naive write would make the
-    # payload differ on every run and the weekly Actions job would commit churn
-    # forever. Rewrite only when something OTHER than the stamp changed.
-    unchanged, old_n = False, 0
-    if OUT.exists():
-        try:
-            old = json.loads(OUT.read_text(encoding="utf-8"))
-            old_n = len(old.get("restaurants", []))
-            unchanged = ({k: v for k, v in old.items() if k != "generated_at"}
-                         == {k: v for k, v in payload.items() if k != "generated_at"})
-        except (ValueError, OSError):
-            unchanged = False
+    # The season file is what this run published last time; the legacy copy is
+    # only the fallback for a cached frontend, so it cannot set the floor.
+    published = jfile(season_out) or jfile(OUT) or {}
+    old_n = len(published.get("restaurants", []))
 
-    if not check and not unchanged:
+    wrote = []
+    if not check:
         assert_not_shrunk(old_n, len(payload["restaurants"]), allow_shrink)
-        OUT.parent.mkdir(parents=True, exist_ok=True)
-        # build in a temp dir then copy (some mounted filesystems break unlink)
-        tmp = Path(tempfile.mkdtemp()) / OUT.name
-        tmp.write_text(text, encoding="utf-8")
-        shutil.copyfile(tmp, OUT)
+        wrote = [p for p, o, t in ((season_out, payload, text),
+                                   # LEGACY, TEMPORARY: dropped once the frontend
+                                   # reads seasons/ -- until then it is the file
+                                   # every published page actually fetches.
+                                   (OUT, payload, text),
+                                   (registry_out, reg_obj, reg_text))
+                 if write_if_changed(p, o, t)]
 
     if not quiet:
         n = len(payload["restaurants"])
@@ -1303,9 +1383,14 @@ def main():
         print(f"tags          {tagged} restaurants ({tags_dropped} snippets pruned)")
         print(f"recognition   {badged} restaurants ({recog_dropped} rows suppressed)")
         where = ("  (not written: --check)" if check
-                 else "  (unchanged, not rewritten)" if unchanged
-                 else "  -> " + str(OUT.relative_to(ROOT)))
+                 else "  (unchanged, not rewritten)" if not wrote
+                 else f"  ({len(wrote)} of 3 files rewritten)")
         print(f"payload       {len(text.encode('utf-8')):,} bytes{where}")
+        mine = next(s for s in registry if s["code"] == SEASON)
+        print(f"  season      {rel(season_out)}  ({mine['status']})")
+        print(f"  registry    {rel(registry_out)}  ({len(registry)} season(s))")
+        print(f"  legacy      {rel(OUT)}"
+              "  -- temporary, until the frontend reads seasons/")
 
 
 if __name__ == "__main__":

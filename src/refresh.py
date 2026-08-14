@@ -50,6 +50,9 @@ def main():
     else:
         print("fetch_google_ratings.py skipped: no GOOGLE_PLACES_KEY in env")
     run("export_site_data.py")    # docs/ payload; must follow tag+recognition
+    # The my-list payload shrinks its Google scores toward the ROSTER mean, so
+    # it has to follow both the ratings fetch and the exporter it borrows from.
+    run("export_places.py")
     run("diff_report.py")
 
 

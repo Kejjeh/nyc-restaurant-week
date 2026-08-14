@@ -10,7 +10,17 @@
  */
 'use strict';
 
-const DATA_URL = 'data/restaurants.json';
+const DATA_DIR = 'data/';
+const REGISTRY_URL = `${DATA_DIR}seasons.json`;
+const PLACES_URL = `${DATA_DIR}places.json`;
+/* The pre-registry payload. A published site can be a build behind this file,
+   and a browser can be holding a cached index.html — either way there may be
+   no seasons.json to fetch, and the single-season page must still come up. */
+const LEGACY_URL = `${DATA_DIR}restaurants.json`;
+/* The only season the un-namespaced localStorage keys can have belonged to:
+   when they were written there was exactly one. Also the namespace used when
+   no registry is there to name one. */
+const LEGACY_SEASON = 'srw26';
 
 /* ---------- helpers ----------------------------------------------------- */
 
@@ -75,7 +85,16 @@ const money = (n) => (n == null ? null : `$${Number(n).toLocaleString('en-US')}`
 
 let DATA = null;
 let ROWS = [];                 // array of restaurant objects
+let SEASONS = [];              // registry entries, newest end first; [] = none
+let SEASON = null;             // the selected entry, null when there is no registry
+let PLACES = [];               // your own places — prepared once, season-agnostic
 const EXPANDED = new Set();    // slugs whose detail is open
+
+/* A row you added yourself. It is in the dataset for the address, the walk and
+   the rating; it is NOT in Restaurant Week, so every field the programme owns
+   (window, price, gap, menu, rank) is null on it and must read as absent
+   rather than as a bad answer. Roster rows carry no `source` at all. */
+const isMine = (r) => r.source === 'mine';
 
 const FILTERS = {
   borough: new Set(),
@@ -110,11 +129,37 @@ const RESULTS_TOP = () => {
   return m ? m.getBoundingClientRect().top + scrollY : 0;
 };
 
-/* Your own shortlist, kept in this browser. The dataset ships a curated
-   ranking, but choosing what to actually book is a separate, personal pass. */
-const SAVED = new Set(readJSON('rw-saved', []));
+/* Your own shortlist and its dates, kept in this browser — and kept PER
+   SEASON: last summer's shortlist is a record of what you ate, not a starting
+   point for this summer. Both are reassigned when the season changes, so
+   neither can be a const. */
+let STATE_SEASON = LEGACY_SEASON;
+let SAVED = new Set();
+let PLAN = new Map();
 const persistSaved = () =>
-  localStorage.setItem('rw-saved', JSON.stringify([...SAVED]));
+  localStorage.setItem(`rw-saved:${STATE_SEASON}`, JSON.stringify([...SAVED]));
+const persistPlan = () =>
+  localStorage.setItem(`rw-plan:${STATE_SEASON}`, JSON.stringify(Object.fromEntries(PLAN)));
+
+function loadState(code) {
+  STATE_SEASON = code;
+  SAVED = new Set(readJSON(`rw-saved:${code}`, []));
+  PLAN = new Map(Object.entries(readJSON(`rw-plan:${code}`, {})));
+}
+
+/* The keys were global before there were seasons, so whatever is in them was
+   written under the one season there was. Deleting the old key is the guard
+   that makes this run once; an existing namespaced value is never clobbered. */
+function migrateLegacyState() {
+  for (const base of ['rw-saved', 'rw-plan']) {
+    const old = localStorage.getItem(base);
+    if (old == null) continue;
+    const key = `${base}:${LEGACY_SEASON}`;
+    if (localStorage.getItem(key) == null) localStorage.setItem(key, old);
+    localStorage.removeItem(base);
+  }
+}
+
 let SORT = 'best';   // trust-weighted; see SORTS.best
 let QUERY = '';
 let BANNER = () => {};   // set during boot, once the banner nodes exist
@@ -124,6 +169,11 @@ const EXPANDED_FACETS = new Set();      // facets the user expanded past the cap
 /* Facet groups are declared once. Adding a facet = one entry here; the panel,
    the counts, the URL state and the clear-all all follow automatically. */
 const FACETS = [
+  // The coarsest split there is, and only a question at all once you have
+  // added something of your own — otherwise every row is the same answer.
+  { key: 'list',        title: 'List',          values: (r) => [isMine(r) ? 'mine' : 'rw'],
+                                                show: () => ROWS.some(isMine),
+                                                labels: { rw: 'Restaurant Week', mine: 'My list' } },
   { key: 'borough',     title: 'Borough',       values: (r) => r.borough ? [r.borough] : [] },
   { key: 'neighborhood',title: 'Neighborhood',  values: (r) => r.neighborhood ? [r.neighborhood] : [], scroll: true },
   { key: 'cuisine',     title: 'Cuisine',       values: (r) => r.cuisines || [], scroll: true },
@@ -372,6 +422,10 @@ function urgencyHorizon() {
    at all, and copy written for a live programme ("days left", "closing soon",
    "no dates left") stops being true — 'archive' is what switches it. */
 function seasonPhase() {
+  // The registry's `status` is only as fresh as that season's own last build,
+  // so "live" proves nothing and the dates below decide. "archived" is the one
+  // direction a stale stamp cannot be wrong in: it never un-ends.
+  if (SEASON && SEASON.status === 'archived') return 'archive';
   const t = todayISO();
   if (DATA.program_end && t > DATA.program_end) return 'archive';
   if (DATA.book_by && t > DATA.book_by) return 'extensions';
@@ -388,6 +442,10 @@ function isUrgent(r) {
 
 function renderGapCell(r) {
   const cell = el('div', 'gapCell');
+  // Your own place was never priced against a Restaurant Week menu, so it has
+  // no gap — and "no comparable" would be answering a question never asked
+  // of it. The cell stays empty and keeps the column aligned.
+  if (isMine(r)) return cell;
   if (r.gap_basis === 'estimate') cell.classList.add('est');
 
   if (r.gap_usd == null) {
@@ -452,11 +510,21 @@ function renderRow(r) {
     meta.append(el('span', 'sep', '·'));
     meta.append(el('span', null, r.meal_periods.join(', ')));
   }
+  // Your own places carry no borough, neighborhood or cuisine — only what you
+  // typed and what Google returned. Without this the line renders blank.
+  if (isMine(r) && !meta.childNodes.length && r.address) {
+    meta.append(el('span', null, r.address));
+  }
   main.append(meta);
 
   const pills = el('div', 'pills');
   if (SAVED.has(r.slug)) pills.append(pill('saved', '★ saved'));
-  if (urgent) {
+  if (isMine(r)) {
+    // No window, so nothing here is urgent, ended, or a missing end date —
+    // "no end date" would report a data gap where there is no datum to have.
+    pills.append(pill('quiet', 'my list',
+      'On your own list — not a Restaurant Week participant'));
+  } else if (urgent) {
     // Show the row's OWN closing date, not the program-wide Aug 16 headline —
     // 18 rows close earlier than that, and a tooltip is not a disclosure.
     pills.append(pill('crit', `book by ${fmtDate(r.end_date)}`,
@@ -582,6 +650,16 @@ const flagText = (f) =>
 function renderDetail(r) {
   const d = el('section', 'detail');
 
+  const mine = isMine(r);
+  if (mine) {
+    const n = el('div', 'note');
+    n.append(el('strong', null, 'Your list '));
+    n.append(document.createTextNode(
+      'Not a Restaurant Week participant, so it has no window, no prix fixe '
+      + 'price and no value gap. What is below is the address, the walk and '
+      + 'the rating — everything else about it is unknown to this dataset.'));
+    d.append(n);
+  }
   if (r.verdict_note) {
     const n = el('div', 'note');
     n.append(el('strong', null, r.grade ? `Verdict [${r.grade}] ` : 'Verdict '));
@@ -589,8 +667,10 @@ function renderDetail(r) {
     d.append(n);
   }
   if (r.notes) {
-    const n = el('div', 'note warn');
-    n.append(el('strong', null, 'Caveat '));
+    // On a roster row `notes` is a caveat found during verification; on your
+    // own row it is the note YOU wrote, which is not a warning about anything.
+    const n = el('div', mine ? 'note' : 'note warn');
+    n.append(el('strong', null, mine ? 'Note ' : 'Caveat '));
     n.append(document.createTextNode(r.notes));
     d.append(n);
   }
@@ -605,33 +685,38 @@ function renderDetail(r) {
   });
 
   const dl = el('dl', 'dgrid');
-  field(dl, 'RW price', r.rw_price != null
+  /* Fields only the programme — or a pipeline that only runs over it — can
+     fill. Several of them print a default ("Not stated", "Not established",
+     "No RW menu published") when the value is null, and on your own row every
+     one of those defaults is a claim about a restaurant nobody ever checked. */
+  const rwField = (label, value, mono) => { if (!mine) field(dl, label, value, mono); };
+  rwField('RW price', r.rw_price != null
     ? money(r.rw_price) + (r.price_source === 'verified' ? ' (verified)' : '')
     : (r.price_tiers || []).join(' / ') || null, true);
-  field(dl, 'Comparable', r.comparable_usd != null
+  rwField('Comparable', r.comparable_usd != null
     ? money(r.comparable_usd) + (r.comparable_usd_high ? `–${r.comparable_usd_high}` : '')
     : null, true);
   // Name the tier the estimate was computed against — the gap is always taken
   // at ONE tier, and without saying which, the comparable minus the headline
   // price appears not to add up.
-  field(dl, 'Estimated at tier', r.estimate_tier || null, true);
-  field(dl, 'Gap basis', r.gap_basis === 'verified' ? 'Verified — own-menu arithmetic'
+  rwField('Estimated at tier', r.estimate_tier || null, true);
+  rwField('Gap basis', r.gap_basis === 'verified' ? 'Verified — own-menu arithmetic'
     : r.gap_basis === 'estimate'
       ? `Heuristic estimate — triage only (${r.estimate_confidence || '?'} confidence)`
       : 'No comparable published');
-  field(dl, 'Window ends', r.end_date
+  rwField('Window ends', r.end_date
     ? `${fmtDate(r.end_date)}${r.end_date_source === 'printed' ? ' (printed)' : r.end_date_source === 'conflict' ? ' (conservative)' : ' (listing API)'}`
     : 'Not stated', true);
-  field(dl, 'Days / service', r.days);
+  rwField('Days / service', r.days);
   // "verified" only when it actually came from the restaurant. 160 rows are
   // false purely because the listing API says so — that is not verification.
-  field(dl, 'Sunday',
+  rwField('Sunday',
     r.sunday === true
       ? (r.sunday_source === 'verified' ? 'Yes — verified' : 'Yes — per listing (unverified)')
       : r.sunday === false
         ? (r.sunday_source === 'verified' ? 'No — verified' : 'No — per listing (unverified)')
         : 'Not established');
-  field(dl, 'Courses', r.courses != null ? `${r.courses}-course` : null);
+  rwField('Courses', r.courses != null ? `${r.courses}-course` : null);
   field(dl, 'Meal periods', (r.meal_periods || []).join(', ') || null);
   field(dl, 'Price tiers', (r.price_tiers || []).join(' / ') || null, true);
   field(dl, 'Cuisines', (r.cuisines || []).join(', ') || null);
@@ -647,10 +732,10 @@ function renderDetail(r) {
     : null, true);
   field(dl, 'Google status', r.google && r.google.closed
     ? 'Reported permanently closed \u2014 the rating above is what it closed with' : null);
-  field(dl, 'Outdoor seating', outdoorText(r));
+  rwField('Outdoor seating', outdoorText(r));
   field(dl, 'Address', r.address || (r.borough ? `${r.borough} — address unavailable` : null));
-  field(dl, 'Final-list rank', r.rank != null ? `#${r.rank} of 15` : null, true);
-  field(dl, 'Menu', r.menu_state === 'pdf' ? 'Official PDF published'
+  rwField('Final-list rank', r.rank != null ? `#${r.rank} of 15` : null, true);
+  rwField('Menu', r.menu_state === 'pdf' ? 'Official PDF published'
     : r.menu_state === 'image_only' ? 'PDF is image-only — not machine-readable'
     : 'No RW menu published');
   d.append(dl);
@@ -892,6 +977,8 @@ function buildFacets() {
   host.textContent = '';
 
   for (const f of FACETS) {
+    // A facet that has nothing to ask about is not rendered as an empty group.
+    if (f.show && !f.show()) continue;
     // Count each facet against the rows surviving every OTHER facet — never
     // its own. Counting against the fully-filtered set would zero out every
     // unselected value in the facet you just used, making a second selection
@@ -1030,6 +1117,14 @@ const PRESETS = [
     count: () => SAVED.size,
     is: () => FILTERS.savedOnly,
     set() { FILTERS.savedOnly = true; },
+  },
+  {
+    // Only appears once you have added a place of your own.
+    key: 'mine', label: 'My list',
+    show: () => ROWS.some(isMine),
+    count: () => ROWS.filter(isMine).length,
+    is: () => FILTERS.list.has('mine'),
+    set() { FILTERS.list.add('mine'); },
   },
   {
     key: 'ranked', label: 'The 15',
@@ -1277,6 +1372,9 @@ function clearAll(silent) {
 function writeHash() {
   if (new URLSearchParams(location.hash.replace(/^#/, '')).get('r')) return;
   const p = new URLSearchParams();
+  // Only written once there is a choice to record, so a single-season site's
+  // URLs stay exactly what they were before the registry existed.
+  if (SEASONS.length > 1 && SEASON) p.set('season', SEASON.code);
   FACETS.forEach((f) => { if (FILTERS[f.key].size) p.set(f.key, [...FILTERS[f.key]].join('~')); });
   // "any" is written explicitly: an absent `by` means "no state yet", which
   // boot resolves to today — so clearing the date filter has to be recorded,
@@ -1467,7 +1565,10 @@ function stackedBar(host, segs, onPick) {
 
 function renderStats() {
   if (!DATA) return;
-  const all = ROWS;
+  // Every tile and every chart here is a statement about the PROGRAMME — how
+  // many are in it, when they close, what the value figures rest on. Your own
+  // places are not in it, so counting them would make each of those false.
+  const all = ROWS.filter((r) => !isMine(r));
   const today = todayISO();
   const daysLeft = Math.max(0, Math.round(
     (Date.parse(`${DATA.program_end || '2026-09-06'}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 864e5));
@@ -1489,6 +1590,14 @@ function renderStats() {
     { n: stars, k: 'michelin stars' },
     { n: SAVED.size, k: 'you saved' },
   ];
+  // Say so, rather than leaving the reader to notice that the count here and
+  // the count in the status bar disagree by however many places you added.
+  const note = $opt('#stats .statsNote');
+  if (ROWS.length > all.length) {
+    note.textContent = 'The whole programme — the filters above don’t apply here, '
+      + 'and your own places are left out of every figure. Click any bar to filter the list by it.';
+  }
+
   const th = $('#tiles');
   th.textContent = '';
   tiles.forEach((t) => {
@@ -1542,14 +1651,21 @@ function renderStats() {
    a restaurant prints otherwise, and a Sunday is only offered where Sunday
    service is established. */
 
-const PLAN = new Map(Object.entries(readJSON('rw-plan', {})));
-const persistPlan = () =>
-  localStorage.setItem('rw-plan', JSON.stringify(Object.fromEntries(PLAN)));
+/* PLAN and persistPlan live with SAVED at the top of the file — both are
+   per-season state and both are swapped by loadState(). */
+
+/* How far ahead your own places can be dated. They have no window to bound
+   them, so the list has to be bounded by something; eight weeks is long
+   enough to plan against and short enough to still be a list. */
+const MINE_HORIZON_DAYS = 56;
 
 /** Why a given date is or isn't bookable — the reason is shown, not just the
  *  verdict, because several of these come from contested source data. */
 function dateIssue(r, iso) {
   if (iso < todayISO()) return 'in the past';
+  // The window, the Saturday exclusion and the Sunday rule are all rules OF
+  // the programme. Your own places are not in it, so none of them binds here.
+  if (isMine(r)) return null;
   if (r.end_date && iso > r.end_date) return `after it closes (${fmtDate(r.end_date)})`;
   const dow = dowOf(iso);
   if (dow === 6 && !(r.flags || []).includes('saturday_service')) {
@@ -1564,8 +1680,9 @@ function dateIssue(r, iso) {
 
 function validDates(r) {
   const out = [];
-  const last = r.end_date && r.end_date < (DATA.program_end || '2026-09-06')
-    ? r.end_date : (DATA.program_end || '2026-09-06');
+  const end = DATA.program_end || '2026-09-06';
+  const last = isMine(r) ? addDays(todayISO(), MINE_HORIZON_DAYS)
+    : r.end_date && r.end_date < end ? r.end_date : end;
   for (let d = todayISO(); d <= last; d = addDays(d, 1)) {
     if (!dateIssue(r, d)) out.push(d);
   }
@@ -1615,6 +1732,8 @@ function renderPlan() {
       const nm = el('div', 'planName');
       if (r.rank != null) nm.append(el('span', 'rankBadge', `#${r.rank}`));
       nm.append(el('span', 'rname', r.name));
+      // Says why this one has no closing date and a much longer date list.
+      if (isMine(r)) nm.append(pill('quiet', 'my list', 'Not a Restaurant Week participant'));
       main.append(nm);
 
       const meta = [r.neighborhood, (r.price_tiers || []).join('/')].filter(Boolean).join(' · ');
@@ -1685,9 +1804,14 @@ function renderPlan() {
   };
 
   section('Scheduled', dated);
-  section('Not yet scheduled', undated, seasonPhase() === 'archive'
+  // The window/Saturday/Sunday rules are the programme's, so claiming them over
+  // a list that is all my own places would describe a constraint that isn't there.
+  const undatedNote = seasonPhase() === 'archive'
     ? 'The season is over, so these are what never got a date. Kept as part of the record.'
-    : 'The date list for each is limited to days it is actually open — inside its window, and not a Saturday or a Sunday it does not serve.');
+    : undated.every(isMine)
+      ? 'Your own places carry no programme window, so any day from today is offered.'
+      : 'The date list for each is limited to days it is actually open — inside its window, and not a Saturday or a Sunday it does not serve.';
+  section('Not yet scheduled', undated, undatedNote);
 }
 
 /* ---------- compare ------------------------------------------------------ */
@@ -1695,7 +1819,11 @@ function renderPlan() {
 /* Attributes down the side, restaurants across. The last decision is "which of
    my saved four?", and that is a row-by-row comparison, not four separate
    detail panels you have to hold in your head. `best` marks the winning cell
-   where a row HAS a winner -- and deliberately does not where it doesn't. */
+   where a row HAS a winner -- and deliberately does not where it doesn't.
+   `rw: true` marks a row the programme owns: it is blank, and never a winner,
+   for a place on your own list. Several of these print a word ("No
+   comparable", "not stated", "None") when the value is null, and on a row
+   that was never in the programme each of those reads as a checked fact. */
 const CMP_ROWS = [
   // First row: the composite, with the share of it that rested on real data.
   // Shown together on purpose — a 78 built on everything and a 71 built on
@@ -1706,26 +1834,26 @@ const CMP_ROWS = [
       : `${r.rubric.toFixed(1)}${r.rubric_completeness < 100
           ? ` · ${Math.round(r.rubric_completeness)}% known` : ''}`),
     raw: (r) => r.rubric, bestRaw: 'max' },
-  { k: 'Rank', get: (r) => (r.rank != null ? `#${r.rank}` : '—'), mono: true,
+  { k: 'Rank', rw: true, get: (r) => (r.rank != null ? `#${r.rank}` : '—'), mono: true,
     best: (v, all) => v !== '—' && v === all.filter((x) => x !== '—')
       .sort((a, b) => +a.slice(1) - +b.slice(1))[0] },
-  { k: 'Gap', mono: true,
+  { k: 'Gap', mono: true, rw: true,
     get: (r) => (r.gap_usd == null ? '—'
       : `${r.gap_usd < 0 ? '+' : ''}${money(Math.abs(r.gap_usd))}`
         + (r.gap_pct != null ? ` · ${Math.abs(r.gap_pct)}%` : '')),
     raw: (r) => (r.gap_usd == null ? null : r.gap_usd),
     bestRaw: 'max' },
-  { k: 'Basis', get: (r) => (r.gap_basis === 'verified' ? 'Verified'
+  { k: 'Basis', rw: true, get: (r) => (r.gap_basis === 'verified' ? 'Verified'
     : r.gap_basis === 'estimate' ? 'Estimate' : 'No comparable'),
     best: (v) => v === 'Verified' },
-  { k: 'RW price', get: (r) => (r.rw_price != null ? money(r.rw_price) : '—'), mono: true,
+  { k: 'RW price', rw: true, get: (r) => (r.rw_price != null ? money(r.rw_price) : '—'), mono: true,
     raw: (r) => r.rw_price, bestRaw: 'min' },
-  { k: 'Comparable', get: (r) => (r.comparable_usd != null ? money(r.comparable_usd) : '—'), mono: true },
-  { k: 'Window ends', mono: true,
+  { k: 'Comparable', rw: true, get: (r) => (r.comparable_usd != null ? money(r.comparable_usd) : '—'), mono: true },
+  { k: 'Window ends', mono: true, rw: true,
     get: (r) => (r.end_date ? `${fmtDate(r.end_date)}${r.end_date_source === 'printed' ? '' : ' ?'}` : 'not stated'),
     raw: (r) => (r.end_date ? Date.parse(r.end_date) : null), bestRaw: 'max' },
-  { k: 'Days', get: (r) => r.days || '—' },
-  { k: 'Sunday', get: (r) => (r.sunday === true
+  { k: 'Days', rw: true, get: (r) => r.days || '—' },
+  { k: 'Sunday', rw: true, get: (r) => (r.sunday === true
     ? (r.sunday_source === 'verified' ? 'Yes — verified' : 'Yes — unverified')
     : r.sunday === false
       ? (r.sunday_source === 'verified' ? 'No — verified' : 'No — unverified')
@@ -1733,13 +1861,15 @@ const CMP_ROWS = [
     best: (v) => v === 'Yes — verified' },
   { k: 'Recognition', get: (r) => (r.recognition || [])
     .map((b) => `${b.source_label} ${b.level}`).slice(0, 2).join(', ') || '—' },
-  { k: 'Where', get: (r) => [r.neighborhood, r.borough].filter(Boolean).join(', ') },
+  // Your own places carry neither, and an empty cell reads as a rendering
+  // fault where the dash next to it reads as "not known".
+  { k: 'Where', get: (r) => [r.neighborhood, r.borough].filter(Boolean).join(', ') || '—' },
   { k: 'Nearest subway', mono: true,
     get: (r) => (r.subway_nearest
       ? `${r.subway_nearest.name} ${r.subway_nearest.min}m · ${(r.subway_nearest.routes || []).join('')}`
       : '—'),
     raw: (r) => (r.subway_nearest ? r.subway_nearest.min : null), bestRaw: 'min' },
-  { k: 'Outdoor', get: (r) => {
+  { k: 'Outdoor', rw: true, get: (r) => {
       const o = r.outdoor;
       if (!o) return 'Not established';
       if (!o.licensed) return 'Says so on its listing';
@@ -1747,7 +1877,7 @@ const CMP_ROWS = [
         .filter(Boolean).join(' + ');
     },
     best: (v) => v !== 'Not established' && v !== 'Says so on its listing' },
-  { k: 'Menu', get: (r) => (r.menu_state === 'pdf' ? 'PDF published'
+  { k: 'Menu', rw: true, get: (r) => (r.menu_state === 'pdf' ? 'PDF published'
     : r.menu_state === 'image_only' ? 'Image-only PDF' : 'None') },
 ];
 
@@ -1788,19 +1918,20 @@ function renderCompare() {
   CMP_ROWS.forEach((row) => {
     const tr = el('tr');
     tr.append(el('th', 'cmpKey', row.k));
-    const vals = picks.map(row.get);
+    const na = (r) => row.rw && isMine(r);
+    const vals = picks.map((r) => (na(r) ? '—' : row.get(r)));
     let winners = new Set();
     if (row.bestRaw) {
-      const nums = picks.map(row.raw).filter((v) => v != null);
+      const nums = picks.filter((r) => !na(r)).map(row.raw).filter((v) => v != null);
       if (nums.length > 1) {
         const target = row.bestRaw === 'max' ? Math.max(...nums) : Math.min(...nums);
         // no dot when everything ties — a dot on every cell says nothing
         if (new Set(nums).size > 1) {
-          picks.forEach((r, i) => { if (row.raw(r) === target) winners.add(i); });
+          picks.forEach((r, i) => { if (!na(r) && row.raw(r) === target) winners.add(i); });
         }
       }
     }
-    if (row.best) vals.forEach((v, i) => { if (row.best(v, vals)) winners.add(i); });
+    if (row.best) vals.forEach((v, i) => { if (!na(picks[i]) && row.best(v, vals)) winners.add(i); });
     // Marking every cell in a row marks nothing — if they all tie, drop it.
     if (winners.size === picks.length) winners = new Set();
 
@@ -1926,7 +2057,8 @@ function popupFor(r) {
     box.append(g);
   }
   box.append(el('div', 'meta',
-    r.end_date ? `Runs through ${fmtDate(r.end_date)}` : 'No end date published'));
+    isMine(r) ? 'On your own list — not a Restaurant Week participant'
+      : r.end_date ? `Runs through ${fmtDate(r.end_date)}` : 'No end date published'));
 
   const acts = el('div', 'acts');
   if (r.links && r.links.reservation) {
@@ -2053,6 +2185,125 @@ function initTheme() {
   });
 }
 
+/* ---------- seasons ------------------------------------------------------ */
+
+async function fetchJSON(url) {
+  const res = await fetch(url, { cache: 'no-cache' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+/** The registry, or [] when there isn't one — which is what a site published
+ *  before the exporter wrote seasons.json looks like, and it must still boot
+ *  off the legacy single-season payload. */
+async function loadRegistry() {
+  try {
+    const reg = await fetchJSON(REGISTRY_URL);
+    return (reg.seasons || []).filter((s) => s && s.code && s.file);
+  } catch { return []; }
+}
+
+/** The requested code if the registry has it, else the live one, else the
+ *  newest by end date. `status` is stamped by each season's own last build and
+ *  goes stale, so it is a hint here and the dates are the fallback. */
+function chooseSeason(list, code) {
+  return (code && list.find((s) => s.code === code))
+    || list.find((s) => s.status === 'live')
+    || [...list].sort((a, b) => String(b.end || '').localeCompare(String(a.end || '')))[0];
+}
+
+const seasonURL = (s) => DATA_DIR + String(s.file).replace(/^\/+/, '');
+
+/** Your own places. Not having any is the normal case, not a failure. */
+async function loadPlaces() {
+  try {
+    const p = await fetchJSON(PLACES_URL);
+    return (p.places || []).map(prepare);
+  } catch { return []; }
+}
+
+/** Everything on the page that names the season: the masthead control, the
+ *  provenance line and the archive banner. Re-run after every switch — with a
+ *  switcher the phase really can change under you, so unlike before, none of
+ *  this can be decided once at boot. */
+function renderSeasonChrome() {
+  const host = $opt('#seasonLabel');
+  if (SEASONS.length > 1) {
+    if (host.tagName === 'SELECT') host.value = SEASON.code;
+    else if (host.parentNode) host.replaceWith(seasonSelect());
+  } else if (host.parentNode) {
+    host.textContent = DATA.season_label || '';
+  }
+
+  $opt('#footProvenance').textContent =
+    `${(DATA.restaurants || []).length} participants · listing snapshot ${DATA.snapshot_date || '—'} · ` +
+    `verified facts hand-checked ${DATA.verified_asof || '—'} · built ${(DATA.generated_at || '').slice(0, 10)}`;
+
+  const over = $opt('#seasonOver');
+  over.textContent = '';
+  over.hidden = true;
+  if (seasonPhase() !== 'archive') return;
+  const p = el('p');
+  p.append(el('strong', null, `${DATA.season_label || 'The season'} has ended.`));
+  p.append(document.createTextNode(DATA.season_start
+    ? ` The programme ran ${fmtDate(DATA.season_start)} – ${fmtDate(DATA.program_end)}.`
+    : ` The last windows closed ${fmtDate(DATA.program_end)}.`));
+  p.append(document.createTextNode(
+    ' This is the full-season archive: every participant is listed, none is still bookable.'));
+  over.append(p);
+  over.hidden = false;
+}
+
+function seasonSelect() {
+  const sel = el('select', 'season seasonSel');
+  sel.id = 'seasonLabel';
+  sel.setAttribute('aria-label', 'Season');
+  SEASONS.forEach((s) => {
+    const o = el('option', null, s.label || s.code);
+    o.value = s.code;
+    if (SEASON && s.code === SEASON.code) o.selected = true;
+    sel.append(o);
+  });
+  sel.addEventListener('change', () => switchSeason(sel.value));
+  return sel;
+}
+
+/** Swap the page over to another season: its payload, its shortlist, its plan,
+ *  its phase. Filters are dropped rather than carried across — a neighborhood
+ *  would survive the move but "closes by Aug 21" is meaningless in it. */
+let SWITCH_SEQ = 0;   // two picks in flight: only the last one may land
+async function switchSeason(code) {
+  const entry = SEASONS.find((s) => s.code === code);
+  if (!entry || (SEASON && entry.code === SEASON.code)) return;
+  const seq = ++SWITCH_SEQ;
+  let payload;
+  try {
+    payload = await fetchJSON(seasonURL(entry));
+  } catch (err) {
+    if (seq !== SWITCH_SEQ) return;
+    // Nothing has changed yet, so put the control back on the season that is
+    // actually on screen rather than letting it name one that failed to load.
+    renderSeasonChrome();
+    $('#rows').textContent = '';
+    $('#rows').append(Object.assign(el('div', 'empty'), { textContent:
+      `Could not load ${entry.label || entry.code} — ${err.message}. `
+      + `Still showing ${DATA.season_label || 'the season already open'}.` }));
+    return;
+  }
+  if (seq !== SWITCH_SEQ) return;   // a later pick already won
+  SEASON = entry;
+  DATA = payload;
+  loadState(entry.code);          // the shortlist and the plan are per season
+  EXPANDED.clear();               // slugs belong to the season they came from
+  ROWS = (DATA.restaurants || []).map(prepare).concat(PLACES);
+  renderSeasonChrome();
+  clearAll(true);
+  // Re-decided, not carried: the default is a fact about the season, and boot
+  // makes the same call for whichever season it opens on.
+  if (seasonPhase() !== 'archive') FILTERS.bookableBy = todayISO();
+  apply();
+}
+
 /* ---------- boot -------------------------------------------------------- */
 
 function prepare(r) {
@@ -2077,24 +2328,28 @@ function prepare(r) {
 
 async function boot() {
   initTheme();
+  migrateLegacyState();
 
-  let res;
+  SEASONS = await loadRegistry();
+  SEASON = SEASONS.length
+    ? chooseSeason(SEASONS, new URLSearchParams(location.hash.replace(/^#/, '')).get('season'))
+    : null;
+  const url = SEASON ? seasonURL(SEASON) : LEGACY_URL;
   try {
-    res = await fetch(DATA_URL, { cache: 'no-cache' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    DATA = await res.json();
+    DATA = await fetchJSON(url);
   } catch (err) {
     $('#rows').append(Object.assign(el('div', 'empty'), { textContent:
-      `Could not load ${DATA_URL} — ${err.message}. Run: python src/export_site_data.py` }));
+      `Could not load ${url} — ${err.message}. Run: python src/export_site_data.py` }));
     return;
   }
 
-  ROWS = (DATA.restaurants || []).map(prepare);
+  loadState(SEASON ? SEASON.code : LEGACY_SEASON);
+  // Season-agnostic and fetched once: your list is yours whatever season is on
+  // screen, and a missing places.json is the ordinary case, not an error.
+  PLACES = await loadPlaces();
+  ROWS = (DATA.restaurants || []).map(prepare).concat(PLACES);
 
-  $('#seasonLabel').textContent = DATA.season_label || '';
-  $('#footProvenance').textContent =
-    `${ROWS.length} participants · listing snapshot ${DATA.snapshot_date || '—'} · ` +
-    `verified facts hand-checked ${DATA.verified_asof || '—'} · built ${(DATA.generated_at || '').slice(0, 10)}`;
+  renderSeasonChrome();
 
   // Default view: everything still bookable today, biggest gap first. In the
   // archive that date matches nothing, so the season opens whole rather than
@@ -2112,21 +2367,6 @@ async function boot() {
   // Event as its `silent` argument, which is truthy, and skip the re-render.
   $('#clearBtn').addEventListener('click', () => clearAll());
   $('#clearBtn2').addEventListener('click', () => clearAll());
-
-  // Fixed for the life of the page — the phase cannot change under you, so
-  // unlike the estimate caveat this is set once and never re-evaluated.
-  if (seasonPhase() === 'archive') {
-    const over = $opt('#seasonOver');
-    const p = el('p');
-    p.append(el('strong', null, `${DATA.season_label || 'The season'} has ended.`));
-    p.append(document.createTextNode(DATA.season_start
-      ? ` The programme ran ${fmtDate(DATA.season_start)} – ${fmtDate(DATA.program_end)}.`
-      : ` The last windows closed ${fmtDate(DATA.program_end)}.`));
-    p.append(document.createTextNode(
-      ' This is the full-season archive: every participant is listed, none is still bookable.'));
-    over.append(p);
-    over.hidden = false;
-  }
 
   // The estimate caveat only matters while estimates are actually in view.
   const banner = $('#estBanner');
@@ -2208,8 +2448,12 @@ async function boot() {
   // re-run. Without this, pasting or editing a filter URL on an already-open
   // page silently does nothing.
   addEventListener('hashchange', () => {
-    const one = new URLSearchParams(location.hash.replace(/^#/, '')).get('r');
+    const p = new URLSearchParams(location.hash.replace(/^#/, ''));
+    const one = p.get('r');
     if (one) { openRestaurant(one); return; }   // a single-restaurant link
+    // A pasted #season= is a different payload, not a different filter set.
+    const code = p.get('season');
+    if (code && SEASON && code !== SEASON.code) { switchSeason(code); return; }
     const want = wantedView();
     clearAll(true);
     readHash();

@@ -64,14 +64,14 @@ def api_key():
             "to config/secrets.py and fill it in.")
 
 
-def _norm(s):
+def norm(s):
     s = unicodedata.normalize("NFKD", s or "")
     s = "".join(c for c in s if not unicodedata.combining(c)).lower()
     return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]+", " ", s)).strip()
 
 
 def name_sim(a, b):
-    A, B = set(_norm(a).split()), set(_norm(b).split())
+    A, B = set(norm(a).split()), set(norm(b).split())
     if not A or not B:
         return 0.0
     if A <= B or B <= A:
@@ -130,6 +130,29 @@ def flatten(res):
     }
 
 
+MAX_CANDIDATES = 5
+
+
+def best_candidate(results, name, lat, lng):
+    """Best of the top few Text Search hits -> (candidate, accepted, reason),
+    or None when none of them carried coordinates.
+
+    results[0] alone is not enough: the best name match is not always first when
+    a chain's other branches rank higher. A rejected best is still RETURNED with
+    its reason -- recording why we refused is the whole point of this file.
+    """
+    best = None
+    for res in results[:MAX_CANDIDATES]:
+        c = flatten(res)
+        if c["lat"] is None:
+            continue
+        ok, why = judge(c, name, lat, lng)
+        score = (ok, name_sim(name, c["name"]))
+        if best is None or score > best[0]:
+            best = (score, (c, ok, why))
+    return best[1] if best else None
+
+
 def fetch_one(slug, name, hood, boro, lat, lng, key, place_id=None):
     rec = {"slug": slug, "query_name": name, "matched": None,
            "accepted": False, "reason": None, "source": None, "error": None}
@@ -153,21 +176,11 @@ def fetch_one(slug, name, hood, boro, lat, lng, key, place_id=None):
         if d.get("status") != "OK":
             rec["error"] = f"{d.get('status')}: {d.get('error_message', '')[:120]}"
             return rec
-        # Check the top few, not just results[0] — the best name match is not
-        # always first when a chain's other branches rank higher.
-        best = None
-        for res in d["results"][:5]:
-            c = flatten(res)
-            if c["lat"] is None:
-                continue
-            ok, why = judge(c, name, lat, lng)
-            score = (ok, name_sim(name, c["name"]))
-            if best is None or score > best[0]:
-                best = (score, c, ok, why)
+        best = best_candidate(d["results"], name, lat, lng)
         if best is None:
             rec["reason"] = "no result carried coordinates"
             return rec
-        _, c, ok, why = best
+        c, ok, why = best
         rec.update(matched=c, accepted=ok, reason=why)
     except Exception as e:
         rec["error"] = f"{type(e).__name__}: {str(e)[:120]}"

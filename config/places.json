@@ -1,0 +1,4 @@
+{
+  "_doc": "Restaurants I want to try that are NOT in Restaurant Week. Managed by `python src/places_cli.py add \"Name\" [address hint]`, which resolves the place against Google and asks before writing; hand-editing is equally fine. Entry shape: {slug, name, address?, place_id?, notes?} -- only slug and name are required. The slug is HAND-CHOSEN and must not collide with a Restaurant Week roster slug: every dashboard row is keyed by slug, so a collision would overwrite a real participant. place_id is Google's, and is the only stable key a name can be re-resolved from later.",
+  "places": []
+}

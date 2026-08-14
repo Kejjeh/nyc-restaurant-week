@@ -1,0 +1,14 @@
+{
+ "seasons": [
+  {
+   "code": "srw26",
+   "label": "Summer 2026",
+   "year": 2026,
+   "start": "2026-07-20",
+   "book_by": "2026-08-16",
+   "end": "2026-09-06",
+   "status": "live",
+   "file": "seasons/srw26.json"
+  }
+ ]
+}

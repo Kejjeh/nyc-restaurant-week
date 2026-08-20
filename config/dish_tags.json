@@ -262,38 +262,6 @@
       "note": "Japanese menu terms for eel"
     }
   ],
-  "rabbit": [
-    {
-      "pattern": "\\brabbits?\\b",
-      "confidence": "high"
-    },
-    {
-      "pattern": "\\bconiglio\\b",
-      "confidence": "high",
-      "note": "Italian for rabbit"
-    },
-    {
-      "pattern": "\\blapin\\b",
-      "confidence": "high",
-      "note": "French for rabbit"
-    }
-  ],
-  "pigeon / squab": [
-    {
-      "pattern": "\\bpigeons?\\b",
-      "confidence": "high"
-    },
-    {
-      "pattern": "\\bsquabs?\\b",
-      "confidence": "high",
-      "note": "the common menu term for young pigeon"
-    },
-    {
-      "pattern": "\\bpiccione\\b",
-      "confidence": "high",
-      "note": "Italian for pigeon"
-    }
-  ],
   "souffle": [
     {
       "pattern": "\\bsouffl[e\\u00e9]s?\\b",
@@ -392,7 +360,35 @@
     {
       "pattern": "\\bguinea\\s+hen\\b|\\bpheasant\\b|\\bquails?\\b(?!\\s+eggs?)",
       "confidence": "high",
-      "note": "game birds beyond pigeon, which has its own tag; a quail EGG is a tartare garnish, not a quail dish"
+      "note": "game birds; a quail EGG is a tartare garnish, not a quail dish"
+    },
+    {
+      "pattern": "\\brabbits?\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bconiglio\\b",
+      "confidence": "high",
+      "note": "Italian for rabbit"
+    },
+    {
+      "pattern": "\\blapin\\b",
+      "confidence": "high",
+      "note": "French for rabbit"
+    },
+    {
+      "pattern": "\\bpigeons?\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bsquabs?\\b",
+      "confidence": "high",
+      "note": "the common menu term for young pigeon"
+    },
+    {
+      "pattern": "\\bpiccione\\b",
+      "confidence": "high",
+      "note": "Italian for pigeon"
     }
   ],
   "dover sole": [

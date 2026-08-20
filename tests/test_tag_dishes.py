@@ -134,13 +134,18 @@ def test_eel_skips_unrelated_word():
 
 
 def test_rabbit_matches():
-    assert hits("rabbit", "braised rabbit leg, mustard jus")
-    assert hits("rabbit", "coniglio alla cacciatora")
+    # Rabbit merged into "game meats" -- it's the same rare-game category as
+    # venison/boar/elk, not a distinct concept deserving its own facet chip.
+    assert hits("game meats", "braised rabbit leg, mustard jus")
+    assert hits("game meats", "coniglio alla cacciatora")
+    assert hits("game meats", "lapin a la moutarde")
 
 
 def test_pigeon_matches():
-    assert hits("pigeon / squab", "roasted squab, foie gras, cherry")
-    assert hits("pigeon / squab", "pigeon breast, beets")
+    # Squab/pigeon merged into "game meats" for the same reason.
+    assert hits("game meats", "roasted squab, foie gras, cherry")
+    assert hits("game meats", "pigeon breast, beets")
+    assert hits("game meats", "piccione alla cacciatora")
 
 
 def test_souffle_matches():

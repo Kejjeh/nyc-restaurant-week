@@ -102,5 +102,319 @@
       "confidence": "low",
       "note": "usually tuna belly, but 'wagyu toro' is beef -- excluded"
     }
+  ],
+  "beef wellington": [
+    {
+      "pattern": "\\bbeef\\s+wellington\\b",
+      "confidence": "high"
+    }
+  ],
+  "dry-aged steak": [
+    {
+      "pattern": "\\bdry[\\s-]?aged\\b",
+      "confidence": "high"
+    }
+  ],
+  "wagyu / a5": [
+    {
+      "pattern": "\\bwagyu\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bkobe\\b",
+      "confidence": "high",
+      "note": "on a menu, near-always Kobe beef"
+    },
+    {
+      "pattern": "\\bA5\\b[^.\\n]{0,30}\\bwagyu\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bwagyu\\b[^.\\n]{0,30}\\bA5\\b",
+      "confidence": "high"
+    }
+  ],
+  "uni": [
+    {
+      "pattern": "\\buni\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bsea\\s+urchin\\b",
+      "confidence": "high"
+    }
+  ],
+  "caviar": [
+    {
+      "pattern": "\\bcaviar\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bossetra\\b|\\bsevruga\\b",
+      "confidence": "high",
+      "note": "caviar varieties, named without the word caviar"
+    },
+    {
+      "pattern": "\\bbeluga\\b(?!\\s+lentils?)",
+      "confidence": "low",
+      "note": "beluga caviar -- but 'beluga lentils' is an unrelated dish, excluded"
+    }
+  ],
+  "bone marrow": [
+    {
+      "pattern": "\\bbone\\s+marrow\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bmarrow\\s+bones?\\b",
+      "confidence": "high"
+    }
+  ],
+  "foie gras": [
+    {
+      "pattern": "\\bfoie\\s+gras\\b",
+      "confidence": "high"
+    }
+  ],
+  "cassoulet": [
+    {
+      "pattern": "\\bcassoulet\\b",
+      "confidence": "high"
+    }
+  ],
+  "bouillabaisse": [
+    {
+      "pattern": "\\bbouillabaisse\\b",
+      "confidence": "high"
+    }
+  ],
+  "duck a l'orange / whole duck": [
+    {
+      "pattern": "\\bduck\\b[^.\\n]{0,40}\\bl.?orange\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bcanard\\b[^.\\n]{0,40}\\borange\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bwhole\\s+duck\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bpeking\\s+duck\\b",
+      "confidence": "high"
+    }
+  ],
+  "oysters": [
+    {
+      "pattern": "\\boysters?\\b(?!\\s+mushrooms?)",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bhu[iî]tres?\\b",
+      "confidence": "high",
+      "note": "French for oysters"
+    }
+  ],
+  "crudo / ceviche": [
+    {
+      "pattern": "\\bcrudo\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bceviche\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "(?<!squash\\s)(?<!fennel\\s)(?<!mushroom\\s)(?<!funghi\\s)(?<!beet\\s)(?<!zucchini\\s)(?<!eggplant\\s)(?<!watermelon\\s)\\bcarpaccio\\b(?!\\s+(?:di|of)\\s+(?:funghi|squash|fennel|zucchin\\w*|carciofi|carote|barbabietola|mushrooms?|beets?|eggplant|artichokes?|watermelon))",
+      "confidence": "high",
+      "note": "vegetable/fruit carpaccios (squash/fennel/mushroom/watermelon, either word order) excluded -- off-theme from the rare-protein intent"
+    },
+    {
+      "pattern": "\\bsashimi\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\btataki\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bpok[e\\u00e9]\\b",
+      "confidence": "low",
+      "note": "poke -- also a generic verb in non-menu text, so low confidence"
+    }
+  ],
+  "monkfish": [
+    {
+      "pattern": "\\bmonkfish\\b",
+      "confidence": "high"
+    }
+  ],
+  "eel": [
+    {
+      "pattern": "\\beels?\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bunagi\\b|\\banago\\b|\\bunadon\\b",
+      "confidence": "high",
+      "note": "Japanese menu terms for eel"
+    }
+  ],
+  "rabbit": [
+    {
+      "pattern": "\\brabbits?\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bconiglio\\b",
+      "confidence": "high",
+      "note": "Italian for rabbit"
+    },
+    {
+      "pattern": "\\blapin\\b",
+      "confidence": "high",
+      "note": "French for rabbit"
+    }
+  ],
+  "pigeon / squab": [
+    {
+      "pattern": "\\bpigeons?\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bsquabs?\\b",
+      "confidence": "high",
+      "note": "the common menu term for young pigeon"
+    },
+    {
+      "pattern": "\\bpiccione\\b",
+      "confidence": "high",
+      "note": "Italian for pigeon"
+    }
+  ],
+  "souffle": [
+    {
+      "pattern": "\\bsouffl[e\\u00e9]s?\\b",
+      "confidence": "high"
+    }
+  ],
+  "sweetbreads": [
+    {
+      "pattern": "\\bsweetbreads?\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bris\\s+de\\s+veau\\b",
+      "confidence": "high",
+      "note": "French menu term"
+    }
+  ],
+  "truffle": [
+    {
+      "pattern": "\\b(?:black|white|shaved|summer|winter|fresh|p[e\\u00e9]rigord|alba)\\s+truffles?\\b",
+      "confidence": "high",
+      "note": "a named variety or a shaving is the actual fungus"
+    },
+    {
+      "pattern": "(?<!chocolate\\s)\\btruffles?\\b(?!\\s*(?:oil|fries?|aioli|mayo|butter\\b))",
+      "confidence": "low",
+      "note": "bare 'truffle X' is usually truffle oil (tater tots, arancini, wedges) -- real only when a variety is named, which the high rule above catches"
+    },
+    {
+      "pattern": "\\btartufo\\b(?!\\s+(?:gelato|ice))",
+      "confidence": "low",
+      "note": "Italian for truffle -- but also a gelato dessert, hence low"
+    }
+  ],
+  "steak tartare": [
+    {
+      "pattern": "\\b(?:steak|beef|filet)\\s+tartare?\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\btartare?\\s+de\\s+b\\u0153uf\\b|\\btartare?\\s+de\\s+boeuf\\b",
+      "confidence": "high",
+      "note": "French menu term"
+    }
+  ],
+  "octopus": [
+    {
+      "pattern": "\\boctopus\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bpolpo\\b",
+      "confidence": "high",
+      "note": "Italian"
+    },
+    {
+      "pattern": "\\bpulpo\\b",
+      "confidence": "high",
+      "note": "Spanish"
+    },
+    {
+      "pattern": "\\bhtapodi\\b|\\bxtapodi\\b",
+      "confidence": "high",
+      "note": "Greek taverna spellings"
+    },
+    {
+      "pattern": "\\btako\\b",
+      "confidence": "low",
+      "note": "Japanese for octopus -- but also matches taco misspellings, hence low"
+    }
+  ],
+  "game meats": [
+    {
+      "pattern": "\\bvenison\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\b(?:wild\\s+)?boar\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\belk\\b(?!\\s+cove)",
+      "confidence": "high",
+      "note": "Elk Cove is an Oregon winery on wine lists, not a dish"
+    },
+    {
+      "pattern": "\\bcinghiale\\b",
+      "confidence": "high",
+      "note": "Italian for wild boar"
+    },
+    {
+      "pattern": "\\bcervo\\b",
+      "confidence": "high",
+      "note": "Italian for venison"
+    },
+    {
+      "pattern": "\\bguinea\\s+hen\\b|\\bpheasant\\b|\\bquails?\\b(?!\\s+eggs?)",
+      "confidence": "high",
+      "note": "game birds beyond pigeon, which has its own tag; a quail EGG is a tartare garnish, not a quail dish"
+    }
+  ],
+  "dover sole": [
+    {
+      "pattern": "\\bdover\\s+sole\\b",
+      "confidence": "high"
+    },
+    {
+      "pattern": "\\bsole\\s+meuni[e\\u00e8]re\\b",
+      "confidence": "high"
+    }
+  ],
+  "paella": [
+    {
+      "pattern": "\\bpaellas?\\b",
+      "confidence": "high"
+    }
+  ],
+  "lobster thermidor": [
+    {
+      "pattern": "\\b(?:lobster\\s+)?thermidor\\b",
+      "confidence": "high"
+    }
   ]
 }

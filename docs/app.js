@@ -223,7 +223,12 @@ const FACETS = [
   // Seeded from the exported tag_vocabulary (= config/dish_tags.json keys), so a
   // newly configured tag that matched nothing shows "0" instead of vanishing —
   // a missing chip reads as a broken pipeline rather than as the real answer.
-  { key: 'tag',         title: 'Dish tags',     values: (r) => [...new Set((r.tags || []).map((t) => t.tag))],
+  // Only high-confidence matches make a restaurant FILTERABLE by a tag: the low
+  // rules exist to flag "probably not the dish" (lumache the pasta, truffle the
+  // oil), and a filter that returns those is answering a different question.
+  // The low-confidence pill still renders on the row, tooltip and all.
+  { key: 'tag',         title: 'Dish tags',     values: (r) => [...new Set((r.tags || [])
+                                                  .filter((t) => t.confidence !== 'low').map((t) => t.tag))],
                                                 seed: () => (DATA && DATA.tag_vocabulary) || [] },
   // Routes within a 12-minute walk. Values come straight from the data, so a
   // new line or station shows up without touching the UI.

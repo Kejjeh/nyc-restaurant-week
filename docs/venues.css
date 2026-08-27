@@ -78,6 +78,10 @@
                          text-decoration: line-through; }
 .pill.status-unknown   { color: var(--ink-3); background: transparent;
                          border: 1px dashed var(--rule-strong); }
+/* A temporary closure is not a closure. It keeps the closed pill's quiet
+   colour so it still reads as "you cannot eat here now", and drops the
+   line-through, which is the mark this page uses for gone for good. */
+.pill.status-closed.temporary { text-decoration: none; font-style: italic; }
 
 .pill.rw {
   background: var(--value-sub);

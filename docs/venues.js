@@ -204,13 +204,25 @@ const HONOR_CLASS = (key) =>
   !key ? 'none' : key.startsWith('michelin') ? 'michelin'
     : key.startsWith('nyt') ? 'nyt' : 'beard';
 
+/* `status` has three values and the sources have more. A restaurant Google
+   reports as CLOSED_TEMPORARILY is `closed` here — you cannot eat there — but
+   it has not shut for good, and striking it through as "Closed" says something
+   the source did not. status_source carries the verbatim answer, so read it
+   for the label rather than flattening the two. */
+const TEMPORARY = /CLOSED_TEMPORARILY/i;
+
 function statusPill(v) {
-  const label = { open: 'Open', closed: 'Closed', unknown: 'Unverified' }[v.status];
-  const pill = el('span', `pill status-${v.status}`, label);
-  pill.title = v.status_source
-    ? `Status from ${v.status_source}`
-    : 'Nothing has confirmed whether this restaurant is still trading. '
-      + 'That is a gap in our data, not a claim that it closed.';
+  const temporary = v.status === 'closed' && TEMPORARY.test(v.status_source || '');
+  const label = temporary ? 'Temporarily closed'
+    : { open: 'Open', closed: 'Closed', unknown: 'Unverified' }[v.status];
+  const pill = el('span', `pill status-${v.status}${temporary ? ' temporary' : ''}`,
+                  label);
+  pill.title = temporary
+    ? `${v.status_source} — not shut for good; check before you travel`
+    : v.status_source
+      ? `Status from ${v.status_source}`
+      : 'Nothing has confirmed whether this restaurant is still trading. '
+        + 'That is a gap in our data, not a claim that it closed.';
   return pill;
 }
 

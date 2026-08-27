@@ -43,6 +43,10 @@ def blank_row():
         "cuisines": [], "price_tiers": [], "meal_periods": [], "meal_types_raw": [],
         "end_date": None, "end_date_source": None, "end_date_api": None,
         "days": None, "sunday": None, "sunday_source": None, "sunday_api": None,
+        # Your own places are not in the programme, so there is no Sunday
+        # prix fixe to be dinner or brunch. Null, like every other
+        # Restaurant Week field here.
+        "sunday_dinner": None,
         "courses": None, "rank": None, "grade": None,
         "verdict": "Not in the program", "verdict_note": None,
         "flags": [], "menu_state": "none",

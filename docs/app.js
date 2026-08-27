@@ -624,10 +624,19 @@ function renderRow(r) {
       + `${x.era ? ` · ${ERA_LABEL[x.era]}` : ''}`
       + `${x.name_match_only ? ' · name match only' : ''}`));
   });
-  // Places close for good between seasons; the listing never catches up.
+  /* Places close between seasons and the listing never catches up. Say which
+     kind, because they are different facts and only one of them means don't
+     bother: `closed` is PERMANENT only, and a temporary closure is quoted as
+     temporary. This pill used to read "permanently closed" for anything Google
+     did not call OPERATIONAL — including CLOSED_TEMPORARILY, i.e. the opposite
+     of what the tooltip credited Google with saying. */
   if (r.google && r.google.closed) {
     pills.append(pill('warn', 'permanently closed',
       'Google reports this location as permanently closed'));
+  } else if (r.google && r.google.status === 'CLOSED_TEMPORARILY') {
+    pills.append(pill('warn', 'temporarily closed',
+      'Google reports this location as temporarily closed — it has not shut '
+      + 'for good, but check before you travel'));
   }
   if (r.google && r.google.rating != null) {
     const g = r.google;
@@ -787,8 +796,12 @@ function renderDetail(r) {
     ? r.google.rating + ' from ' + r.google.reviews.toLocaleString() + ' reviews'
       + ' \u00b7 weighted ' + r.google.score.toFixed(2)
     : null, true);
-  field(dl, 'Google status', r.google && r.google.closed
-    ? 'Reported permanently closed \u2014 the rating above is what it closed with' : null);
+  field(dl, 'Google status', !r.google ? null
+    : r.google.closed
+      ? 'Reported permanently closed \u2014 the rating above is what it closed with'
+    : r.google.status === 'CLOSED_TEMPORARILY'
+      ? 'Reported temporarily closed \u2014 not shut for good; check before you travel'
+      : null);
   rwField('Outdoor seating', outdoorText(r));
   field(dl, 'Address', r.address || (r.borough ? `${r.borough} — address unavailable` : null));
   rwField('Final-list rank', r.rank != null ? `#${r.rank} of 15` : null, true);
@@ -1857,7 +1870,14 @@ function dateIssue(r, iso) {
   }
   if (dow === 0) {
     if (r.sunday !== true) return 'no Sunday service';
-    if ((r.flags || []).includes('no_sunday_dinner')) return 'Sunday brunch only, no dinner';
+    /* The listing distinguishes "$N Sunday Dinner Price" from "$N Sunday
+       Lunch/Brunch Price", so it says this for every restaurant. This branch
+       used to fire only on a hand-set `no_sunday_dinner` flag, which exactly
+       one restaurant carries — and that one's `sunday` is false, so the line
+       above returns first and the branch had never run for anybody. The other
+       23 brunch-only restaurants were offered a Sunday with no qualification.
+       The flag still wins where it is set; `sunday_dinner` folds it in. */
+    if (r.sunday_dinner === false) return 'Sunday brunch only, no dinner';
   }
   return null;
 }

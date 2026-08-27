@@ -61,6 +61,14 @@ PAUSE = 0.12
 # pipeline depends on it being current.
 TEXT_SEARCH_USD_PER_1000 = 32.0
 
+# The roster has three states and Google has three answers, but they are not
+# the same three. A temporary closure is not "still trading" and is not a
+# closure either, so it maps to `closed` -- the honest reading of "you cannot
+# eat here now" -- and status_source carries which kind it was, verbatim, so
+# the page can say "Temporarily closed" instead of striking the restaurant
+# through as gone. Flattening both into one word is how the dashboard came to
+# tell a reader that Antica Pesa had closed permanently while its own cited
+# source said CLOSED_TEMPORARILY.
 STATUS_FROM_GOOGLE = {
     "OPERATIONAL": "open",
     "CLOSED_TEMPORARILY": "closed",

@@ -384,7 +384,21 @@ def google_row(rec, mean):
         # 'place_id' means a human pinned it; 'textsearch' means it was
         # accepted on coordinates, which the UI should not overstate.
         "basis": rec.get("source") or "textsearch",
-        "closed": m.get("business_status") not in (None, "OPERATIONAL"),
+        # What Google actually said, verbatim, so the page can quote it rather
+        # than paraphrase it. `closed` used to be
+        # `business_status not in (None, "OPERATIONAL")`, which collapsed three
+        # different statements into one boolean: CLOSED_PERMANENTLY,
+        # CLOSED_TEMPORARILY, and Google not saying anything at all. The row
+        # then rendered a red "permanently closed" pill titled "Google reports
+        # this location as permanently closed" -- for Antica Pesa, whose record
+        # says CLOSED_TEMPORARILY. The site stated the opposite of its own
+        # cited source about a named restaurant, in the one way that stops
+        # somebody booking.
+        "status": m.get("business_status"),
+        # Permanent only. An absent status is UNKNOWN, which is null here as it
+        # is everywhere else in this payload -- never false.
+        "closed": (None if m.get("business_status") is None
+                   else m.get("business_status") == "CLOSED_PERMANENTLY"),
     }
 
 
@@ -608,6 +622,39 @@ def jload(raw, default=None):
 # --------------------------------------------------------------------------
 # end dates
 # --------------------------------------------------------------------------
+
+SUNDAY_RE = re.compile(r"sunday", re.I)
+SUNDAY_DINNER_RE = re.compile(r"sunday[^$]*dinner|dinner[^$]*sunday", re.I)
+
+
+def sunday_dinner_from_meal_types(meal_types, flags=()):
+    """-> True / False / None. Does the programme include Sunday DINNER here?
+
+    The listing's whole meal-type vocabulary is four strings: "$N Dinner
+    Price", "$N Lunch Price", "$N Sunday Dinner Price", "$N Sunday Lunch/Brunch
+    Price". So it already says, for every restaurant, whether Sunday is dinner
+    or only brunch -- and 24 restaurants carry a Sunday lunch/brunch price with
+    no Sunday dinner price at all.
+
+    The planner has always known the distinction matters: it has a branch that
+    answers "Sunday brunch only, no dinner". That branch fired on a hand-set
+    `no_sunday_dinner` flag, which exactly one restaurant carries -- Mark's Off
+    Madison, whose `sunday` is false, so the line above it returns first and
+    the branch has never run for anybody. Meanwhile the other 23 were offered a
+    Sunday with no qualification at all.
+
+    None means the restaurant has no Sunday participation to describe; `sunday`
+    already carries that. The hand flag still wins, because a transcription
+    from the restaurant's own printed materials beats the listing everywhere
+    else in this file.
+    """
+    if "no_sunday_dinner" in (flags or []):
+        return False
+    types = [str(m or "") for m in (meal_types or [])]
+    if not any(SUNDAY_RE.search(m) for m in types):
+        return None
+    return any(SUNDAY_DINNER_RE.search(m) for m in types)
+
 
 def end_date_from_weeks(weeks, year=SEASON_YEAR):
     """Last week label -> ISO end date. 'Week 7 (Sept 1 - Sept 6)' -> 2026-09-06.
@@ -1103,6 +1150,12 @@ def build_payload():
             sunday, sunday_src = v["sunday_verified"], "verified"
         else:
             sunday, sunday_src = bool(sunday_api), "api"
+        # Sunday and Sunday DINNER are different facts and the listing carries
+        # both. Derived independently of sunday_verified: an entry that says
+        # "serves Sunday" is not saying anything about dinner -- 53 is verified
+        # for Sunday and its listing says dim sum brunch.
+        sunday_dinner = sunday_dinner_from_meal_types(
+            jload(raw_types, []), v.get("flags", []))
 
         # --- gap: verified beats heuristic, heuristic is always labelled --
         est = price_by_slug.get(slug)
@@ -1215,6 +1268,9 @@ def build_payload():
             "sunday": sunday,
             "sunday_source": sunday_src,
             "sunday_api": bool(sunday_api),
+            # True/False/None -- null means "no Sunday participation to
+            # describe", never "no Sunday dinner".
+            "sunday_dinner": sunday_dinner,
             "courses": v.get("courses"),
             "rank": v.get("rank"),
             "grade": v.get("grade"),

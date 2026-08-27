@@ -968,6 +968,29 @@ the issue was then attributed to a pull request whose own text says it did not d
 the work. Say `Closes #2` to close one and `issue 2` to mention one;
 `.github/pull_request_template.md` carries the rule where it will be read.
 
+**Sunday and Sunday dinner are different facts, and the listing carries both.**
+Its whole meal-type vocabulary is four strings — `$N Dinner Price`, `$N Lunch
+Price`, `$N Sunday Dinner Price`, `$N Sunday Lunch/Brunch Price` — so it already
+says, per restaurant, whether Sunday is dinner or only brunch. 24 carry a Sunday
+lunch/brunch price and no Sunday dinner price. `sunday_dinner` is derived from
+that (`true` / `false` / `null`, where null means there is no Sunday
+participation to describe), and the planner reads it. It used to read a hand-set
+`no_sunday_dinner` flag that exactly one restaurant carries — and that one's
+`sunday` is false, so the line above it returns first and the branch had never
+run for anybody, while the other 23 were offered a Sunday with no qualification.
+The flag still wins where it is set.
+
+**A closure has two kinds and the page says which.** Google answers
+`OPERATIONAL`, `CLOSED_TEMPORARILY`, `CLOSED_PERMANENTLY`, or nothing at all.
+`google.closed` means **permanently** closed and nothing else; `google.status`
+carries the verbatim answer so the page quotes the source instead of
+paraphrasing it, and an absent answer is `null`, not `false`. Collapsing all
+four into one boolean had the dashboard render a red *"permanently closed"*
+pill, titled *"Google reports this location as permanently closed"*, over a
+record that says `CLOSED_TEMPORARILY`. On the roster a temporary closure keeps
+the closed pill's colour but loses the line-through, which is that page's mark
+for gone for good.
+
 **ToS enforcement is in code, not convention.** `assert_tos_clean()` fails the
 export rather than publish a banned field. Menu text may leave only as dish-tag
 snippets, and the rule is: **at most 5% of a menu's extracted text, or 40

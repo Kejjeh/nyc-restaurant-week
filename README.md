@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 240 tests, ~0.5s, no network
+python -m pytest -q tests/             # 248 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -124,7 +124,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 240 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 248 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -157,6 +157,14 @@ succeeds, the payload is well-formed, and the site is wrong.
 - `scoring_day()` — the rubric's window component counts down from
   `min(today, PROGRAM_END)`, so a post-season re-export cannot silently reshuffle
   every published grade.
+- `test_no_hardcoded_season.py` — the README's own invariant, made testable.
+  No shipped file in `src/` or `docs/` may QUOTE a season start, book-by, end or
+  code; a date in a comment is prose about the value, a date in a string literal
+  is the value. It has caught two real breaches after the fact and now catches
+  them before. `LEGACY_SEASON = 'srw26'` is the one named exception — it points
+  at a *past* season on purpose, to migrate localStorage keys written when there
+  was only one, and a second test fails if that exemption ever stops describing
+  something real.
 - `assert_verified_gaps_reconcile()` — a hand-verified `comparable_usd` minus
   `rw_price` must equal `gap_usd`, and likewise for the high figures. These are
   printed as SOLID figures, the display state that means "checked against the
@@ -541,7 +549,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 240 tests
+1. the 248 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -999,6 +1007,16 @@ recognition badges (3 rows suppressed) · 137 licensed outdoor. Payload
   them nor lets one bad point wreck its auto-fit. With the 2 NULL-address rows
   that leaves 631 of 636 mappable.
 
+### The countdown counts today
+
+`days left` is **inclusive**, because every other date test on the page is: a
+restaurant ending today has not ended (`hasEnded`), still counts as urgent
+(`isUrgent`), and the season is not archived until we are *past* `program_end`
+(`seasonPhase`). Counting exclusively made the final day of the season read
+**"0 days left"** beside "401 close by Sep 6" — a day you could still book and
+eat, announced as over, on the one day the number matters most. It reads
+"1 day left" now, singular.
+
 ### Numbers a reader can check
 
 Every figure printed beside another is derived so the two reconcile.
@@ -1091,7 +1109,7 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli, job_summary)
-tests/      240 pytest tests, no network; run in CI before the crawl
+tests/      248 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights

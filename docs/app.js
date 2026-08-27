@@ -1721,8 +1721,18 @@ function renderStats() {
   // places are not in it, so counting them would make each of those false.
   const all = ROWS.filter((r) => !isMine(r));
   const today = todayISO();
-  const daysLeft = Math.max(0, Math.round(
-    (Date.parse(`${DATA.program_end || '2026-09-06'}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 864e5));
+  /* INCLUSIVE of today, because every other date test on this page is: a
+     restaurant ending today has not ended (hasEnded), still counts as urgent
+     (isUrgent), and the season is not archived until we are PAST program_end
+     (seasonPhase). Counting exclusively made the last day of the season read
+     "0 days left" beside "401 close by Sep 6" — a day you can still book and
+     eat, announced as over.
+
+     No hardcoded fallback date. When a payload carries no program_end -- a
+     browser holding a cached one from before the field existed -- the honest
+     answer is that we do not know, not a countdown to a date from 2026. */
+  const daysLeft = DATA.program_end ? Math.max(0, 1 + Math.round(
+    (Date.parse(`${DATA.program_end}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 864e5)) : null;
   // Past the end, both date tiles become facts about a finished season rather
   // than a countdown: "0 days left" and "0 close by Sep 6" are each false.
   const over = seasonPhase() === 'archive';
@@ -1734,7 +1744,9 @@ function renderStats() {
 
   const tiles = [
     { n: all.length, k: 'restaurants' },
-    over ? { n: fmtDate(DATA.program_end), k: 'season ended' } : { n: daysLeft, k: 'days left' },
+    over ? { n: fmtDate(DATA.program_end), k: 'season ended' }
+         : { n: daysLeft == null ? '—' : daysLeft,
+             k: daysLeft === 1 ? 'day left' : 'days left' },
     { n: soon, k: `${over ? 'ended' : 'close'} by ${fmtDate(urgencyHorizon())}`,
       cls: !over && soon ? 'crit' : null },
     { n: all.filter((r) => r.gap_basis === 'verified').length, k: 'verified gaps', cls: 'value' },
@@ -1852,7 +1864,13 @@ function dateIssue(r, iso) {
 
 function validDates(r) {
   const out = [];
-  const end = DATA.program_end || '2026-09-06';
+  /* Without a program_end there is no programme window to plan inside, so the
+     restaurant's own end date decides and, failing that, the same horizon your
+     own places get. Falling back to a hardcoded 2026-09-06 meant that in any
+     later season the loop below started after `last` and silently produced NO
+     dates at all -- a planner that offers nothing, with nothing saying why. */
+  const end = DATA.program_end
+    || r.end_date || addDays(todayISO(), MINE_HORIZON_DAYS);
   const last = isMine(r) ? addDays(todayISO(), MINE_HORIZON_DAYS)
     : r.end_date && r.end_date < end ? r.end_date : end;
   for (let d = todayISO(); d <= last; d = addDays(d, 1)) {

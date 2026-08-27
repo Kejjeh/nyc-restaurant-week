@@ -8,7 +8,8 @@ entire SHORTLIST ALERTS block on every run.
 """
 import pytest
 
-from job_summary import block, closures, render, split_sections
+from job_summary import (block, closures, render, split_sections,
+                         unfinished)
 
 LOG = """\
 === fetch_listing.py ===
@@ -99,10 +100,15 @@ def test_the_roster_block_and_pending_rulings_survive_into_the_summary():
 
 def test_an_empty_log_does_not_crash_the_step():
     """The summary step runs `if: always()`, so it must survive the refresh
-    having died before writing anything."""
+    having died before writing anything.
+
+    This test used to assert `"Shortlist: unchanged" in out` -- it knew the run
+    could die and then checked for the output that says nothing did. Surviving
+    is necessary; what it says while surviving is the point.
+    """
     out = render("")
     assert out.startswith("# NYC Restaurant Week")
-    assert "Shortlist: unchanged" in out
+    assert "Shortlist: unchanged" not in out
 
 
 @pytest.mark.parametrize("text", ["", None, "no banners at all\njust lines"])
@@ -135,3 +141,72 @@ def test_dropping_the_closure_block_keeps_everything_after_it():
     ])
     assert kept == ["  gained recognition (1):",
                     "    + Frenchette (frenchette) +2 records"]
+
+
+# --------------------------------------------------------------------------
+# a run that did not finish
+#
+# The summary had no idea a refresh could fail. It reads three named sections
+# and renders what changed; when the chain died before any of them existed, it
+# rendered, in full:
+#
+#     # NYC Restaurant Week - weekly refresh
+#
+#     ## Shortlist: unchanged
+#
+# Not merely unhelpful. "Unchanged" is a CLAIM, and a false one -- nothing had
+# checked the shortlist, because the pipeline never reached the step that does.
+# The workflow builds this summary with `if: always()` precisely so it renders
+# on failure, and what it rendered was reassurance.
+# --------------------------------------------------------------------------
+
+FAILED_LOG = """
+=== fetch_listing.py ===
+fetched 636 rows, 636 unique slugs, API total=636
+
+=== build_db.py ===
+Traceback (most recent call last):
+  File "src/build_db.py", line 108, in main
+    parsed = json.loads(parsed_path.read_text())
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+"""
+
+
+def test_a_failed_run_says_so_at_the_top():
+    out = render(FAILED_LOG)
+    assert "did not finish" in out
+    head = out[:out.index("## Shortlist")]
+    assert "did not finish" in head, "the failure must lead, not trail"
+
+
+def test_it_names_the_step_that_broke():
+    assert "`build_db`" in render(FAILED_LOG)
+
+
+def test_it_carries_the_error_into_the_notification():
+    """The log is tens of thousands of characters and nobody opens it."""
+    out = render(FAILED_LOG)
+    assert "JSONDecodeError" in out
+
+
+def test_it_does_not_claim_the_shortlist_is_unchanged():
+    out = render(FAILED_LOG)
+    assert "Shortlist: unchanged" not in out
+    assert "not checked" in out
+
+
+def test_a_completed_run_says_nothing_about_failing():
+    """The signal is the last step's absence, so a real run must not trip it."""
+    out = render(LOG)
+    assert "did not finish" not in out
+
+
+def test_an_empty_log_is_a_failure_not_a_quiet_week():
+    out = render("")
+    assert "did not finish" in out
+    assert "Shortlist: unchanged" not in out
+
+
+def test_a_run_that_reached_the_last_step_is_complete_even_if_quiet():
+    out = render("\n=== diff_report.py ===\nno change to the roster\n")
+    assert "did not finish" not in out

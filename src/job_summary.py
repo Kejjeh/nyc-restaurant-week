@@ -22,6 +22,11 @@ import sys
 SECTION_RE = re.compile(r"^=== (\S+?)\.py.*===$")
 FENCE = "#" * 10
 MAX_DIFF = 50000
+# refresh.py's last step. Its absence is the one signal that catches EVERY way
+# the chain can stop early -- a traceback, a SystemExit from one of the guards,
+# a killed runner -- without needing to guess what the failure printed.
+LAST_STEP = "diff_report"
+FAIL_TAIL = 40
 
 
 def split_sections(text):
@@ -87,6 +92,36 @@ def drop_closure_block(roster_lines):
     return out
 
 
+def unfinished(sections):
+    """-> (step, tail lines) when the chain did not reach its last step.
+
+    refresh.py prints its banner BEFORE running each step and uses check=True,
+    so in a failed run the final section is the step that raised, and its error
+    is inside that section because the workflow pipes stderr into the log.
+
+    This exists because the summary had no idea a run could fail. A refresh
+    that died in build_db.py rendered, in full:
+
+        # NYC Restaurant Week - weekly refresh
+
+        ## Shortlist: unchanged
+
+    Which is not merely unhelpful -- it is a claim, and a false one. Nothing had
+    checked the shortlist, because the pipeline never got that far. The report
+    that exists to say what changed was reassuring somebody about a run that
+    had crashed.
+    """
+    steps = [k for k in sections if k != "start"]
+    if LAST_STEP in sections:
+        return None
+    if not steps:
+        return (None, ["No step banners in the log at all -- the run produced no "
+                       "output, or the log was never written."])
+    step = steps[-1]
+    tail = [ln for ln in (sections[step] or "").splitlines() if ln.strip()]
+    return (step, tail[-FAIL_TAIL:])
+
+
 def render(text):
     sections = split_sections(text)
     diff = sections.get("diff_report", "")
@@ -96,6 +131,20 @@ def render(text):
     alerts = [a.strip() for a in block(diff, "SHORTLIST ALERTS")]
 
     lines = ["# NYC Restaurant Week — weekly refresh", ""]
+
+    # 0. Did it finish? Everything below describes what changed, and none of it
+    # means anything if the chain stopped early. This goes above the closures
+    # because a half-run cannot be trusted to have found them either.
+    broke = unfinished(sections)
+    if broke:
+        step, tail = broke
+        lines += ["## 💥 The refresh did not finish"
+                  + (f" — it stopped in `{step}`" if step else ""), "",
+                  "Nothing below is a complete picture of this week: "
+                  + ("the steps after this one never ran." if step
+                     else "no step of it is known to have run."), ""]
+        if tail:
+            lines += ["```", *tail, "```", ""]
 
     # 1. Closures. Nothing else in this report can tell you a restaurant shut.
     shut = closures(roster)
@@ -108,6 +157,9 @@ def render(text):
     if changed:
         lines += ["## ⚠️ Shortlist changes — booking-relevant", ""]
         lines += [f"- **{a.lstrip('! ').strip()}**" for a in changed] + [""]
+    elif broke:
+        # "unchanged" is a claim. Nothing checked it, so it must not be made.
+        lines += ["## Shortlist: not checked — the run stopped first", ""]
     else:
         lines += ["## Shortlist: unchanged", ""]
 

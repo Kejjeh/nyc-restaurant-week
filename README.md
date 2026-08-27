@@ -968,6 +968,16 @@ the issue was then attributed to a pull request whose own text says it did not d
 the work. Say `Closes #2` to close one and `issue 2` to mention one;
 `.github/pull_request_template.md` carries the rule where it will be read.
 
+**The Monday summary says when the refresh did not finish.** It renders three
+named sections of the log, and when the chain died before any of them existed
+it rendered a masthead and `## Shortlist: unchanged` — a claim, and a false one,
+since nothing had checked. The workflow builds the summary with `if: always()`
+precisely so it appears on a failed run, and what appeared was reassurance.
+`unfinished()` now leads the report with the step that broke and the tail of its
+error; the signal is the absence of `diff_report`, refresh.py's last step, which
+catches every way the chain can stop rather than guessing what the failure
+printed.
+
 **An empty result says which thing found nothing.** Every zero-row state used
 to read "Nothing matches those filters." beside a Clear filters button —
 including a typo in the search box, which is the commonest way to reach zero

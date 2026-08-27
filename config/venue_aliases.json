@@ -1,0 +1,24 @@
+{
+  "_doc": {
+    "purpose": "Human rulings on award-record names the matching rules in src/build_venues.py will not decide for themselves. Same role config/recognition_suppress.json plays for the dashboard: the rules stay conservative, and a person's answer goes here rather than into a lowered threshold.",
+    "why_not_just_loosen_the_rules": "Every one of these is one edit away from a rule that would also mis-handle a real name. 'Zaab Zaab, Zaab Zaab Talay' is two restaurants in one string; 'Fifty Seven Fifty Seven, The Four Seasons Hotel' and \"Lorenzo's Restaurant, Bar & Cabaret\" are single restaurants with the identical shape. A rule that splits the first splits the other two, and those failures are invisible. Three hand rulings cost nothing and break nothing.",
+    "how_to_add": "Run src/build_venues.py and read data/processed/venue_merge_review.json, or look for a venue whose name is plainly not a restaurant. Add it here with a reason, re-run, and confirm the row is gone."
+  },
+
+  "not_venues": {
+    "_doc": "Award-record names that are people, companies or publications rather than restaurants. The award record is DROPPED with its reason recorded -- no venue is created, and nothing is silently attached to a real restaurant instead.",
+    "Dale DeGroff Co., Inc.": "A bartender's company. The award is to Dale DeGroff, who has no restaurant in these files.",
+    "Founders, \"Food & Wine\" and \"Food Arts\"": "Two magazines. The award is to their founders, not to a room.",
+    "B.R. Guests Restaurants": "A restaurant group's corporate name; the rooms it names are handled by the group-award split.",
+    "Red Cat Restaurants": "A restaurant group's corporate name, same as above.",
+    "Elizabeth Street Hospitality": "A restaurant group's corporate name, same as above.",
+    "Gracious Hospitality": "A restaurant group's corporate name, same as above.",
+    "Gracious Hospitality Management": "A restaurant group's corporate name, same as above.",
+    "Overthrow Hospitality": "A restaurant group's corporate name, same as above."
+  },
+
+  "split_into": {
+    "_doc": "Strings that ARE a list of restaurants, where the automatic split cannot prove it because fewer than two parts are already on the roster. The named parts each get the award, and each becomes a venue if it is not one already -- which is safe here precisely because a human has confirmed the split.",
+    "Zaab Zaab, Zaab Zaab Talay": ["Zaab Zaab", "Zaab Zaab Talay"]
+  }
+}

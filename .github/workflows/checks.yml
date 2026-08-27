@@ -1,0 +1,103 @@
+name: Checks
+
+# The 153 tests used to run in exactly one place: inside the Monday refresh,
+# after the checkout and before ten minutes of polite crawling. That is the
+# right place for them -- a broken guard should fail in seconds rather than
+# after the crawl -- but it meant a pull request got no CI at all, and a break
+# introduced on a Tuesday was found by the cron on the following Monday.
+#
+# This workflow is the fast half of that: tests, plus the guards that can run
+# without touching the network. It never crawls, never fetches, never commits.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# A second push to the same branch makes the first run's answer irrelevant.
+# Unlike the refresh, cancelling here costs nothing -- there is no crawl to
+# throw away.
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Tests
+        run: python -m pytest -q tests/
+
+      # The one thing NYC Tourism prohibits is hosting the exact PDFs, and the
+      # repo is public. The refresh workflow checks this before it commits;
+      # this checks it before a pull request can be merged.
+      - name: Guard — no menu PDFs are tracked
+        run: |
+          n=$(git ls-files | grep -ci '\.pdf$' || true)
+          if [ "$n" != "0" ]; then
+            echo "::error::$n PDF(s) are tracked in git. PDFs must never be hosted."
+            exit 1
+          fi
+          echo "OK — 0 PDFs tracked."
+
+      # Both exporters validate the payload they would write and exit non-zero
+      # on any error. --check writes nothing, so this cannot leave a dirty tree
+      # and cannot publish a payload that only CI has seen.
+      - name: Guard — the payloads still validate
+        run: |
+          python src/export_site_data.py --check --quiet
+          python src/export_venues.py --check --quiet
+
+      # A payload that no longer matches the committed database means someone
+      # changed the pipeline and did not re-export. The site would then be a
+      # build behind its own data with nothing saying so.
+      #
+      # Compared field by field with `generated_at` dropped: it is the wall
+      # clock, it changes on every single export, and a plain `git diff` would
+      # therefore fail this step 100% of the time and teach everyone to ignore it.
+      - name: Guard — the committed roster payload is up to date
+        run: |
+          cp docs/data/venues.json /tmp/venues-committed.json
+          python src/build_venues.py --quiet
+          python src/resolve_venues.py
+          python src/export_venues.py --quiet
+          python - <<'PY'
+          import json, sys
+          def body(path):
+              d = json.load(open(path, encoding="utf-8"))
+              d.pop("generated_at", None)
+              return d
+          before, after = body("/tmp/venues-committed.json"), body("docs/data/venues.json")
+          if before == after:
+              print("OK — venues.json matches the database.")
+              sys.exit(0)
+          print("::error::docs/data/venues.json is stale. Run src/build_venues.py, "
+                "src/resolve_venues.py and src/export_venues.py, then commit the result.")
+          for key in sorted(set(before) | set(after)):
+              if before.get(key) != after.get(key):
+                  print(f"  section differs: {key}")
+          b = {v["slug"]: v for v in before.get("venues", [])}
+          a = {v["slug"]: v for v in after.get("venues", [])}
+          for slug in sorted(set(b) ^ set(a))[:20]:
+              print(f"  {'removed' if slug in b else 'added'}: {slug}")
+          changed = [s for s in sorted(set(b) & set(a)) if b[s] != a[s]]
+          for slug in changed[:20]:
+              print(f"  changed: {slug}")
+          print(f"  ({len(changed)} venues changed in total)")
+          sys.exit(1)
+          PY

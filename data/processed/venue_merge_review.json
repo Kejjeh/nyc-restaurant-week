@@ -1,0 +1,343 @@
+{
+ "_doc": "refused: no venue was touched and the award was DROPPED -- rule on these or they stay missing. confirm: the merge WAS made on weaker-than-usual evidence (same name and postal code, different street number) -- check that it is really one restaurant and not two.",
+ "refused": [
+  {
+   "source": "james_beard",
+   "name": "(Frankie's 457, Prime Meats, Cafe Pedlar, and others)",
+   "address": null,
+   "year": 2015,
+   "level": "semifinalist",
+   "reason": "names 'and others', but none of its parts match a venue",
+   "candidates": [
+    "Frankie's 457",
+    "Prime Meats",
+    "Cafe Pedlar"
+   ]
+  },
+  {
+   "source": "james_beard",
+   "name": "(Frankie's 457, Prime Meats, Cafe Pedlar, and others)",
+   "address": null,
+   "year": 2015,
+   "level": "semifinalist",
+   "reason": "names 'and others', but none of its parts match a venue",
+   "candidates": [
+    "Frankie's 457",
+    "Prime Meats",
+    "Cafe Pedlar"
+   ]
+  },
+  {
+   "source": "james_beard",
+   "name": "Red Cat Restaurants (The Red Cat and The Harrison)",
+   "address": null,
+   "year": 2008,
+   "level": "semifinalist",
+   "reason": "parenthesised list, but none of its parts match a venue",
+   "candidates": [
+    "Red Cat Restaurants (The Red Cat",
+    "The Harrison)"
+   ]
+  },
+  {
+   "source": "james_beard",
+   "name": "B.R. Guests Restaurants (Fiamma, Ruby Foo's, Ocean Grill, Atlantic Grill, Blue Water Grill, Vento, Isabella's, Primehouse New York, and Dos Caminos)",
+   "address": null,
+   "year": 2008,
+   "level": "semifinalist",
+   "reason": "parenthesised list, but none of its parts match a venue",
+   "candidates": [
+    "Fiamma",
+    "Ruby Foo's",
+    "Ocean Grill",
+    "Atlantic Grill",
+    "Blue Water Grill",
+    "Vento",
+    "Isabella's",
+    "Primehouse New York",
+    "Dos Caminos"
+   ]
+  }
+ ],
+ "confirm": [
+  {
+   "source": "michelin",
+   "name": "Ci Siamo",
+   "external_address": "440 W. 33rd St., Ste. 100, New York, NY 10001",
+   "merged_into": "ci-siamo",
+   "our_address": "385 Ninth Ave., Manhattan, NY, 10001",
+   "year": 2025,
+   "level": "recommended",
+   "reason": "exact name, same postal code, different street entrance"
+  }
+ ],
+ "folded_spelling_variants": [
+  {
+   "kept": "locanda-verde",
+   "kept_name": "Locanda Verde",
+   "folded": "locande-verde",
+   "folded_name": "Locande Verde",
+   "name_was_a_tie": false,
+   "reason": "one differing token, same first letter, similarity >= 0.85"
+  },
+  {
+   "kept": "momfuku-ssam-bar",
+   "kept_name": "Momofuku Ssam Bar",
+   "folded": "momofuku-ssam-bar",
+   "folded_name": "Momfuku Ssam Bar",
+   "name_was_a_tie": false,
+   "reason": "one differing token, same first letter, similarity >= 0.85"
+  },
+  {
+   "kept": "saint-ambroeus",
+   "kept_name": "Sant Ambroeus",
+   "folded": "sant-ambroeus",
+   "folded_name": "Saint Ambroeus",
+   "name_was_a_tie": true,
+   "reason": "one differing token, same first letter, similarity >= 0.85"
+  },
+  {
+   "kept": "uncle-boon",
+   "kept_name": "Uncle Boons",
+   "folded": "uncle-boons",
+   "folded_name": "Uncle Boon",
+   "name_was_a_tie": false,
+   "reason": "one differing token, same first letter, similarity >= 0.85"
+  }
+ ],
+ "group_award_parts_unmatched": [
+  {
+   "group": "Elizabeth Street Hospitality (The Musket Room, Raf's, and Cafe Zaffri)",
+   "part": "Cafe Zaffri",
+   "marker": "parenthesised list",
+   "year": 2026,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Elizabeth Street Hospitality (The Musket Room, Raf's, and Cafe Zaffri)",
+   "part": "Cafe Zaffri",
+   "marker": "parenthesised list",
+   "year": 2026,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Gracious Hospitality (COTE, Undercote, and COQODAQ)",
+   "part": "Undercote",
+   "marker": "parenthesised list",
+   "year": 2026,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Frenchette, Le Veau d' Or, and Le Rock",
+   "part": "Le Veau d' Or",
+   "marker": "comma list",
+   "year": 2025,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Frenchette, Le Veau d' Or, and Le Rock",
+   "part": "Le Veau d' Or",
+   "marker": "comma list",
+   "year": 2025,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Gracious Hospitality Management (COTE, Undercote, and  COQODAQ)",
+   "part": "Undercote",
+   "marker": "parenthesised list",
+   "year": 2025,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Overthrow Hospitality (Cadence, Etérea, Avant Garden)",
+   "part": "Etérea",
+   "marker": "parenthesised list",
+   "year": 2024,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Overthrow Hospitality (Cadence, Etérea, Avant Garden)",
+   "part": "Etérea",
+   "marker": "parenthesised list",
+   "year": 2022,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "(Diner, Marlow & Sons, Reynard, and others)",
+   "part": "Reynard",
+   "marker": "names 'and others'",
+   "year": 2018,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Diner, Marlow & Sons, Reynard, and others",
+   "part": "Reynard",
+   "marker": "names 'and others'",
+   "year": 2017,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "The Spotted Pig, The Breslin, Tosca Cafe, and others",
+   "part": "The Breslin",
+   "marker": "names 'and others'",
+   "year": 2016,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "The Spotted Pig, The Breslin, Tosca Cafe, and others",
+   "part": "Tosca Cafe",
+   "marker": "names 'and others'",
+   "year": 2016,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "(Diner, Marlow & Sons, Reynard, and others)",
+   "part": "Reynard",
+   "marker": "names 'and others'",
+   "year": 2016,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "(Diner, Marlow & Sons, Reynard, and others)",
+   "part": "Reynard",
+   "marker": "names 'and others'",
+   "year": 2015,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Balthazar, Lucky Strike, Minetta Tavern, Morandi, Pastis, Pravda, and Schiller's Liquor Bar",
+   "part": "Lucky Strike",
+   "marker": "comma list",
+   "year": 2010,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Balthazar, Lucky Strike, Minetta Tavern, Morandi, Pastis, Pravda, and Schiller's Liquor Bar",
+   "part": "Pastis",
+   "marker": "comma list",
+   "year": 2010,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Balthazar, Lucky Strike, Minetta Tavern, Morandi, Pastis, Pravda, and Schiller's Liquor Bar",
+   "part": "Pravda",
+   "marker": "comma list",
+   "year": 2010,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Balthazar, Lucky Strike, Morandi, Pastis, Pravda, and Schiller's Liquor Bar",
+   "part": "Lucky Strike",
+   "marker": "comma list",
+   "year": 2009,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Balthazar, Lucky Strike, Morandi, Pastis, Pravda, and Schiller's Liquor Bar",
+   "part": "Pastis",
+   "marker": "comma list",
+   "year": 2009,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Balthazar, Lucky Strike, Morandi, Pastis, Pravda, and Schiller's Liquor Bar",
+   "part": "Pravda",
+   "marker": "comma list",
+   "year": 2009,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Balthazar, Schiller's Liquor Bar, Pastis, Morandi, Lucky Strike, and Pravda",
+   "part": "Pastis",
+   "marker": "comma list",
+   "year": 2008,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Balthazar, Schiller's Liquor Bar, Pastis, Morandi, Lucky Strike, and Pravda",
+   "part": "Lucky Strike",
+   "marker": "comma list",
+   "year": 2008,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Balthazar, Schiller's Liquor Bar, Pastis, Morandi, Lucky Strike, and Pravda",
+   "part": "Pravda",
+   "marker": "comma list",
+   "year": 2008,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Nobu, NY/Matsuhisa, LA",
+   "part": "NY/Matsuhisa",
+   "marker": "comma list",
+   "year": 2001,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Nobu, NY/Matsuhisa, LA",
+   "part": "LA",
+   "marker": "comma list",
+   "year": 2001,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Nobu, NY/Matsuhisa, LA",
+   "part": "NY/Matsuhisa",
+   "marker": "comma list",
+   "year": 2000,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Nobu, NY/Matsuhisa, LA",
+   "part": "LA",
+   "marker": "comma list",
+   "year": 2000,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Nobu, NY/Matsuhisa, LA",
+   "part": "NY/Matsuhisa",
+   "marker": "comma list",
+   "year": 1999,
+   "reason": "named in a group award but no venue matches"
+  },
+  {
+   "group": "Nobu, NY/Matsuhisa, LA",
+   "part": "LA",
+   "marker": "comma list",
+   "year": 1999,
+   "reason": "named in a group award but no venue matches"
+  }
+ ],
+ "ruled_out_by_venue_aliases": [
+  {
+   "source": "james_beard",
+   "name": "Founders, \"Food & Wine\" and \"Food Arts\"",
+   "year": 2010,
+   "level": "winner",
+   "reason": "Two magazines. The award is to their founders, not to a room."
+  },
+  {
+   "source": "james_beard",
+   "name": "Founders, \"Food & Wine\" and \"Food Arts\"",
+   "year": 2010,
+   "level": "winner",
+   "reason": "Two magazines. The award is to their founders, not to a room."
+  },
+  {
+   "source": "james_beard",
+   "name": "Red Cat Restaurants",
+   "year": 2009,
+   "level": "semifinalist",
+   "reason": "A restaurant group's corporate name, same as above."
+  },
+  {
+   "source": "james_beard",
+   "name": "Dale DeGroff Co., Inc.",
+   "year": 2009,
+   "level": "winner",
+   "reason": "A bartender's company. The award is to Dale DeGroff, who has no restaurant in these files."
+  }
+ ]
+}

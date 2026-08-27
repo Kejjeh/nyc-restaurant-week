@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Must stay ahead of every link/script below, or they are fetched before the
+     policy exists. Everything here is same-origin except the map, which is only
+     ever loaded on demand: Leaflet 1.9.4 from unpkg, raster tiles from CARTO's
+     a/b/c hosts — Leaflet's default {s} set, so a fourth would have to be added
+     here as well as to TILES. There is no inline script or style on the page,
+     so neither directive needs 'unsafe-inline'; the few inline styles the code
+     does set are CSSOM property writes, which CSP does not police. -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'none';
+  script-src 'self' https://unpkg.com;
+  style-src 'self' https://unpkg.com;
+  img-src 'self' data: https://a.basemaps.cartocdn.com https://b.basemaps.cartocdn.com https://c.basemaps.cartocdn.com;
+  connect-src 'self';
+  base-uri 'none';
+  form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
+<meta name="referrer" content="no-referrer">
+<title>NYC Restaurant Week — value dashboard</title>
+<meta name="description" content="Personal sort/filter tool for NYC Restaurant Week Summer 2026. Not a publication.">
+<!-- Only the OS preference can move this; the in-page theme toggle cannot. The
+     light value is the accent, the dark one is the dark masthead surface. A
+     browser that ignores `media` takes the first, which is what it took before. -->
+<meta name="theme-color" content="#0d6a5f" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151d1c" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="styles.css?v=4">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230d6a5f'/%3E%3Ctext x='8' y='12' font-family='monospace' font-size='10' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%24%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <h1>NYC Restaurant Week</h1>
+    <span class="season" id="seasonLabel">Summer 2026</span>
+    <span class="spacer"></span>
+    <!-- The roster is the site's front door now: this page is the prix-fixe
+         drilldown for the 636 restaurants that are in this one season. -->
+    <a class="crosslink" href="./">All award-recognised restaurants →</a>
+    <button type="button" class="themeToggle" id="themeToggle" aria-label="Switch colour theme">Theme</button>
+  </div>
+</header>
+
+<!-- Every row, chart and filter on this page is built from JSON at runtime;
+     there is no server-rendered fallback to degrade to. Say so, rather than
+     leaving a working page frame above a permanently empty list. -->
+<noscript>
+  <div class="wrap">
+    <div class="banner">
+      <p><strong>This page needs JavaScript.</strong> It is a client-side tool: the
+         restaurant list, the filters and the charts are all assembled in the browser
+         from a JSON file, so with scripting off there is nothing below but an empty
+         frame. The underlying data lives in <code>docs/data/</code> in the repository.</p>
+    </div>
+  </div>
+</noscript>
+
+<div class="controls">
+  <div class="wrap">
+
+    <div class="searchRow">
+      <input type="search" class="search" id="q" autocomplete="off" spellcheck="false"
+             placeholder="Search name, neighborhood, cuisine…  (press /)"
+             aria-label="Search restaurants">
+      <button type="button" class="btn" id="filterBtn" aria-expanded="false" aria-controls="panel">
+        Filters<span class="n" id="filterCount" hidden>0</span>
+      </button>
+      <div class="viewSeg" id="viewSeg" role="group" aria-label="View">
+        <button type="button" class="segBtn" data-view="list" aria-pressed="true">List</button>
+        <button type="button" class="segBtn" data-view="map" aria-pressed="false">Map</button>
+        <button type="button" class="segBtn" data-view="stats" aria-pressed="false">Stats</button>
+        <button type="button" class="segBtn" data-view="plan" aria-pressed="false">Plan</button>
+        <!-- only meaningful once there is more than one thing to weigh up -->
+        <button type="button" class="segBtn" data-view="compare" aria-pressed="false" hidden>Compare</button>
+      </div>
+      <label class="sr-only" for="sort">Sort by</label>
+      <select class="sortSel" id="sort" aria-label="Sort by">
+        <option value="best">Best value — verified first</option>
+        <option value="gap_usd_desc">Gap $ — high to low</option>
+        <option value="gap_pct_desc">Gap % — high to low</option>
+        <option value="price_asc">RW price — low to high</option>
+        <option value="price_desc">RW price — high to low</option>
+        <option value="end_asc">End date — soonest first</option>
+        <option value="end_desc">End date — latest first</option>
+        <option value="walk_asc">Subway walk — shortest first</option>
+        <option value="name_asc">Name — A to Z</option>
+        <option value="rubric_desc">Rubric grade — highest first</option>
+        <option value="google_desc">Google rating — weighted</option>
+        <option value="google_raw_desc">Google rating — raw stars</option>
+        <option value="distinction">Distinction — strongest award first</option>
+        <option value="rank_asc">Final-list rank</option>
+      </select>
+    </div>
+
+  </div>
+
+  <section class="panel" id="panel" hidden aria-label="Filters">
+    <div class="wrap">
+      <input type="search" class="facetFind" id="facetFind" autocomplete="off"
+             placeholder="Find a filter — e.g. Tribeca, Korean, confit"
+             aria-label="Find a filter">
+      <div class="facets" id="facets"></div>
+    </div>
+  </section>
+</div>
+
+<!-- Deliberately OUTSIDE the sticky bar: these are orientation, not controls
+     you need mid-scroll. Keeping them sticky cost 235px of a 844px phone. -->
+<div class="subbar">
+  <div class="wrap">
+    <div class="presets" id="presets" role="group" aria-label="Quick views"></div>
+    <div class="activeFilters" id="activeFilters" hidden aria-label="Active filters"></div>
+    <div class="statusbar" role="status" aria-live="polite" aria-atomic="true">
+      <span><strong id="shown">0</strong> of <strong id="total">0</strong> restaurants</span>
+      <span id="urgentCount"></span>
+      <button type="button" class="linkish" id="clearBtn" hidden>Clear filters</button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap results">
+  <!-- The season being over is a fact about the data, not a caveat about it:
+       quiet, and deliberately without the dismiss the estimate banner has. -->
+  <div class="banner quiet" id="seasonOver" hidden></div>
+  <div class="banner" id="estBanner" hidden>
+    <p><strong>Estimates crowd the top.</strong> This sort mixes verified gaps with heuristic
+       ones, which overstate casual restaurants. Estimates are
+       <span class="pill warn">estimate</span>-marked and underlined.</p>
+    <div class="bannerActions">
+      <button type="button" class="btn" id="verifiedOnly">Show verified only</button>
+      <button type="button" class="linkish" id="dismissBanner">Dismiss</button>
+    </div>
+  </div>
+  <!-- Map tiles and Leaflet load only when this is first opened, so the list
+       view stays instant and makes no third-party requests at all. -->
+  <section class="mapWrap" id="mapWrap" hidden aria-label="Map of results">
+    <div id="map"></div>
+    <div class="mapFoot">
+      <!-- shape carries the meaning as well as colour: solid / ring / small dot -->
+      <span class="mapLegend">
+        <span class="dot verified"></span> solid = verified gap
+        <span class="dot estimate"></span> ring = estimate
+        <span class="dot none"></span> small = no comparable
+        <span id="legendUrgent"><span class="dot urgentDot"></span> red = closing soon</span>
+      </span>
+      <span id="mapNote"></span>
+    </div>
+  </section>
+
+  <!-- Every chart here is a filter control: clicking a bar narrows the list. -->
+  <section class="stats" id="stats" hidden aria-label="Overview">
+    <p class="statsNote">The whole programme — the filters above don't apply here.
+       Click any bar to filter the list by it.</p>
+    <div class="tiles" id="tiles"></div>
+    <div class="chartGrid">
+      <figure class="chart" id="chartClose">
+        <figcaption>When restaurants stop serving<span>click a bar to see that day</span></figcaption>
+        <div class="plot"></div>
+      </figure>
+      <figure class="chart" id="chartBasis">
+        <!-- the ratio is written by renderStats: it moves every time another
+             restaurant is hand-checked, and a printed one would go stale -->
+        <figcaption>What the value figures rest on<span id="basisRatio"></span></figcaption>
+        <div class="plot"></div>
+      </figure>
+      <figure class="chart" id="chartBorough">
+        <figcaption>Where they are<span>click to filter by borough</span></figcaption>
+        <div class="plot"></div>
+      </figure>
+      <figure class="chart" id="chartCuisine">
+        <figcaption>Most common cuisines<span>click to filter</span></figcaption>
+        <div class="plot"></div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- The date picker for each restaurant offers ONLY dates it can actually
+       serve you — inside its window, and on a weekday it actually opens. -->
+  <section class="plan" id="plan" hidden aria-label="Plan">
+    <div id="planBody"></div>
+  </section>
+
+  <section class="compare" id="compare" hidden aria-label="Compare saved restaurants">
+    <p class="statsNote" id="cmpNote"></p>
+    <div class="cmpScroll"><table class="cmpTable" id="cmpTable"></table></div>
+  </section>
+
+  <div id="rows"></div>
+  <button type="button" class="showMore" id="showMore" hidden></button>
+  <div class="empty" id="empty" hidden>
+    <p id="emptyMsg">Nothing matches those filters.</p>
+    <button type="button" class="btn" id="clearBtn2">Clear filters</button>
+  </div>
+</main>
+
+<button type="button" class="toTop" id="toTop" hidden aria-label="Back to top">↑ Top</button>
+
+<footer class="foot">
+  <div class="wrap">
+    <p id="footProvenance"></p>
+    <p><strong>Verified</strong> windows, days and gaps come from the restaurants' own printed
+       materials (hand-checked). <strong>Estimates</strong> are heuristic website triage — they
+       understate expensive kitchens and overstate casual ones, and are never a substitute for
+       checking. Where a restaurant publishes no prices, the gap is left blank rather than guessed.</p>
+    <p>Menus are linked to the official PDF, never reproduced here. Personal, non-commercial tool.</p>
+  </div>
+</footer>
+
+<!-- ?v= is bumped whenever app.js or styles.css changes. Without it a cached
+     index.html can pair with a fresh app.js — which crashes boot the moment the
+     script reaches for an element the stale document does not have. -->
+<script src="app.js?v=13"></script>
+</body>
+</html>

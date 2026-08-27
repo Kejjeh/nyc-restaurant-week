@@ -1,0 +1,213 @@
+/* NYC award-recognised restaurants — roster
+ *
+ * Layered on styles.css, which owns the palette, the masthead, the controls
+ * bar and the buttons. Nothing here redefines a token: the two pages must stay
+ * one site, and the viewer's theme choice carries across them.
+ *
+ * The design problem this file solves is absence. A Restaurant Week row has a
+ * price, a menu, a gap and a subway walk; most rows here have a name, some
+ * awards, and nothing else. So the row is built to read well at its THINNEST
+ * — the honour badge and the name carry it, and every other element simply
+ * does not render when its field is missing, rather than printing a dash or a
+ * zero that looks like a measurement.
+ *
+ * Honour colour is by JURY, not by rank, and never carries meaning alone: the
+ * badge always spells the honour out. Rank is carried by sort order and by the
+ * text, so the page works in greyscale and for a colour-blind reader.
+ */
+
+.crosslink {
+  font: 500 13px/1 var(--sans);
+  color: var(--accent);
+  text-decoration: none;
+  padding: 6px 10px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r);
+  white-space: nowrap;
+}
+.crosslink:hover { background: var(--accent-sub); }
+.crosslink:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- rows -------------------------------------------------------- */
+
+.venueRows { display: flex; flex-direction: column; gap: 10px; }
+
+.venue {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  padding: 13px 15px;
+  box-shadow: var(--shadow);
+}
+
+.venueHead {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.venueName {
+  font: 600 17px/1.25 var(--sans);
+  color: var(--ink);
+  margin: 0;
+  /* The name must win the row even next to three badges. */
+  flex: 0 1 auto;
+}
+
+.pill {
+  font: 500 11.5px/1 var(--mono);
+  letter-spacing: .01em;
+  padding: 4px 7px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+/* By jury. The badge text always names the honour, so these are a scanning
+   aid and never the only carrier of the fact. */
+.pill.honor.michelin { background: var(--crit-sub);   color: var(--crit);   border-color: var(--crit); }
+.pill.honor.beard    { background: var(--warn-sub);   color: var(--warn);   border-color: var(--warn); }
+.pill.honor.nyt      { background: var(--accent-sub); color: var(--accent); border-color: var(--accent); }
+
+/* Trading state is a SHAPE as much as a colour: open is quiet and unbordered,
+   closed is struck through, unverified is dashed — the same "we do not know"
+   grammar the dashboard uses for an estimated price. */
+.pill.status-open      { color: var(--ink-3); background: var(--surface-2); }
+.pill.status-closed    { color: var(--ink-2); background: var(--surface-2);
+                         text-decoration: line-through; }
+.pill.status-unknown   { color: var(--ink-3); background: transparent;
+                         border: 1px dashed var(--rule-strong); }
+
+.pill.rw {
+  background: var(--value-sub);
+  color: var(--value);
+  border-color: var(--value);
+  text-decoration: none;
+}
+.pill.rw:hover { filter: brightness(1.04); text-decoration: underline; }
+.pill.rw:focus-visible { outline: 2px solid var(--value); outline-offset: 2px; }
+
+.venueMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 7px 0 0;
+  font: 400 13px/1.4 var(--sans);
+  color: var(--ink-2);
+}
+.venueMeta .rating,
+.venueMeta .era,
+.venueMeta .juries {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
+
+/* ---------- award detail ------------------------------------------------ */
+
+.awards { margin-top: 9px; }
+.awards > summary {
+  font: 500 12.5px/1 var(--sans);
+  color: var(--accent);
+  cursor: pointer;
+  padding: 3px 0;
+  width: fit-content;
+}
+.awards > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.awardList {
+  list-style: none;
+  margin: 8px 0 2px;
+  padding: 0 0 0 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-left: 2px solid var(--rule-2);
+  padding-left: 12px;
+}
+.awardRow {
+  display: grid;
+  grid-template-columns: 4.2em minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: baseline;
+  font: 400 12.5px/1.5 var(--sans);
+}
+.awardYear {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
+.awardWhat { color: var(--ink-2); }
+a.awardWhat { color: var(--accent); text-decoration: none; }
+a.awardWhat:hover { text-decoration: underline; }
+/* The chef, when the award was to a person. Right-aligned so a scan down the
+   column separates "the restaurant won this" from "its chef did". */
+.awardWho {
+  font: 400 12px/1.5 var(--mono);
+  color: var(--ink-3);
+  text-align: right;
+}
+
+/* ---------- filter panel ------------------------------------------------ */
+
+.facets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px 22px;
+  padding: 4px 0 2px;
+}
+.facet h3 {
+  font: 600 11px/1 var(--sans);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 8px;
+}
+.facetOpt {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 3px 0;
+  font: 400 13px/1.3 var(--sans);
+  color: var(--ink);
+  cursor: pointer;
+}
+.facetOpt:hover { color: var(--accent); }
+.facetName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.facetN {
+  font: 400 11.5px/1 var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
+
+.preset {
+  font: 500 12.5px/1 var(--sans);
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.preset:hover { border-color: var(--accent); color: var(--accent); }
+.preset:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.chip {
+  font: 500 12px/1 var(--sans);
+  background: var(--accent-sub);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (max-width: 560px) {
+  .awardRow { grid-template-columns: 3.6em minmax(0, 1fr); }
+  .awardWho { grid-column: 2; text-align: left; }
+  .crosslink { display: none; }   /* the footer links back; the bar is full */
+}

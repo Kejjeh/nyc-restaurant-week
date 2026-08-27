@@ -8,6 +8,7 @@ import tempfile
 
 from pathlib import Path
 
+import parse_menus
 from config import DETAILS_DIR, LISTING_DIR, MENUS_DIR, PROCESSED, SITE
 
 DB = PROCESSED / "restaurant_week.sqlite"
@@ -141,12 +142,20 @@ def main():
 
     for slug, meta in manifest.items():
         p = parsed.get(slug, {})
+        # Re-derived on the way in, for the same reason the price sweeps are:
+        # parse_menus.py is fixed at the source, but regenerating parsed.json
+        # means re-downloading 473 PDFs at the mandatory 1 req/sec, and this
+        # costs nothing. See dedupe()/grade() in src/parse_menus.py.
+        items = parse_menus.dedupe(p.get("items", []))
+        quality = (parse_menus.grade(p.get("raw_text") or "",
+                                     p.get("courses") or [], items)
+                   if "raw_text" in p else p.get("parse_quality", "failed"))
         cur = con.execute(
             "INSERT INTO menus (restaurant_slug, menu_url, pdf_file, sha256,"
             " parse_quality, raw_text) VALUES (?,?,?,?,?,?)",
             (
                 slug, meta.get("url"), meta.get("file"), meta.get("sha256"),
-                p.get("parse_quality", "failed"), p.get("raw_text"),
+                quality, p.get("raw_text"),
             ),
         )
         mid = cur.lastrowid
@@ -156,7 +165,7 @@ def main():
             [
                 (mid, x["course"], x["dish"], x["description"],
                  x["supplement_price"], i)
-                for i, x in enumerate(p.get("items", []))
+                for i, x in enumerate(items)
             ],
         )
     # price_sweep triage table (heuristic comparables; see README) — reload

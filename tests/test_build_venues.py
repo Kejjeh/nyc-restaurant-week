@@ -436,3 +436,46 @@ def test_a_ruling_is_matched_on_the_normalised_name():
 def test_aliases_load_to_empty_when_the_file_is_absent():
     from build_venues import load_aliases
     assert load_aliases(ROOT / "does-not-exist.json") == ({}, {})
+
+
+def test_the_reference_year_comes_from_the_season_file_not_from_awards_json():
+    """config/season.json is the only file in this repo allowed to carry a year.
+    reference_year sat hard-coded in awards.json, so the first changeover would
+    have decayed every venue's standing against a stale year and nothing would
+    have failed to say so."""
+    from config import SEASON_YEAR
+    from build_venues import reference_year
+    assert reference_year(load_awards_config()) == SEASON_YEAR
+    assert reference_year({}) == SEASON_YEAR
+    assert reference_year({"recency": {}}) == SEASON_YEAR
+    assert reference_year({"recency": {"reference_year": None}}) == SEASON_YEAR
+    # pinning a rebuild to a past scoring run is still possible on purpose
+    assert reference_year({"recency": {"reference_year": 2019}}) == 2019
+
+
+def test_awards_json_carries_no_hard_coded_year():
+    raw = (ROOT / "config" / "awards.json").read_text(encoding="utf-8")
+    cfg = json.loads(raw)
+    assert cfg["recency"]["reference_year"] is None, (
+        "pin it only deliberately; a stale year here is silent")
+
+
+def test_a_non_integer_reference_year_fails_the_run_rather_than_scoring_wrongly():
+    import build_venues
+    bad = json.loads((ROOT / "config" / "awards.json").read_text(encoding="utf-8"))
+    bad["recency"]["reference_year"] = "2026"
+    tmp = ROOT / "data" / "processed" / "_awards_test.json"
+    tmp.write_text(json.dumps(bad), encoding="utf-8")
+    try:
+        with pytest.raises(ValueError, match="reference_year"):
+            build_venues.load_awards_config(tmp)
+    finally:
+        tmp.unlink()
+
+
+def test_recency_still_separates_an_old_award_from_a_current_one_after_the_change():
+    cfg = load_awards_config()
+    from config import SEASON_YEAR
+    now = [{"source": "james_beard", "level": "winner", "year": SEASON_YEAR}]
+    then = [{"source": "james_beard", "level": "winner", "year": SEASON_YEAR - 25}]
+    assert prestige_for(now, cfg, closed=False)[0] > prestige_for(then, cfg, closed=False)[0]

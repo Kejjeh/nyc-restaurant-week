@@ -19,6 +19,8 @@
 
 const DATA_URL = 'data/venues.json';
 const PAGE = 120;
+/* Values listed per filter group before the group says how many it is hiding. */
+const FACET_LIMIT = 14;
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, cls, text) => {
@@ -201,9 +203,13 @@ function renderRow(v) {
   if (v.rw) {
     const tiers = v.rw.price_tiers.join(' / ') || 'Restaurant Week';
     const rw = el('a', 'pill rw', `Restaurant Week ${tiers}`);
-    rw.href = 'restaurant-week.html';
-    rw.title = 'This one is also in the current Restaurant Week season — '
-             + 'the value dashboard has its prix fixe, menu and gap.';
+    /* Straight to this restaurant on the dashboard, not to the top of it. The
+       dashboard reads `#r=<slug>` and openRestaurant() clears whatever was
+       filtered so the link wins -- landing someone on a 636-row list and
+       leaving them to find the name again is not a link, it is a hint. */
+    rw.href = `restaurant-week.html#r=${encodeURIComponent(v.rw.slug)}`;
+    rw.title = 'Open this restaurant on the value dashboard — its prix fixe, '
+             + 'menu, gap against à la carte and subway walk.';
     head.append(rw);
   }
   row.append(head);
@@ -222,6 +228,18 @@ function renderRow(v) {
   if (span) meta.append(el('span', 'era', `recognised ${span}`));
   if (v.award_sources.length > 1) {
     meta.append(el('span', 'juries', `${v.award_sources.length} juries`));
+  }
+  /* The one thing a person actually wants to DO with a row. Only the 636
+     Restaurant Week rows carry a link -- the award files have no websites in
+     them -- so this renders for those and is simply absent for the rest,
+     rather than a dead control that looks the same for everyone. */
+  if (v.rw && v.rw.reserve) {
+    const book = el('a', 'reserve', 'Book');
+    book.href = v.rw.reserve;
+    book.rel = 'noreferrer noopener';
+    book.target = '_blank';
+    book.title = `Reservations or website for ${v.name}`;
+    meta.append(book);
   }
   row.append(meta);
 
@@ -252,7 +270,18 @@ function renderFacets() {
     group.append(el('h3', null, f.label));
     const chosen = STATE.filters.get(f.key);
     const sorted = [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-    for (const [val, n] of sorted.slice(0, 14)) {
+    /* Cuisine has far more values than fit, so the list is cut -- but a cut
+       list that does not say it was cut reads as "those are all of them", and
+       someone looking for Georgian would conclude the roster has none. Any
+       chosen value is kept regardless of where it sorts, or ticking it and
+       then searching would make the tick vanish. */
+    const shown = sorted.slice(0, FACET_LIMIT);
+    const shownVals = new Set(shown.map(([v]) => v));
+    for (const [val, n] of sorted) {
+      if (chosen && chosen.has(val) && !shownVals.has(val)) shown.push([val, n]);
+    }
+    const hidden = sorted.length - shown.length;
+    for (const [val, n] of shown) {
       const id = `f-${f.key}-${fold(val).replace(/\W+/g, '-')}`;
       const label = el('label', 'facetOpt');
       const cb = el('input');
@@ -268,6 +297,13 @@ function renderFacets() {
       });
       label.append(cb, el('span', 'facetName', val), el('span', 'facetN', String(n)));
       group.append(label);
+    }
+    if (hidden > 0) {
+      const note = el('p', 'facetMore',
+        `+${hidden} more — use the search box`);
+      note.title = `${sorted.length} values in total; the ${shown.length} `
+                 + `commonest are listed. Search matches all of them.`;
+      group.append(note);
     }
     box.append(group);
   }

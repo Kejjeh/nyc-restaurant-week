@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 168 tests, ~0.5s, no network
+python -m pytest -q tests/             # 180 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -116,7 +116,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 168 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 180 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -357,7 +357,10 @@ is absent, and absence is not an average.
 
 Recency keys on the venue's most recent honour of any kind, not on each award's
 own age — a 1995 Beard winner that took a 2025 Michelin star is a current
-restaurant, and is scored as one.
+restaurant, and is scored as one. The year it measures from comes from
+`config/season.json`, because that is the only file in this repo allowed to
+carry a year; `awards.json` can pin an explicit one to reproduce a past scoring
+run, and a non-integer there fails the run rather than scoring against garbage.
 
 ### Resolving venues against Google (`src/resolve_venues.py`)
 
@@ -368,9 +371,23 @@ them up — roughly 700–800 Text Search calls, billed once and then cached in
 
 ```
 python src/resolve_venues.py --report            # what is still unresolved
+python src/resolve_venues.py --dry-run           # the exact queries, and the cost
 python src/resolve_venues.py --fetch --limit 50  # needs GOOGLE_PLACES_KEY
 python src/resolve_venues.py                     # apply the cache; no key, no network
 ```
+
+`--dry-run` prints the Text Search string every venue would be sent, marks the
+ones with no address on our side (`!` — only the name and the NYC bounds can
+confirm those), and estimates the bill. It sends nothing and needs no key. The
+run it previews costs real money and cannot be undone, so the person paying
+should be able to read the queries first.
+
+Both paths build the query through `query_for()` rather than each rolling its
+own, and a test enforces that: a dry run that constructs its own string is worse
+than no dry run, because it invites confidence in something never tested. That
+is not hypothetical here — the dry run's first execution revealed that every
+address-carrying venue was being queried as `"… New York, NY 10022 New York"`,
+with the city stapled on twice. Fixed before a cent was spent.
 
 `fetch_google_ratings.py` can judge a candidate on **distance**, because every
 Restaurant Week row has coordinates. Nothing here does, so this file's rule is
@@ -421,11 +438,21 @@ Ordered. This is the section that will actually be used in January.
    `data/raw/google/*.json`. **Skipping this is not neutral**: an unrated
    restaurant has its `rating` component — 30 of the 90 available grade points —
    imputed at the corpus mean.
-7. **Archives and saved state need nothing.** The exporter writes
+7. **The roster needs nothing, and that is worth knowing rather than assuming.**
+   `build_venues.py` re-seeds from the new season's `restaurants` table, so last
+   season's participants that hold no award simply stop being venues — correct,
+   since the roster is *award venues plus current participants*. Award venues
+   persist untouched; `data/raw/venues_google/` is keyed by venue slug and stays
+   valid; `awards.json` no longer carries a year, so recency follows
+   `season.json` with the rest. The one thing to expect is a noisy `## ROSTER`
+   block for one run: several hundred venues gone and several hundred new, which
+   is the changeover, not a fault. It is capped and counted, not silently
+   truncated.
+8. **Archives and saved state need nothing.** The exporter writes
    `docs/data/seasons/<code>.json` and merges one entry into
    `docs/data/seasons.json`, copying every other season through untouched; the
    frontend namespaces `localStorage` per season code.
-8. Expect new week labels in `restaurantInclusionWeek`. The API URL slug
+9. Expect new week labels in `restaurantInclusionWeek`. The API URL slug
    (`restaurant-week`) is unchanged across seasons, and the API key survives
    seasons and self-rediscovers if rotated.
 
@@ -459,7 +486,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 168 tests
+1. the 180 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -600,6 +627,21 @@ key, so a viewer's choice survives the hop between them.
   carried by shape as much as colour: open is quiet, closed is struck through,
   unverified is dashed, matching the grammar the dashboard already uses for an
   estimated price.
+
+  Two links per row, where the data supports them. A Restaurant Week badge is a
+  deep link — `restaurant-week.html#r=<slug>`, which the dashboard reads and
+  `openRestaurant()` honours by clearing whatever was filtered, so the link
+  wins. Landing someone on a 636-row list and leaving them to find the name
+  again is a hint, not a link. A **Book** link goes to the restaurant's
+  reservation partner or its own site. Only the 636 Restaurant Week rows carry
+  one — the award files hold no websites — so it is absent on the rest rather
+  than a dead control that looks identical for everyone.
+
+  Filter groups list the 14 commonest values and then say how many they are
+  hiding (`+42 more — use the search box`). A cut list that does not admit it
+  was cut reads as "those are all of them", and someone looking for Georgian
+  would conclude the roster has none. A ticked value is kept on screen wherever
+  it sorts, so searching cannot make your own tick disappear.
 
   It loads no map and no third-party anything, so its CSP is tighter than the
   dashboard's: no unpkg, no CARTO.
@@ -943,7 +985,7 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli)
-tests/      168 pytest tests, no network; run in CI before the crawl
+tests/      180 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights

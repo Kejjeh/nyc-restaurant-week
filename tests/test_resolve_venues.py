@@ -63,3 +63,48 @@ def test_business_status_maps_to_our_three_states(google, ours):
 def test_an_unknown_business_status_leaves_the_venue_unverified():
     """Google inventing a fourth value must not silently mark a venue open."""
     assert STATUS_FROM_GOOGLE.get("SOMETHING_NEW") is None
+
+
+# --------------------------------------------------------------------------
+# the query the billed run will actually send
+# --------------------------------------------------------------------------
+
+def test_the_city_is_not_stapled_onto_an_address_that_already_has_it():
+    """Caught by --dry-run on its first execution, before a cent was spent.
+    Every address-carrying venue was being queried as
+    '... New York, NY 10022 New York'."""
+    from resolve_venues import query_for
+    q = query_for({"name": "Aquavit", "address": "65 E. 55th St., New York, NY 10022"})
+    assert q == "Aquavit 65 E. 55th St., New York, NY 10022"
+    assert q.count("New York") == 1
+
+
+@pytest.mark.parametrize("venue,expected", [
+    # nothing places it -> the city is worth adding
+    ({"name": "Borgo"}, "Borgo New York"),
+    ({"name": "Borgo", "borough": None}, "Borgo New York"),
+    # a borough places it
+    ({"name": "Borgo", "borough": "Manhattan"}, "Borgo Manhattan"),
+    ({"name": "Aska", "borough": "Brooklyn"}, "Aska Brooklyn"),
+    # so does an address, in any borough
+    ({"name": "Aska", "address": "47 S. 5th St., Brooklyn, NY 11249"},
+     "Aska 47 S. 5th St., Brooklyn, NY 11249"),
+    # and so does the name itself, which is rarer but real
+    ({"name": "New York Sushi Ko"}, "New York Sushi Ko"),
+])
+def test_query_for(venue, expected):
+    from resolve_venues import query_for
+    assert query_for(venue) == expected
+
+
+def test_the_dry_run_previews_the_same_string_the_billed_run_sends():
+    """A dry run that builds its own query is worse than no dry run: it invites
+    confidence in something that was never tested. Both paths call query_for,
+    and this is the test that keeps them on it."""
+    import inspect
+
+    import resolve_venues
+    body = inspect.getsource(resolve_venues.fetch_one)
+    assert "query_for(venue)" in body, (
+        "fetch_one must build its query through query_for, or --dry-run lies")
+    assert "TEXT_URL" in body

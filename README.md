@@ -664,7 +664,8 @@ key, so a viewer's choice survives the hop between them.
   have none. Tags come from the parsed menus — `game meats`, `foie gras`,
   `snails`, `sweetbreads` — and are searchable, filterable, and printed on the
   row. There is a `Game, offal & odd cuts` preset because that is the question
-  the roster was first asked.
+  the roster was first asked; it returns 38 restaurants, not the 44 it returned
+  before the confidence split, because six of those rested on a weak match.
 
   Tags are split by confidence, the same way the dashboard separates a verified
   gap from an estimated one. A tag is the **confident** claim when any of its

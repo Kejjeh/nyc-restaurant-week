@@ -241,9 +241,21 @@ def outdoor_for(name, address, lat, lng, licences):
         return None
     hits.sort(key=lambda h: (-h[0], -h[1]))
     best = hits[0][2]
+    # Fold in only the rows belonging to the SAME business as the best match.
+    # "Every qualifying row" folded in every nearby licence that cleared the
+    # name test, and a neighbourhood inside a restaurant's own name clears it
+    # easily: Boucherie Union Square took a licence from Union Square Cafe, and
+    # A Pasta Bar took one from Il Mulino Prime 21m away. Both were published
+    # with seating they may not have, credited to a licence_name that did not
+    # have it either -- so the row named its own evidence and then contradicted
+    # it. One business appearing twice, once for the pavement and once for the
+    # roadway, is the case this loop is for; two businesses is not.
+    best_key = _out_norm(best["name"] or best["legal"])
+    same = [h for h in hits
+            if _out_norm(h[2]["name"] or h[2]["legal"]) == best_key]
     return {
-        "sidewalk": any(h[2]["sidewalk"] for h in hits),
-        "roadway": any(h[2]["roadway"] for h in hits),
+        "sidewalk": any(h[2]["sidewalk"] for h in same),
+        "roadway": any(h[2]["roadway"] for h in same),
         "licence_name": clean(best["name"] or best["legal"]),
         "dist_m": int(round(-hits[0][1])),
     }

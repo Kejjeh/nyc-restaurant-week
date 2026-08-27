@@ -93,10 +93,37 @@ def parse_structure(text):
     return courses, items
 
 
+def dedupe(items):
+    """Identical (course, dish, description) rows, collapsed, order kept.
+
+    A menu PDF that prints the same section on two pages, or carries a lunch
+    and a dinner menu under the same headings, yields the same dish twice.
+    11% of all parsed rows were exact repeats.
+    """
+    out, seen = [], set()
+    for x in items:
+        key = (x["course"], x["dish"], x["description"])
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(x)
+    return out
+
+
 def grade(text, courses, items):
+    """The docstring promises ">=2 course SECTIONS detected". `courses` counts
+    occurrences, so a single heading printed twice satisfied that and the menu
+    was graded `full` -- the state the dashboard shows as a menu we understood.
+
+    Harta was the plainest case: courses ['Desserts', 'Desserts'], graded full.
+    The parser had found one heading late in the PDF and swallowed everything
+    after it as dessert items, including 'graham cracker crust' and 'market
+    berries, chantilly cream'. Seven menus claimed to be fully parsed on the
+    strength of one repeated heading.
+    """
     if len(text.strip()) < 40:
         return "failed"
-    if len(courses) >= 2 and len(items) >= 4:
+    if len(set(courses)) >= 2 and len(items) >= 4:
         return "full"
     return "partial"
 
@@ -118,6 +145,7 @@ def main():
             continue
         text = extract_text(path)
         courses, items = parse_structure(text)
+        items = dedupe(items)
         out[slug] = {
             "parse_quality": grade(text, courses, items),
             "courses": courses,

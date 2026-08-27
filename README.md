@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 254 tests, ~0.5s, no network
+python -m pytest -q tests/             # 283 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -124,7 +124,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 254 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 283 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -549,7 +549,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 254 tests
+1. the 283 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -1035,6 +1035,56 @@ restaurant ending today has not ended (`hasEnded`), still counts as urgent
 eat, announced as over, on the one day the number matters most. It reads
 "1 day left" now, singular.
 
+### Counting distinct things
+
+Two bugs in the menu parser, both the same mistake — counting occurrences of a
+thing rather than distinct things.
+
+`grade()` promises `full` means ">=2 course sections detected", but counted
+entries in a list that appends a heading every time it matches. Harta parsed as
+`courses: ['Desserts', 'Desserts']` and was graded `full`: the parser had found
+one heading late in the PDF and swallowed everything after it as dessert items,
+including `graham cracker crust` and `market berries, chantilly cream`. Seven
+menus claimed a full parse on one repeated heading. Note the dashboard collapses
+this to `pdf` and never showed it — the grade reaches you through
+`menu_parse_quality` in `restaurants.csv`, so this is a fix to the dataset
+rather than to the page.
+
+`menu_items` held **1,041 exact duplicate rows, 11% of the table**: PDFs that
+print the same section on two pages, or carry a lunch and a dinner menu under
+one set of headings. Anyone counting dishes off this dataset over-counted by a
+ninth. 43 duplicate tag rows went with them; no published tag changed, because
+the exporter already caps snippets per tag.
+
+Both are fixed in `parse_menus.py` and re-derived by `build_db.py` on the way
+in, so the committed parse is corrected without re-downloading 473 PDFs at the
+mandatory 1 req/sec.
+
+### Asking the payload whether it agrees with itself
+
+`tests/test_published_invariants.py` checks the *published files* against the
+data they were built from, which is how every bug in this audit was found. None
+of them raised, errored or logged anything; each was a number a reader could
+have disproved with arithmetic.
+
+It asks, every run:
+
+- does the payload cover exactly the database it claims to describe, and does
+  every headline count match the rows it summarises
+- does any printed gap disagree with its own comparable, or any percentage with
+  its own gap
+- is anything plotted outside New York
+- is **every** subway walk time recomputable from the raw MTA station file —
+  the whole column, not a sample
+- is a restaurant's outdoor seating actually held by the licence its row names
+- do the published snippets stay inside the menu budget, measured against the
+  raw menu text rather than against the exporter's own accounting, and can two
+  of them never be stitched into one passage
+
+The last two matter most: `assert_tos_clean()` measures what the exporter
+decided to publish, which is a check marking its own homework. These measure the
+published file against the menu it came from.
+
 ### Numbers a reader can check
 
 Every figure printed beside another is derived so the two reconcile.
@@ -1127,7 +1177,7 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli, job_summary)
-tests/      254 pytest tests, no network; run in CI before the crawl
+tests/      283 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights

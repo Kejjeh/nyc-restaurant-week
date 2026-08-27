@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 283 tests, ~0.5s, no network
+python -m pytest -q tests/             # 289 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -124,7 +124,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 283 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 289 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -549,7 +549,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 283 tests
+1. the 289 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -724,6 +724,15 @@ key, so a viewer's choice survives the hop between them.
   reservation partner or its own site. Only the 636 Restaurant Week rows carry
   one — the award files hold no websites — so it is absent on the rest rather
   than a dead control that looks identical for everyone.
+
+  Facet counts are computed against the rows surviving every **other** filter —
+  never the facet's own. A count is a promise about what clicking it will give
+  you, and the roster used to count against the whole roster: filtered to the 62
+  Michelin-starred venues it still read `Manhattan 1104` and `Queens 55`, and
+  clicking Queens returned nothing. Excluding a facet from its own basis is what
+  keeps a second choice in the same group reachable (Brooklyn *or* Queens); a
+  ticked value stays on screen at zero so it can be unticked. Same rule the
+  dashboard states in its own source, now stated the same way here.
 
   Filter groups list the 14 commonest values and then say how many they are
   hiding (`+42 more — use the search box`). A cut list that does not admit it
@@ -1177,7 +1186,7 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli, job_summary)
-tests/      283 pytest tests, no network; run in CI before the crawl
+tests/      289 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights

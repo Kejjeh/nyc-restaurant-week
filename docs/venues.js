@@ -121,10 +121,16 @@ function haystack(v) {
   return v._hay;
 }
 
-function matches(v) {
+/* `exceptKey` leaves one facet out of the test, which is what lets that facet
+   count itself honestly. Counting against the FULLY filtered set would zero
+   every unselected value in the facet you just used, so a second choice in the
+   same group becomes unreachable — you could never say "Brooklyn OR Queens".
+   Same rule the dashboard uses, and for the same reason. */
+function matches(v, exceptKey) {
   if (STATE.q && !haystack(v).includes(STATE.q)) return false;
   if (STATE.threeWay && v.award_sources.length < 3) return false;
   for (const [key, chosen] of STATE.filters) {
+    if (key === exceptKey) continue;
     const facet = FACETS.find((f) => f.key === key);
     const mine = facet.get(v);
     if (!mine.some((m) => chosen.has(m))) return false;
@@ -290,13 +296,22 @@ function renderFacets() {
   const box = $('#facets');
   box.textContent = '';
   for (const f of FACETS) {
+    /* Counted against what is actually on screen, not against the whole
+       roster. Filtered to the 62 Michelin-starred venues, this group used to
+       still say "Manhattan 1104" — a count is a promise about what clicking
+       will give you, and that one could promise 55 rows and deliver none. */
     const counts = new Map();
     for (const v of STATE.rows) {
+      if (!matches(v, f.key)) continue;
       for (const val of f.get(v)) {
         if (val) counts.set(val, (counts.get(val) || 0) + 1);
       }
     }
-    if (counts.size < 2) continue;
+    // A ticked value stays on screen at zero, or there is no way to untick it.
+    for (const val of (STATE.filters.get(f.key) || [])) {
+      if (!counts.has(val)) counts.set(val, 0);
+    }
+    if (counts.size < 2 && !STATE.filters.has(f.key)) continue;
     const group = el('div', 'facet');
     group.append(el('h3', null, f.label));
     const chosen = STATE.filters.get(f.key);
@@ -346,7 +361,7 @@ function renderPresets() {
   for (const p of PRESETS) {
     const b = el('button', 'preset', p.label);
     b.type = 'button';
-    b.addEventListener('click', () => { p.apply(); STATE.shown = PAGE; apply(true); });
+    b.addEventListener('click', () => { p.apply(); STATE.shown = PAGE; apply(); });
     box.append(b);
   }
 }
@@ -368,7 +383,7 @@ function renderActive() {
   for (const [label, undo] of chips) {
     const chip = el('button', 'chip', `${label} ✕`);
     chip.type = 'button';
-    chip.addEventListener('click', () => { undo(); STATE.shown = PAGE; apply(true); });
+    chip.addEventListener('click', () => { undo(); STATE.shown = PAGE; apply(); });
     box.append(chip);
   }
   const n = chips.length;
@@ -377,7 +392,7 @@ function renderActive() {
   $('#clearBtn').hidden = n === 0;
 }
 
-function apply(refreshFacets) {
+function apply() {
   const hits = STATE.rows.filter(matches);
   hits.sort(SORTS[STATE.sort] || SORTS.prestige);
 
@@ -392,7 +407,14 @@ function apply(refreshFacets) {
   more.hidden = hits.length <= STATE.shown;
   more.textContent = `Show ${Math.min(PAGE, hits.length - STATE.shown)} more`;
   renderActive();
-  if (refreshFacets) renderFacets();
+  /* Always, now that the counts depend on the filters. Re-rendering steals
+     focus from the checkbox you just used, so it is handed straight back. */
+  const focused = document.activeElement && document.activeElement.id;
+  renderFacets();
+  if (focused) {
+    const again = document.getElementById(focused);
+    if (again) again.focus();
+  }
 }
 
 function renderCoverage() {
@@ -440,7 +462,7 @@ function wire() {
       STATE.q = '';
       $('#q').value = '';
       STATE.shown = PAGE;
-      apply(true);
+      apply();
     });
   }
   const toTop = $('#toTop');
@@ -491,7 +513,7 @@ async function boot() {
   renderCoverage();
   renderPresets();
   wire();
-  apply(true);
+  apply();
 }
 
 boot();

@@ -978,6 +978,23 @@ be stitched back into a passage. The exporter enforces a deliberately tighter
 passes with margin. The published payload carries no `raw_text`, no `menu_items`,
 and no dish/description fields.
 
+**The `keyword` on a tag is menu text too, and is budgeted like a snippet.**
+`recover_keyword()` returns the matched span, and several rules in
+`config/dish_tags.json` bridge two words with `[^.\n]{0,40}` — so the span is
+routinely a phrase (`nigiri accompanied by a tuna`, `Tuna & Avocado Carpaccio`),
+not a term. Where a snippet is published the keyword sits inside it and costs
+nothing; where one was refused, the keyword used to go out unbudgeted, at
+exactly the point the budget had just refused to release any more of that menu.
+139 did, which put 38 restaurants over the stated rule with nothing failing.
+It is now paid for out of the same allowance, and dropped when the allowance
+cannot cover it — the tag keeps its name and its confidence, so nothing becomes
+unfilterable; only the fragment goes.
+
+`assert_snippet_budget()` enforces the **stated** rule over the finished payload
+and fails the export if it is breached. That check deliberately lives in the
+export path rather than only in `tests/`: a test measures the way `build_tags`
+measures, so it drifts with the same bug — this one measures against the menus.
+
 `build_tags()` walks **every** candidate match for a tag and publishes the first
 that clears all three guards, rather than stopping at the first one that fails.
 A refusal is about that particular snippet — it overlaps one already published,

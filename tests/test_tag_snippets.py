@@ -164,3 +164,78 @@ def test_the_tag_vocabulary_is_unchanged_by_this(real):
     for r in pub["restaurants"]:
         assert {h["tag"] for h in r["tags"]} == {
             h["tag"] for h in by.get(r["slug"], [])}
+
+
+# --------------------------------------------------------------------------
+# the keyword is menu text too
+#
+# recover_keyword returns m.group(0) -- a span of the matched menu text -- and
+# several tag rules bridge two words with `[^.\n]{0,40}`, so that span is
+# routinely a phrase rather than a term: "nigiri accompanied by a tuna",
+# "CEVICHE AMARILLO* 22 tuna", "Tuna & Avocado Carpaccio".
+#
+# When a snippet is published the keyword sits inside it, so it costs nothing.
+# When one is refused, the keyword used to go out anyway and uncounted --
+# published at exactly the moment the budget had just refused to let any more
+# of that menu out. 139 did. Counting them put 38 restaurants over the 5%/40
+# rule this project states, with nothing failing.
+# --------------------------------------------------------------------------
+
+def test_a_published_keyword_sits_inside_its_own_snippet(real):
+    """The premise of not double-counting them."""
+    by, _ = real
+    for slug, hits in by.items():
+        for h in hits:
+            if h["snippet"] and h["keyword"]:
+                assert h["keyword"].strip().lower() in h["snippet"].lower(), (
+                    f"{slug}: keyword {h['keyword']!r} is not inside its snippet")
+
+
+def test_a_keyword_without_a_snippet_is_budgeted(real):
+    """Measured at the STATED rule -- 5% of the menu or 40 chars, whichever is
+    greater -- counting the keyword where there is no snippet to contain it."""
+    by, raws = real
+    over = []
+    for slug, hits in by.items():
+        raw = raws.get(slug, "")
+        if not raw:
+            continue
+        used = sum(E.published_menu_chars(h) for h in hits)
+        cap = max(40, len(raw) * 0.05)
+        if used > cap:
+            over.append(f"{slug}: {used} against a cap of {cap:.0f}")
+    assert not over, "\n  ".join([""] + over)
+
+
+def test_dropping_the_fragment_never_drops_the_tag(real):
+    """A tag that cannot afford its keyword must still be filterable and
+    searchable by name. Losing the fragment is the point; losing the tag is
+    not."""
+    by, _ = real
+    for slug, hits in by.items():
+        for h in hits:
+            assert h["tag"], f"{slug}: a hit with no tag name"
+            assert h["confidence"] in ("high", "low"), (
+                f"{slug}/{h['tag']}: confidence went missing with the keyword")
+
+
+def test_the_exporter_refuses_to_publish_over_the_rule():
+    """The guard is in the export path, not only in this file. A test here
+    measures the way build_tags measures, so it would have moved with the bug;
+    assert_snippet_budget measures against the menus themselves."""
+    rows = [{"slug": "r", "tags": [
+        {"tag": "t", "confidence": "high", "keyword": "x" * 60, "snippet": None}]}]
+    with pytest.raises(AssertionError, match="exceeds 5%"):
+        E.assert_snippet_budget(rows, {"r": "y" * 100})
+
+
+def test_the_guard_allows_the_forty_character_floor():
+    """A short menu gets 40 characters, not 5% of very little."""
+    rows = [{"slug": "r", "tags": [
+        {"tag": "t", "confidence": "high", "keyword": "x" * 39, "snippet": None}]}]
+    assert E.assert_snippet_budget(rows, {"r": "y" * 100})
+
+
+def test_the_guard_runs_during_the_export():
+    import inspect
+    assert "assert_snippet_budget(out, raw_by_slug)" in inspect.getsource(E.build_payload)

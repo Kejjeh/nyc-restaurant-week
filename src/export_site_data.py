@@ -790,10 +790,44 @@ def build_tags(con, rules):
         if not published:
             # Nothing on this menu could be published for the tag. Keep the tag
             # so it stays filterable and searchable, with the strongest match's
-            # confidence and keyword and no text -- which is what the row and
-            # the facet already know how to render.
+            # confidence and no text -- which is what the row and the facet
+            # already know how to render.
+            #
+            # The KEYWORD is menu text too, and it used to go out here
+            # unbudgeted. Several tag rules bridge two words with
+            # `[^.\n]{0,40}`, so the matched span is a phrase, not a term:
+            # "nigiri accompanied by a tuna", "CEVICHE AMARILLO* 22 tuna",
+            # "Tuna & Avocado Carpaccio". 139 of these were published with no
+            # snippet, i.e. exactly where the budget had just refused to let
+            # any more of that menu out -- and counting them put 38
+            # restaurants over the 5%/40-char rule this project states.
+            #
+            # So it is budgeted like a snippet: it goes out only if what is
+            # left of the menu's allowance can pay for it, and only if it does
+            # not sit inside MIN_SOURCE_GAP of something already published.
+            # Otherwise the tag keeps everything it needs to be found -- its
+            # name, its confidence -- and loses only the fragment.
+            kw = clean(best_kw)
+            core = (kw or "").strip()
+            raw = raw_by_slug.get(slug, "")
+            used = spans.setdefault(slug, [])
+            if core and raw:
+                budget = max(COVERAGE_FLOOR, int(len(raw) * COVERAGE_CAP))
+                remaining = budget - sum(e - s for s, e in used)
+                at_src = raw.find(core)
+                too_close = (at_src >= 0 and any(
+                    at_src < e + MIN_SOURCE_GAP
+                    and st - MIN_SOURCE_GAP < at_src + len(core)
+                    for st, e in used))
+                if len(core) > remaining or too_close:
+                    kw = None
+                    dropped += 1
+                elif at_src >= 0:
+                    used.append((at_src, at_src + len(core)))
+                else:
+                    used.append((-1, -1 + len(core)))
             kept.append({"tag": tag, "confidence": best_conf,
-                         "keyword": clean(best_kw), "snippet": None,
+                         "keyword": kw, "snippet": None,
                          "source": candidates[0][4]})
     return by_slug, dropped
 
@@ -990,6 +1024,12 @@ def build_payload():
 
     rules = load_tag_rules()
     tags_by_slug, tags_dropped = build_tags(con, rules)
+    # Read once more for the budget guard below. Cheap next to the export, and
+    # keeping it out of build_tags' return value keeps that function's contract
+    # about tags rather than about menus.
+    raw_by_slug = {s: re.sub(r"\s+", " ", (t or "")).strip()
+                   for s, t in con.execute(
+                       "SELECT restaurant_slug, raw_text FROM menus")}
     recog_by_slug, recog_dropped = build_recognition(
         con, load_suppression(), load_jb_awards())
     price_by_slug = build_price(con)
@@ -1182,6 +1222,8 @@ def build_payload():
     con.close()
 
     assert_end_dates_in_window(out, BOOK_BY, PROGRAM_END)
+    # Measured against the menus themselves, at the figure the README states.
+    assert_snippet_budget(out, raw_by_slug)
 
     # --- rubric: a second pass, because the rating component is a PERCENTILE
     # and so cannot be known until every restaurant has been read.
@@ -1268,6 +1310,53 @@ def con_snapshot():
 
 BANNED_KEYS = {"raw_text", "menu_items", "dish", "description", "summary",
                "matched_text", "supplement_price", "course"}
+
+
+def published_menu_chars(tag_hit):
+    """Characters of MENU TEXT a published tag hit carries.
+
+    The snippet when there is one -- the keyword sits inside it, because
+    recentre() builds the snippet around the keyword, so counting both would
+    double-count. The keyword alone when there is not: it is a span of the
+    matched menu text either way, and several tag rules bridge two words with
+    `[^.\n]{0,40}`, so that span is routinely a phrase.
+    """
+    snip = (tag_hit.get("snippet") or "").strip("\u2026").strip()
+    if snip:
+        return len(snip)
+    return len((tag_hit.get("keyword") or "").strip())
+
+
+def assert_snippet_budget(rows, raw_by_slug):
+    """THE RULE, enforced rather than merely intended.
+
+    At most 5% of a menu's extracted text, or 40 characters, whichever is
+    greater. build_tags applies a tighter internal cap (COVERAGE_CAP /
+    COVERAGE_FLOOR) so an independent auditor measuring at the stated figure
+    always has margin; this measures at the STATED figure, over the payload as
+    it will actually be written, and refuses to publish if it is breached.
+
+    It exists because the tighter internal cap was applied to snippets only.
+    Keywords went out unbudgeted, and 38 restaurants were over the stated rule
+    with nothing failing -- the guard and the thing being guarded had drifted
+    apart, which a test in this file would not have caught either, because it
+    would have measured the same way build_tags did.
+    """
+    over = []
+    for r in rows:
+        raw = raw_by_slug.get(r["slug"], "")
+        if not raw:
+            continue
+        used = sum(published_menu_chars(t) for t in r.get("tags", []))
+        cap = max(40, len(raw) * 0.05)
+        if used > cap:
+            over.append(f"{r['slug']}: {used} chars published against a cap of "
+                        f"{cap:.0f} ({len(raw)} chars of menu)")
+    if over:
+        raise AssertionError(
+            "ToS: published menu text exceeds 5% of the menu (or 40 chars, "
+            "whichever is greater):\n  " + "\n  ".join(over[:20]))
+    return True
 
 
 def assert_tos_clean(payload):

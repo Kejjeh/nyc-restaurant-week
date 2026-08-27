@@ -29,7 +29,7 @@ import urllib.parse
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from price_sweep import OUT, fetch, pdf_text, targets  # noqa: E402
+from price_sweep import OUT, fetch, gaps_for, pdf_text, targets  # noqa: E402
 
 GUESS_PATHS = ["/menu", "/menus", "/food", "/dinner-menu", "/menu/", "/menus/",
                "/dinner", "/our-menu", "/food-menu", "/lunch-menu"]
@@ -65,6 +65,15 @@ def gather_urls(html, base):
 
 
 def render_prices(url):
+    """-> (prices, pages_seen).
+
+    The page count is returned rather than assumed, because confidence is
+    graded on prices AND pages ("high" needs twelve prices off two pages) and
+    the caller used to hard-code 1. Render mode clicks through to a menu page
+    when the landing page is thin, so the second page was real and simply not
+    counted -- which made "high" unreachable for every rendered record, all
+    254 of them.
+    """
     from playwright.sync_api import sync_playwright
     with sync_playwright() as pw:
         b = pw.chromium.launch(headless=True)
@@ -75,6 +84,7 @@ def render_prices(url):
             page.goto(url, timeout=20000, wait_until="networkidle")
             content = page.content()
             ps = prices_from(content)
+            pages = 1
             # try one menu link in-page
             if len(ps) < 6:
                 loc = page.locator("a[href*='menu' i]").first
@@ -82,9 +92,10 @@ def render_prices(url):
                     loc.click(timeout=4000)
                     page.wait_for_timeout(2500)
                     ps += prices_from(page.content())
+                    pages += 1
                 except Exception:
                     pass
-            return ps
+            return ps, pages
         finally:
             b.close()
 
@@ -94,8 +105,7 @@ def rescue_one(slug, website, tiers, render=False):
            else "v2", "pages_fetched": 0, "prices": [], "error": None}
     try:
         if render:
-            rec["prices"] = render_prices(website)
-            rec["pages_fetched"] = 1
+            rec["prices"], rec["pages_fetched"] = render_prices(website)
         else:
             data, _ = fetch(website)
             html = data.decode("utf-8", "replace")
@@ -123,8 +133,13 @@ def rescue_one(slug, website, tiers, render=False):
     if apps and mains:
         comp = (statistics.median(apps) + statistics.median(mains)
                 + (statistics.median(desserts) if desserts else 14))
-        rec["comparable_3course"] = round(comp)
-        rec["gaps"] = {t: round(comp - int(t.strip("$"))) for t in tiers}
+        # Derived from the comparable AS PUBLISHED, not rounded independently
+        # from the same unrounded figure -- see gaps_for() in price_sweep.
+        # This module writes to the same cache price_sweep does, and only
+        # price_sweep got the fix the first time round.
+        comp_r = round(comp)
+        rec["comparable_3course"] = comp_r
+        rec["gaps"] = gaps_for(comp_r, tiers)
     n = len(ps)
     rec["confidence"] = ("high" if n >= 12 and rec["pages_fetched"] >= 2
                          else "medium" if n >= 6 else

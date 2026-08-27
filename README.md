@@ -1104,11 +1104,18 @@ published file against the menu it came from.
 Every figure printed beside another is derived so the two reconcile.
 
 - **The heuristic comparable and its gaps** are both rounded from the same
-  sweep figure, so they are rounded *once*: `price_sweep.py` derives each gap
-  from the already-rounded comparable. Rounding them independently gave a
-  comparable of 60 with a $45 gap of 16 — 29 rows that visibly did not subtract.
-  `build_db.reconciled_gaps()` re-derives the cached sweeps on the way in, so
-  the existing 600-odd cache files did not need re-crawling.
+  sweep figure, so they are rounded *once*: `price_sweep.gaps_for()` derives
+  each gap from the already-rounded comparable. Rounding them independently gave
+  a comparable of 60 with a $45 gap of 16 — 29 rows that visibly did not
+  subtract. `gaps_for()` is the only definition, and **both** writers to
+  `data/raw/pricesweep/` call it: `price_sweep.sweep_one` and
+  `price_rescue.rescue_one`. Only the first was fixed originally, so the rescue
+  pass kept writing pairs that did not subtract, and `price_sweep.py --report`
+  printed them — the dashboard never was wrong, because
+  `price_sweep.reconciled_gaps()` re-derives on the way into the database. The
+  44 cache files that held such a pair have since been rewritten in place, so
+  the arithmetic holds for anything that reads those files directly; the
+  read-time re-derivation stays, for a cache written by something else.
 - **The verified figures** are checked by the guard above rather than derived,
   because they are transcriptions and the pipeline must not quietly rewrite a
   human's number.

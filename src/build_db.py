@@ -9,6 +9,7 @@ import tempfile
 from pathlib import Path
 
 import parse_menus
+from price_sweep import reconciled_gaps
 from config import DETAILS_DIR, LISTING_DIR, MENUS_DIR, PROCESSED, SITE
 
 DB = PROCESSED / "restaurant_week.sqlite"
@@ -45,32 +46,6 @@ CREATE TABLE IF NOT EXISTS menu_items (
 CREATE INDEX IF NOT EXISTS idx_menu_rest ON menus(restaurant_slug);
 CREATE INDEX IF NOT EXISTS idx_items_menu ON menu_items(menu_id);
 """
-
-
-def reconciled_gaps(rec):
-    """The cached gaps, re-derived so they subtract from the published comparable.
-
-    price_sweep.py used to round the comparable and each gap INDEPENDENTLY from
-    the same unrounded figure, so a comparable of 60.5 was published as 60 with
-    a $45 gap of 16 -- and 29 rows on the dashboard visibly failed to add up.
-    That is fixed at the source, but the cached sweeps on disk still hold the
-    old numbers and re-deriving them here costs nothing, where re-crawling ~600
-    restaurant websites to regenerate them would cost ten minutes of somebody
-    else's bandwidth.
-
-    A cache without a usable comparable is passed through untouched: there is
-    nothing to reconcile against, and inventing one would be worse.
-    """
-    gaps, comp = rec.get("gaps"), rec.get("comparable_3course")
-    if not isinstance(gaps, dict) or comp is None:
-        return gaps
-    out = {}
-    for tier in gaps:
-        try:
-            out[tier] = comp - int(str(tier).strip("$"))
-        except ValueError:
-            out[tier] = gaps[tier]     # a tier we cannot parse keeps its value
-    return out
 
 
 def derive(meal_types):

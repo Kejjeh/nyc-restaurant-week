@@ -49,6 +49,50 @@ ALREADY_ANALYZED = {  # covered by the manual value research; skip
  'the-bronx-beer-hall','mae-mae-cafe-plant-shop','code-red-restaurant-lounge'}
 
 
+
+# --------------------------------------------------------------------------
+# Gap arithmetic. ONE definition, because there are three places that need it
+# and they used to disagree.
+#
+# The comparable and every gap are published side by side, so a gap must be the
+# difference between the two numbers a reader can see. Rounding each of them
+# independently from the same unrounded comparable does not do that: comp=60.5
+# gives a comparable of 60 and a $45 gap of 16, and 60 - 45 is not 16.
+#
+# price_sweep was fixed for this; price_rescue -- a SECOND writer to the same
+# cache -- was not, and neither was report(), which reads the cache raw. Both
+# now go through here.
+# --------------------------------------------------------------------------
+
+def gaps_for(comparable, tiers):
+    """Tier -> gap, derived from the comparable AS PUBLISHED."""
+    return {t: comparable - int(str(t).strip("$")) for t in tiers}
+
+
+def reconciled_gaps(rec):
+    """The gaps in a cached sweep, re-derived so they subtract from its
+    comparable.
+
+    Records written before the fix hold the old numbers, and re-deriving them
+    on read costs nothing where re-crawling ~600 restaurant websites to
+    regenerate them would cost ten minutes of somebody else's bandwidth.
+
+    A cache without a usable comparable is passed through untouched: there is
+    nothing to reconcile against, and inventing one would be worse. So is a
+    tier this cannot parse -- it keeps whatever it already had.
+    """
+    gaps, comp = rec.get("gaps"), rec.get("comparable_3course")
+    if not isinstance(gaps, dict) or comp is None:
+        return gaps
+    out = {}
+    for tier in gaps:
+        try:
+            out[tier] = comp - int(str(tier).strip("$"))
+        except ValueError:
+            out[tier] = gaps[tier]
+    return out
+
+
 def fetch(url, timeout=15, max_bytes=2_000_000, _retry=True):
     import time
     req = urllib.request.Request(url, headers=UA)
@@ -129,13 +173,9 @@ def sweep_one(slug, website, tiers):
         if mains and apps:
             comp = (statistics.median(apps) + statistics.median(mains)
                     + (statistics.median(desserts) if desserts else 14))
-            # Both figures are published side by side, so the gap is derived
-            # from the ROUNDED comparable rather than rounded independently
-            # from the same unrounded one. Independently, comp=60.5 gives
-            # comparable 60 and a $45 gap of 16, and the two do not subtract.
             comp_r = round(comp)
             rec["comparable_3course"] = comp_r
-            rec["gaps"] = {t: comp_r - int(t.strip("$")) for t in tiers}
+            rec["gaps"] = gaps_for(comp_r, tiers)
         n = len(prices)
         rec["confidence"] = ("high" if n >= 12 and rec["pages_fetched"] >= 2
                              else "medium" if n >= 6 else "low")
@@ -159,7 +199,9 @@ def report():
     for f in OUT.glob("*.json"):
         r = json.loads(f.read_text())
         if r.get("gaps"):
-            for tier, gap in r["gaps"].items():
+            # Same re-derivation the database build does. A report that prints
+            # a comparable and a gap on one line has to have them subtract.
+            for tier, gap in reconciled_gaps(r).items():
                 rows.append((gap, r["slug"], tier, r.get("comparable_3course"),
                              r["confidence"]))
     rows.sort(reverse=True)

@@ -989,6 +989,15 @@ spelling; a term the filters removed says so and counts them
 (*"'ai fiori' matches 1 restaurant, but the filters remove them all"*), which
 is the case where Clear filters is the right move.
 
+**So does the payload fetch, on both pages.** `res.ok` needs a response and a
+thrown network error needs a response; neither arrives when a request is
+accepted and then abandoned, so a fetch with no deadline waits without limit.
+The roster's error path is well written and could not be reached that way — the
+page sat blank, without even a loading line. Both pages now bound the fetch
+(`FETCH_TIMEOUT_MS`), say what they are waiting for, and turn a stall into the
+same sentence a 404 gets. This is the hole the Leaflet load had; the payload
+fetch behind it was not checked at the time.
+
 **The map fails visibly or not at all.** Leaflet and CARTO are the only
 third-party assets on the site and they load on first opening the map. A script
 tag fires `error` when a request is *refused* and nothing at all when it is

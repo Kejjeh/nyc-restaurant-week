@@ -2490,10 +2490,29 @@ function initTheme() {
 
 /* ---------- seasons ------------------------------------------------------ */
 
+/* A fetch that is accepted and never answered hangs forever. `res.ok` and a
+   thrown network error both need a response; neither arrives. The map's
+   Leaflet load had exactly this hole and got a deadline; the payload fetch it
+   sits behind did not, so "Loading the season…" could stay on screen with
+   nothing coming and nothing said. Same treatment: a deadline, and an error a
+   reader can act on. */
+const FETCH_TIMEOUT_MS = 15000;
+
 async function fetchJSON(url) {
-  const res = await fetch(url, { cache: 'no-cache' });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, { cache: 'no-cache', signal: ctl.signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error('it did not answer within fifteen seconds');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /** The registry, or [] when there isn't one — which is what a site published

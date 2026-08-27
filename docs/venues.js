@@ -18,6 +18,7 @@
 'use strict';
 
 const DATA_URL = 'data/venues.json';
+const FETCH_TIMEOUT_MS = 15000;
 const PAGE = 120;
 /* Values listed per filter group before the group says how many it is hiding. */
 const FACET_LIMIT = 14;
@@ -532,13 +533,32 @@ function wire() {
 
 async function boot() {
   let payload;
+  /* 1.2 MB of roster comes down before there is a row to draw, and until it
+     lands the page is a masthead over nothing — which reads as broken rather
+     than as busy. The dashboard next door says this already; the roster said
+     nothing at all, so a slow connection and a dead one looked identical.
+     render() clears this by emptying #rows; the failure path clears it too. */
+  $('#rows').append(el('p', 'empty', 'Loading the roster…'));
   try {
-    const res = await fetch(DATA_URL, { cache: 'no-cache' });
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-    payload = await res.json();
+    /* A fetch that is accepted and never answered hangs forever: `res.ok` and
+       a thrown network error both need a response, and neither arrives. The
+       catch below is good and could not be reached that way — the page simply
+       stayed blank, with not even the loading line, indefinitely. */
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), FETCH_TIMEOUT_MS);
+    try {
+      const res = await fetch(DATA_URL, { cache: 'no-cache', signal: ctl.signal });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      payload = await res.json();
+    } finally {
+      clearTimeout(timer);
+    }
   } catch (err) {
+    const why = err.name === 'AbortError'
+      ? 'it did not answer within fifteen seconds' : err.message;
+    $('#rows').textContent = '';
     $('#rows').append(el('p', 'empty',
-      `Could not load the roster (${err.message}). The data file is docs/data/venues.json.`));
+      `Could not load the roster (${why}). The data file is docs/data/venues.json.`));
     return;
   }
   STATE.data = payload;

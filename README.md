@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 207 tests, ~0.5s, no network
+python -m pytest -q tests/             # 220 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -124,7 +124,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 207 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 220 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -505,6 +505,24 @@ Two reasons: GitHub silently auto-disables scheduled workflows after 60 days of
 repo inactivity, and an explicit pause with a comment is self-documenting where a
 silent disable is not. Re-enabling it is step 5 of the changeover.
 
+### The Monday notification (`src/job_summary.py`)
+
+The log is tens of thousands of characters and nobody reads it. The **summary**
+is what arrives, so what gets promoted out of the fold is the whole question.
+
+Two things lead it, because they are the two that change what somebody should
+*do*: a **closure**, and a **shortlist restaurant's booking details moving**. A
+closure is the only fact in the whole report that is not recoverable from
+anywhere else — it is not a listing change, so nothing else would ever mention
+it — and until this existed it landed inside a collapsed `<details>` blob in a
+50,000-character dump. It is named once above the fold; the raw copy stays in
+the fold, which is meant to be complete.
+
+The logic is a module rather than inline YAML so it can be run and tested
+without pushing a commit and waiting for Monday. Inline is precisely how a wrong
+`parents[]` index came to silently skip the entire `SHORTLIST ALERTS` block on
+every run for weeks while the report printed everything else.
+
 ### Checks on every pull request (`.github/workflows/checks.yml`)
 
 The tests used to run in exactly one place: inside the Monday refresh, before
@@ -516,7 +534,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 207 tests
+1. the 220 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -1046,8 +1064,8 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             resolve_venues, export_venues, export_site_data,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
-            price_rescue, menu_term_sweep, places_cli)
-tests/      207 pytest tests, no network; run in CI before the crawl
+            price_rescue, menu_term_sweep, places_cli, job_summary)
+tests/      220 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights

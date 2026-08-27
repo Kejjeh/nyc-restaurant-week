@@ -989,6 +989,14 @@ spelling; a term the filters removed says so and counts them
 (*"'ai fiori' matches 1 restaurant, but the filters remove them all"*), which
 is the case where Clear filters is the right move.
 
+**Neither page scrolls sideways on a phone.** Both did at 320px — an iPhone SE
+— and it was one element on each, the same one: `select.sortSel`. A `<select>`
+is as wide as its longest option ("Standing — strongest recognition first"
+measured 345px), and the phone rule gave it `flex: 1 1 auto; max-width: none`.
+Neither of those lets it shrink: a flex item will not go below its own content
+without `min-width: 0`, which is the whole fix. On a list you read by scrolling
+vertically, a page that also moves horizontally is the worst kind of wrong.
+
 **Emptying the results list is only half of clearing it.** `RENDERED` is the
 cursor `renderPage()` appends from, and an IntersectionObserver on `#showMore`
 fires whenever the page gets short. A path that emptied `#rows` without

@@ -839,7 +839,17 @@ a:hover { text-decoration-thickness: 2px; }
   .gapUsd { font-size: 19px; }
   .searchRow { flex-wrap: wrap; }
   .search { flex: 1 1 100%; order: -1; }
-  .sortSel { flex: 1 1 auto; max-width: none; }
+  /* `max-width: none` alone is not enough, and neither is flex-shrink: a flex
+     item will not shrink below its own content, and a <select>'s content is
+     its LONGEST option. "Standing — strongest recognition first" made the
+     roster 345px wide inside a 320px viewport, so both pages scrolled
+     sideways on an iPhone SE — on a list you read by scrolling vertically,
+     which is the worst place for the page to slip under your thumb.
+     min-width: 0 is the part that actually lets it shrink. */
+  .sortSel {
+    flex: 1 1 auto; max-width: 100%; min-width: 0;
+    text-overflow: ellipsis;
+  }
   .facets { grid-template-columns: 1fr; gap: 12px; }
   .facet .scroller { max-height: 132px; }
   .panel { max-height: 70vh; }

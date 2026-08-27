@@ -61,7 +61,8 @@
 
   "recency": {
     "_doc": "Multiplier applied to the total, keyed on years since the venue's most recent honor. A restaurant last recognised in 1998 is a piece of history, not a booking recommendation, and the roster should say so without hiding it.",
-    "reference_year": 2026,
+    "_reference_year": "null means 'take the year from config/season.json', which is the only file in this repo allowed to carry one. Set an explicit year ONLY to pin a rebuild to a past scoring run; leaving a stale number here silently decays every venue's standing against the wrong year, and nothing would fail to warn you.",
+    "reference_year": null,
     "steps": [
       {"within_years": 2,  "factor": 1.0},
       {"within_years": 5,  "factor": 0.96},

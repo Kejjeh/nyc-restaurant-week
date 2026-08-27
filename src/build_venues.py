@@ -42,6 +42,7 @@ from collections import Counter
 from difflib import SequenceMatcher
 from pathlib import Path
 
+from config import SEASON_YEAR
 from enrich_recognition import norm_name, street_key
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -533,8 +534,8 @@ def nyt_rank(notes, pattern):
     return int(m.group(1)) if m else None
 
 
-def load_awards_config():
-    cfg = json.loads(AWARDS_CONFIG.read_text(encoding="utf-8"))
+def load_awards_config(path=AWARDS_CONFIG):
+    cfg = json.loads(Path(path).read_text(encoding="utf-8"))
     for key in ("sources", "honors", "breadth_bonus", "recency", "closed_penalty"):
         if key not in cfg:
             raise ValueError(f"awards.json missing key: {key}")
@@ -543,11 +544,31 @@ def load_awards_config():
             continue
         if ":" not in k:
             raise ValueError(f"honor key {k!r} must be 'source:level'")
+    pinned = cfg["recency"].get("reference_year")
+    if pinned is not None and not isinstance(pinned, int):
+        raise ValueError(
+            f"awards.json recency.reference_year must be an integer or null, "
+            f"got {pinned!r}")
     return cfg
 
 
 def honor_key(source, level):
     return f"{source}:{level}"
+
+
+def reference_year(cfg):
+    """The year recency is measured from.
+
+    `config/season.json` is the only file in this repo allowed to carry a year --
+    the README states it as an invariant and every other module honours it. This
+    one quietly did not: `reference_year` sat hard-coded in awards.json, so the
+    first changeover would have decayed every venue's standing against a stale
+    year with nothing failing to say so.
+
+    An explicit value still wins, because pinning a rebuild to a past scoring
+    run is a real thing to want. Absent or null, the season file decides.
+    """
+    return cfg.get("recency", {}).get("reference_year") or SEASON_YEAR
 
 
 def prestige_for(venue_awards, cfg, closed):
@@ -579,7 +600,7 @@ def prestige_for(venue_awards, cfg, closed):
 
     years = [a["year"] for a in venue_awards if a.get("year")]
     if years:
-        age = cfg["recency"]["reference_year"] - max(years)
+        age = reference_year(cfg) - max(years)
         for step in cfg["recency"]["steps"]:
             if age <= step["within_years"]:
                 total *= step["factor"]

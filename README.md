@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 168 tests, ~0.5s, no network
+python -m pytest -q tests/             # 172 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -116,7 +116,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 168 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 172 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -357,7 +357,10 @@ is absent, and absence is not an average.
 
 Recency keys on the venue's most recent honour of any kind, not on each award's
 own age — a 1995 Beard winner that took a 2025 Michelin star is a current
-restaurant, and is scored as one.
+restaurant, and is scored as one. The year it measures from comes from
+`config/season.json`, because that is the only file in this repo allowed to
+carry a year; `awards.json` can pin an explicit one to reproduce a past scoring
+run, and a non-integer there fails the run rather than scoring against garbage.
 
 ### Resolving venues against Google (`src/resolve_venues.py`)
 
@@ -421,11 +424,21 @@ Ordered. This is the section that will actually be used in January.
    `data/raw/google/*.json`. **Skipping this is not neutral**: an unrated
    restaurant has its `rating` component — 30 of the 90 available grade points —
    imputed at the corpus mean.
-7. **Archives and saved state need nothing.** The exporter writes
+7. **The roster needs nothing, and that is worth knowing rather than assuming.**
+   `build_venues.py` re-seeds from the new season's `restaurants` table, so last
+   season's participants that hold no award simply stop being venues — correct,
+   since the roster is *award venues plus current participants*. Award venues
+   persist untouched; `data/raw/venues_google/` is keyed by venue slug and stays
+   valid; `awards.json` no longer carries a year, so recency follows
+   `season.json` with the rest. The one thing to expect is a noisy `## ROSTER`
+   block for one run: several hundred venues gone and several hundred new, which
+   is the changeover, not a fault. It is capped and counted, not silently
+   truncated.
+8. **Archives and saved state need nothing.** The exporter writes
    `docs/data/seasons/<code>.json` and merges one entry into
    `docs/data/seasons.json`, copying every other season through untouched; the
    frontend namespaces `localStorage` per season code.
-8. Expect new week labels in `restaurantInclusionWeek`. The API URL slug
+9. Expect new week labels in `restaurantInclusionWeek`. The API URL slug
    (`restaurant-week`) is unchanged across seasons, and the API key survives
    seasons and self-rediscovers if rotated.
 
@@ -459,7 +472,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 168 tests
+1. the 172 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -952,7 +965,7 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli)
-tests/      168 pytest tests, no network; run in CI before the crawl
+tests/      172 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights

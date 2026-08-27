@@ -309,5 +309,35 @@
    "year": 1999,
    "reason": "named in a group award but no venue matches"
   }
+ ],
+ "ruled_out_by_venue_aliases": [
+  {
+   "source": "james_beard",
+   "name": "Founders, \"Food & Wine\" and \"Food Arts\"",
+   "year": 2010,
+   "level": "winner",
+   "reason": "Two magazines. The award is to their founders, not to a room."
+  },
+  {
+   "source": "james_beard",
+   "name": "Founders, \"Food & Wine\" and \"Food Arts\"",
+   "year": 2010,
+   "level": "winner",
+   "reason": "Two magazines. The award is to their founders, not to a room."
+  },
+  {
+   "source": "james_beard",
+   "name": "Red Cat Restaurants",
+   "year": 2009,
+   "level": "semifinalist",
+   "reason": "A restaurant group's corporate name, same as above."
+  },
+  {
+   "source": "james_beard",
+   "name": "Dale DeGroff Co., Inc.",
+   "year": 2009,
+   "level": "winner",
+   "reason": "A bartender's company. The award is to Dale DeGroff, who has no restaurant in these files."
+  }
  ]
 }

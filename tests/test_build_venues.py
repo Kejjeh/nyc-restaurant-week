@@ -383,3 +383,56 @@ def test_the_exporter_does_not_rewrite_a_payload_for_the_clock_alone():
     assert not _same_but_for_the_clock(out, real_change)
 
     assert not _same_but_for_the_clock(ROOT / "does-not-exist.json", payload)
+
+
+# --------------------------------------------------------------------------
+# hand rulings (config/venue_aliases.json)
+# --------------------------------------------------------------------------
+
+def test_an_award_body_entity_never_becomes_a_venue():
+    """'Dale DeGroff Co., Inc.' is a bartender's company and 'Founders, "Food &
+    Wine" and "Food Arts"' is two magazines. Both were rows on the roster."""
+    from build_venues import load_aliases
+    not_venues, _ = load_aliases()
+    con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+    try:
+        names = {n for (n,) in con.execute("SELECT name FROM venues")}
+    finally:
+        con.close()
+    from build_venues import norm_name
+    leaked = {n for n in names if norm_name(n) in not_venues}
+    assert not leaked, f"ruled-out names are on the roster: {leaked}"
+    assert "Dale DeGroff Co., Inc." not in names
+
+
+def test_a_hand_ruled_split_creates_both_restaurants():
+    """The automatic rule cannot split 'Zaab Zaab, Zaab Zaab Talay' -- neither
+    part was on the roster, so nothing could prove it was a list. A human
+    ruling can, and then the parts are created rather than required."""
+    from build_venues import load_aliases
+    _, split_into = load_aliases()
+    assert split_into, "venue_aliases.json has no hand-ruled splits"
+    con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+    try:
+        rows = dict(con.execute(
+            "SELECT name, award_count FROM venues WHERE name IN"
+            " ('Zaab Zaab', 'Zaab Zaab Talay', 'Zaab Zaab, Zaab Zaab Talay')"))
+    finally:
+        con.close()
+    assert rows.get("Zaab Zaab"), "the split's first part is not a venue"
+    assert rows.get("Zaab Zaab Talay"), "the split's second part is not a venue"
+    assert "Zaab Zaab, Zaab Zaab Talay" not in rows
+    # the awards followed the split rather than being dropped with the husk
+    assert rows["Zaab Zaab"] and rows["Zaab Zaab Talay"]
+
+
+def test_a_ruling_is_matched_on_the_normalised_name():
+    """So a ruling written with different punctuation still applies."""
+    from build_venues import load_aliases, norm_name
+    not_venues, _ = load_aliases()
+    assert norm_name("dale degroff co, inc") in not_venues
+
+
+def test_aliases_load_to_empty_when_the_file_is_absent():
+    from build_venues import load_aliases
+    assert load_aliases(ROOT / "does-not-exist.json") == ({}, {})

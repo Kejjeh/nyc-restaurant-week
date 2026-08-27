@@ -13,7 +13,7 @@ it is ever contradicted, revert to private and re-read "ToS rules" below.
 `data/raw/menus/*.pdf` is gitignored and 0 PDFs are tracked — keep it that way.
 Menus are linked to the official S3 URL, never copied.
 
-Local dataset + pipeline over **1,408 NYC restaurants**: every one named by
+Local dataset + pipeline over **1,405 NYC restaurants**: every one named by
 Michelin, the James Beard Foundation or the New York Times, plus all **636**
 participants in NYC Restaurant Week Summer 2026 (Jul 20–Aug 16, extension weeks
 through Sep 6; Saturdays excluded, Sundays optional per restaurant). Built to
@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 154 tests, ~0.5s, no network
+python -m pytest -q tests/             # 158 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -97,7 +97,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 154 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 158 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -302,6 +302,30 @@ only one, because no real name has those; if none of its parts resolve it become
 a review row rather than a venue. Parts that never resolve are recorded, never
 invented.
 
+### When the rules will not decide (`config/venue_aliases.json`)
+
+The rules above are deliberately conservative, so a few award-record names are
+left over that a person can settle in a second and a threshold cannot settle
+safely at all. Those rulings live in `config/venue_aliases.json`, in the same
+spirit as `config/recognition_suppress.json`:
+
+- **`not_venues`** — names that are people, companies or publications rather
+  than restaurants (`Dale DeGroff Co., Inc.`, `Founders, "Food & Wine" and
+  "Food Arts"`, and the corporate names of six restaurant groups). The record is
+  dropped with its reason recorded. No venue is created, and nothing is quietly
+  attached to some other restaurant instead.
+- **`split_into`** — strings that genuinely are a list, where the automatic
+  split cannot prove it because fewer than two parts were already on the roster.
+  `Zaab Zaab, Zaab Zaab Talay` is two real Queens restaurants and neither
+  appeared under its own name anywhere in the award files. A human ruling lets
+  the parts be *created* rather than required.
+
+Loosening the automatic rules instead was the wrong trade. Every one of these is
+one edit away from a rule that would also mis-handle a real name: anything that
+splits `Zaab Zaab, Zaab Zaab Talay` also splits `Fifty Seven Fifty Seven, The
+Four Seasons Hotel` and `Lorenzo's Restaurant, Bar & Cabaret`, and those failures
+are the invisible kind. Nine hand rulings cost nothing and break nothing.
+
 ### Standing (`prestige`)
 
 A 0–100 composite, defined entirely in `config/awards.json` — change a weight
@@ -318,7 +342,7 @@ restaurant, and is scored as one.
 
 ### Resolving venues against Google (`src/resolve_venues.py`)
 
-772 venues arrive with no coordinates and no confirmed open/closed status,
+769 venues arrive with no coordinates and no confirmed open/closed status,
 because the Beard file carries no addresses. `resolve_venues.py --fetch` looks
 them up — roughly 700–800 Text Search calls, billed once and then cached in
 `data/raw/venues_google/` exactly like `data/raw/google/`.
@@ -416,7 +440,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 154 tests
+1. the 158 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -493,7 +517,7 @@ participants
   overstates casual formats. Hand-verified findings live in `reports/`, not here.
 
 
-### `venues` — the roster (1,408 rows)
+### `venues` — the roster (1,405 rows)
 
 ```sql
 venue_slug TEXT PRIMARY KEY      -- equals rw_slug where the restaurant is in the programme
@@ -508,7 +532,7 @@ prestige   INTEGER              -- 0-100, per config/awards.json
 seeded_from, resolution         -- which source created the row, and how identity was settled
 ```
 
-### `venue_awards` — one row per award record (1,920 rows)
+### `venue_awards` — one row per award record (1,918 rows)
 
 ```sql
 venue_slug, source, level, award, year
@@ -833,7 +857,7 @@ recognition badges (3 rows suppressed) · 137 licensed outdoor. Payload
 
 ### The roster specifically
 
-- **772 of 1,408 venues have never been checked against anything but a name.**
+- **769 of 1,405 venues have never been checked against anything but a name.**
   They came from the James Beard file, which carries no addresses, so they have
   no coordinates, no rating, and an `unknown` trading status until someone spends
   a Places lookup on them. Only 634 venues can be plotted on a map at all.
@@ -842,7 +866,7 @@ recognition badges (3 rows suppressed) · 137 licensed outdoor. Payload
 - **The Beard file goes back to 1991**, so the roster deliberately includes
   restaurants that closed decades ago. That is the archive working as intended —
   they keep their awards and score below anywhere still trading — but it means
-  "1,408 restaurants" is not "1,408 places you can book tonight".
+  "1,405 restaurants" is not "1,405 places you can book tonight".
 - **A Beard award is often to a person, not a room.** `venue_awards.person`
   carries the chef, sommelier or restaurateur, and the site prints it, because a
   roster that quietly credits the restaurant with its chef's Rising Star is
@@ -850,9 +874,10 @@ recognition badges (3 rows suppressed) · 137 licensed outdoor. Payload
 - **Michelin here is the 2025 selection only.** There is no historical Michelin
   data in this repo, so a restaurant that held a star in 2016 and lost it shows
   no Michelin recognition at all.
-- **Three venues are still list-shaped names** the group-award rules could not
-  resolve (`Zaab Zaab, Zaab Zaab Talay` and two award-body entities). They are
-  visible in the roster and recorded; they are not restaurants.
+- **No venue on the roster is a list of restaurants or an award-body entity**,
+  and a test checks that against the database rather than a fixture. The three
+  that survived the automatic rules are settled by hand in
+  `config/venue_aliases.json`.
 
 ## ToS rules — HARD REQUIREMENTS for any output built from this repo
 
@@ -899,10 +924,11 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli)
-tests/      154 pytest tests, no network; run in CI before the crawl
+tests/      158 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights
+            venue_aliases.json  hand rulings: not-a-restaurant, and confirmed splits
             dish_tags.json   RW-menu tag rules
             offsite_tags.json / offsite_verified.json  own-website terms + 56 hand checks
             google_place_ids.json  14 hand-pinned place_ids

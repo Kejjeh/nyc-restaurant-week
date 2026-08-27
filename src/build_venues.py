@@ -48,6 +48,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / "data" / "processed" / "restaurant_week.sqlite"
 RAW = ROOT / "data" / "raw" / "recognition"
 AWARDS_CONFIG = ROOT / "config" / "awards.json"
+ALIASES = ROOT / "config" / "venue_aliases.json"
 REVIEW = ROOT / "data" / "processed" / "venue_merge_review.json"
 
 # How alike two tokens must be before one is treated as a misspelling of the
@@ -87,6 +88,24 @@ CREATE INDEX IF NOT EXISTS idx_va_venue ON venue_awards(venue_slug);
 CREATE INDEX IF NOT EXISTS idx_venues_rw ON venues(rw_slug);
 CREATE INDEX IF NOT EXISTS idx_venues_prestige ON venues(prestige);
 """
+
+
+def load_aliases(path=ALIASES):
+    """Human rulings the matching rules will not make for themselves.
+
+    Kept OUT of the rules on purpose. Every entry here is one edit away from a
+    threshold that would also mis-handle a real name -- splitting "Zaab Zaab,
+    Zaab Zaab Talay" automatically means splitting "Fifty Seven Fifty Seven,
+    The Four Seasons Hotel" too, and that failure is invisible. A handful of
+    hand rulings costs nothing and breaks nothing.
+    """
+    if not path.exists():
+        return {}, {}
+    doc = json.loads(Path(path).read_text(encoding="utf-8"))
+    strip = lambda d: {k: v for k, v in (d or {}).items() if not k.startswith("_")}
+    not_venues = {norm_name(k): v for k, v in strip(doc.get("not_venues")).items()}
+    split_into = {norm_name(k): v for k, v in strip(doc.get("split_into")).items()}
+    return not_venues, split_into
 
 
 def slugify(name):
@@ -456,17 +475,26 @@ def group_marker(name):
     return None
 
 
-def resolve_group_awards(roster, deferred):
+def resolve_group_awards(roster, deferred, split_into=None):
     """Attach each deferred portfolio award to the restaurants it names.
 
     A part that does not resolve is recorded rather than created: "Le Veau d'
     Or" is written with a stray space in this file and will not match, and
     inventing a venue for it is how the junk row got there in the first place.
     """
+    split_into = split_into or {}
     attached, kept_whole, unresolved = [], [], []
     for item in deferred:
-        parts = split_group(item["name"])
-        marker = group_marker(item["name"])
+        ruled = split_into.get(norm_name(item["name"]))
+        parts = ruled or split_group(item["name"])
+        # A human confirmed this one is a list, so the parts do not have to
+        # prove it by already existing -- they are created if they are new.
+        marker = "hand-ruled split" if ruled else group_marker(item["name"])
+        if ruled:
+            for part in parts:
+                if match_name_only(roster, part)[2] == "create":
+                    v = roster.add(part, item["source"])
+                    v["resolution"] = "created from a hand-ruled split in venue_aliases.json"
         hits, misses = [], []
         for part in parts:
             venue, _, decision = match_name_only(roster, part)
@@ -565,6 +593,8 @@ def prestige_for(venue_awards, cfg, closed):
 
 def build(con, cfg, quiet=False):
     roster = Roster()
+    not_venues, split_into = load_aliases()
+    ruled_out = []
 
     # --- seed: this season's Restaurant Week listing -------------------------
     # Seeded first on purpose. These rows are the only ones that arrive with a
@@ -619,9 +649,17 @@ def build(con, cfg, quiet=False):
                 "person": e.get(spec["person_field"]) if spec.get("person_field") else None,
                 "source_url": e.get("url"),
             }
+            # A name a human has ruled is not a restaurant: drop the record and
+            # say so. Never create a venue, and never quietly attach it to some
+            # other restaurant instead.
+            if norm_name(name) in not_venues:
+                ruled_out.append({"source": source, "name": name,
+                                  "year": e.get("year"), "level": e.get("level"),
+                                  "reason": not_venues[norm_name(name)]})
+                continue
             # A name that splits into several is a portfolio award until proved
             # otherwise, and proving it needs the whole roster, so it waits.
-            if len(split_group(name)) > 1:
+            if norm_name(name) in split_into or len(split_group(name)) > 1:
                 deferred.append({"name": name, "award": award_row, "source": source})
                 continue
             if spec["has_addresses"] and address:
@@ -673,7 +711,8 @@ def build(con, cfg, quiet=False):
                   f"{refused} refused, {skipped} without a venue name")
 
     # Portfolio awards, now that every source has been folded in.
-    attached, kept_whole, unresolved = resolve_group_awards(roster, deferred)
+    attached, kept_whole, unresolved = resolve_group_awards(
+        roster, deferred, split_into)
     for item in kept_whole:
         # Not a portfolio after all -- "Gage & Tollner" is one restaurant. Put
         # it back through the ordinary path.
@@ -693,6 +732,10 @@ def build(con, cfg, quiet=False):
                  match_confidence=0.9, how=how)
         roster.awards.append(a)
     roster.group_unresolved = unresolved
+    roster.ruled_out = ruled_out
+    if ruled_out and not quiet:
+        print(f"ruled out by config/venue_aliases.json: {len(ruled_out)} records "
+              f"across {len({r['name'] for r in ruled_out})} names that are not restaurants")
     if not quiet:
         print(f"\nportfolio awards: {len(deferred)} list-shaped names -> "
               f"{len(attached)} attachments across the restaurants they name, "
@@ -745,7 +788,8 @@ def build(con, cfg, quiet=False):
                  "restaurant and not two.",
          "refused": roster.refused, "confirm": roster.confirm,
          "folded_spelling_variants": getattr(roster, "folded", []),
-         "group_award_parts_unmatched": getattr(roster, "group_unresolved", [])},
+         "group_award_parts_unmatched": getattr(roster, "group_unresolved", []),
+         "ruled_out_by_venue_aliases": getattr(roster, "ruled_out", [])},
         indent=1, ensure_ascii=False), encoding="utf-8")
     return roster, seeded, stats
 

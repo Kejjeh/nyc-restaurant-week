@@ -39,6 +39,7 @@ import time
 from pathlib import Path
 
 from build_venues import postal_key
+from config import in_nyc
 from enrich_recognition import street_key
 from fetch_google_ratings import (DETAIL_FIELDS, DETAILS_URL, TEXT_URL, api_key,
                                   flatten, get, name_sim)
@@ -46,11 +47,6 @@ from fetch_google_ratings import (DETAIL_FIELDS, DETAILS_URL, TEXT_URL, api_key,
 ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / "data" / "processed" / "restaurant_week.sqlite"
 CACHE = ROOT / "data" / "raw" / "venues_google"
-
-# The same generous five-borough box the exporter uses. A "Balthazar" that
-# geocodes to New Jersey is not our Balthazar, and one bad point ruins the
-# auto-fit of the map as well as the row.
-NYC_BOUNDS = (40.45, 41.02, -74.30, -73.65)
 
 # With no coordinate to corroborate, the name has to carry the identification,
 # so the bar is higher than fetch_google_ratings.py's 0.55 rescue threshold.
@@ -67,13 +63,6 @@ STATUS_FROM_GOOGLE = {
     "CLOSED_TEMPORARILY": "closed",
     "CLOSED_PERMANENTLY": "closed",
 }
-
-
-def in_nyc(lat, lng):
-    if lat is None or lng is None:
-        return False
-    lo_lat, hi_lat, lo_lng, hi_lng = NYC_BOUNDS
-    return lo_lat <= lat <= hi_lat and lo_lng <= lng <= hi_lng
 
 
 def judge_no_coords(cand, name, address):

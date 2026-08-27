@@ -129,8 +129,13 @@ def sweep_one(slug, website, tiers):
         if mains and apps:
             comp = (statistics.median(apps) + statistics.median(mains)
                     + (statistics.median(desserts) if desserts else 14))
-            rec["comparable_3course"] = round(comp)
-            rec["gaps"] = {t: round(comp - int(t.strip("$"))) for t in tiers}
+            # Both figures are published side by side, so the gap is derived
+            # from the ROUNDED comparable rather than rounded independently
+            # from the same unrounded one. Independently, comp=60.5 gives
+            # comparable 60 and a $45 gap of 16, and the two do not subtract.
+            comp_r = round(comp)
+            rec["comparable_3course"] = comp_r
+            rec["gaps"] = {t: comp_r - int(t.strip("$")) for t in tiers}
         n = len(prices)
         rec["confidence"] = ("high" if n >= 12 and rec["pages_fetched"] >= 2
                              else "medium" if n >= 6 else "low")

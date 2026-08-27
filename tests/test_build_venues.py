@@ -727,3 +727,52 @@ def test_the_dish_tags_still_answer_the_question_they_were_added_for():
     payload = _payload()
     game = [v["name"] for v in payload["venues"] if "game meats" in (v.get("dishes") or [])]
     assert len(game) >= 5, f"only {len(game)} venues tagged with game meats"
+
+
+# --------------------------------------------------------------------------
+# coordinates the listing gets wrong
+# --------------------------------------------------------------------------
+
+def test_the_roster_never_publishes_a_coordinate_outside_new_york():
+    """The listing geocodes three plainly Manhattan restaurants to Oakland CA
+    and San Angelo TX. export_site_data has dropped those since it was written;
+    the roster published them, because it took coordinates straight from the
+    table and only used the bounds for judging Google results."""
+    from config import in_nyc
+    out = ROOT / "docs" / "data" / "venues.json"
+    if not out.exists():
+        pytest.skip("payload not built")
+    stray = [v["slug"] for v in json.loads(out.read_text(encoding="utf-8"))["venues"]
+             if v["lat"] is not None and not in_nyc(v["lat"], v["lng"])]
+    assert not stray, f"plotted outside NYC: {stray}"
+
+
+def test_a_venue_the_listing_misplaces_is_seeded_without_coordinates():
+    """Dropped at the seed rather than at export, so the venue stays a
+    candidate for a Places lookup that could supply real coordinates."""
+    con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+    try:
+        rows = dict(con.execute(
+            "SELECT venue_slug, lat FROM venues"
+            " WHERE venue_slug IN ('dubuhaus', 'musaek', 'the-kunjip')"))
+    finally:
+        con.close()
+    assert rows, "the three misplaced restaurants are not on the roster at all"
+    assert all(lat is None for lat in rows.values()), rows
+
+
+def test_the_bounds_have_exactly_one_definition():
+    """They lived in three files and the roster had a fourth copy it only used
+    for judging Google results, never for the coordinates it published."""
+    import config
+    import export_site_data
+    import resolve_venues
+    for mod in (export_site_data, resolve_venues):
+        own = mod.__dict__.get("NYC_BOUNDS")
+        assert own is None or own is config.NYC_BOUNDS, (
+            f"{mod.__name__} carries its own copy of NYC_BOUNDS")
+    assert config.in_nyc(40.7128, -74.0060)
+    assert not config.in_nyc(37.7997, -122.2287)     # Oakland
+    assert not config.in_nyc(31.4924, -100.4577)     # San Angelo
+    assert config.sane_coords(37.7997, -122.2287) == (None, None)
+    assert config.sane_coords(40.7128, -74.0060) == (40.7128, -74.0060)

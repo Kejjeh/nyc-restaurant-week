@@ -45,6 +45,30 @@ BOOK_BY = _season["book_by"]
 PROGRAM_END = _season["end"]
 MIN_ROWS = _season["min_rows"]
 
+# Generous bounding box over all five boroughs. Three participants with plainly
+# Manhattan addresses geocode to Oakland CA and San Angelo TX in the source
+# detail pages; plotting those is worse than plotting nothing, and a single bad
+# point also ruins any auto-fit of the map bounds.
+#
+# It lived in three files, and the roster -- added later -- had a fourth copy it
+# only used for judging Google results, never for the coordinates it published.
+# So the dashboard nulled Oakland out and the roster shipped it. One definition.
+NYC_BOUNDS = (40.45, 41.02, -74.30, -73.65)   # lat_min, lat_max, lng_min, lng_max
+
+
+def in_nyc(lat, lng):
+    """Is this point plausibly in New York City?"""
+    if lat is None or lng is None:
+        return False
+    lo_a, hi_a, lo_o, hi_o = NYC_BOUNDS
+    return lo_a <= lat <= hi_a and lo_o <= lng <= hi_o
+
+
+def sane_coords(lat, lng):
+    """(lat, lng) if the point is plausibly in NYC, else (None, None)."""
+    return (lat, lng) if in_nyc(lat, lng) else (None, None)
+
+
 API_URL = "https://program-api.nyctourism.com/restaurant-week"
 SITE = "https://www.nyctourism.com"
 LISTING_PAGE = f"{SITE}/restaurant-week/"

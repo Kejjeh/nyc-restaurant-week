@@ -30,7 +30,8 @@ from pathlib import Path
 # BOOK_BY is the program's headline deadline (drives the badge); PROGRAM_END is
 # the last extension week (drives the countdown). Both live in config/season.json,
 # which is the only file a season changeover edits.
-from config import BOOK_BY, PROGRAM_END, SEASON, SEASON_LABEL, SEASON_START, SEASON_YEAR
+from config import (BOOK_BY, NYC_BOUNDS, PROGRAM_END, SEASON, SEASON_LABEL,
+                    SEASON_START, SEASON_YEAR, sane_coords)
 
 ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / "data" / "processed" / "restaurant_week.sqlite"
@@ -63,21 +64,40 @@ COVERAGE_CAP = 0.045
 COVERAGE_FLOOR = 36
 MIN_PAD = 8
 
-# Generous bounding box over all five boroughs. Three participants with plainly
-# Manhattan addresses geocode to Oakland CA and San Angelo TX in the source
-# detail pages; plotting those is worse than plotting nothing, and a single bad
-# point also ruins any auto-fit of the map bounds.
-NYC_BOUNDS = (40.45, 41.02, -74.30, -73.65)   # lat_min, lat_max, lng_min, lng_max
+# NYC_BOUNDS and sane_coords now live in config.py -- see the note there.
 
 
-def sane_coords(lat, lng):
-    """Return (lat, lng) if the point is plausibly in NYC, else (None, None)."""
-    if lat is None or lng is None:
-        return None, None
-    lo_a, hi_a, lo_o, hi_o = NYC_BOUNDS
-    if lo_a <= lat <= hi_a and lo_o <= lng <= hi_o:
-        return lat, lng
-    return None, None
+def assert_verified_gaps_reconcile(verified):
+    """A hand-verified gap must subtract from its own comparable.
+
+    These are the numbers the dashboard prints as SOLID figures -- the display
+    state that means "checked against the restaurant's own printed materials".
+    A pair that does not subtract is worse there than anywhere else on the page,
+    because the whole point of the treatment is that a reader can trust it
+    without checking.
+
+    One entry breached this for weeks: Mark's Off Madison carried a comparable
+    of $57 with a $27 gap on a $45 menu, because the decision doc states $57-68
+    as the TWO-course a la carte price while the saving is quoted "on three".
+    Nothing failed; the dashboard simply printed 57, 45 and 27 side by side.
+    """
+    bad = []
+    for slug, v in (verified or {}).items():
+        if slug.startswith("_"):
+            continue
+        price = v.get("rw_price")
+        for comp_key, gap_key in (("comparable_usd", "gap_usd"),
+                                  ("comparable_usd_high", "gap_usd_high")):
+            comp, gap = v.get(comp_key), v.get(gap_key)
+            if None in (comp, gap, price):
+                continue          # an absent figure is not a contradiction
+            if comp - price != gap:
+                bad.append(f"{slug}: {comp_key} {comp} - rw_price {price} "
+                           f"= {comp - price}, but {gap_key} says {gap}")
+    if bad:
+        raise AssertionError(
+            "verified figures that do not reconcile (fix config/verified_values.json "
+            "against reports/rw-final-bookings.md):\n  " + "\n  ".join(bad))
 
 
 # Subway proximity. Straight-line distance times a 1.3 grid factor, at 80 m/min
@@ -934,6 +954,9 @@ def build_payload():
     offsite, _ = build_offsite()
     google, google_mean = build_google()
     verified = json.loads(VERIFIED.read_text(encoding="utf-8"))["restaurants"]
+    # Checked before a single row is built: a figure the dashboard prints as
+    # verified must reconcile, and finding out at render time is too late.
+    assert_verified_gaps_reconcile(verified)
     menus = {r[0]: r[1] for r in con.execute(
         "SELECT restaurant_slug, parse_quality FROM menus")}
 

@@ -1,0 +1,78 @@
+{
+  "_doc": {
+    "purpose": "The award universe the site is built on, and how a venue's prestige is computed from it. Every number here is data, not code: change a weight, re-run src/build_venues.py, and the roster re-scores. Nothing in src/ hard-codes an honor or a point value.",
+    "why_a_config": "The same reason config/rubric.json exists. A composite score that cannot be argued with is a score nobody should trust, so the inputs are published next to the output and a reader can disagree with the weights without reading Python.",
+    "missing_data_rule": "A venue's prestige uses ONLY the honors it actually holds. There is no imputation here, unlike rubric.json: an award is a fact or it is absent, and absence is not an average.",
+    "recency_rule": "Points decay with the age of the venue's MOST RECENT honor, never with the age of the individual award. A 1995 James Beard winner that took a 2025 Michelin star is scored as a current restaurant, which it is."
+  },
+
+  "sources": {
+    "michelin": {
+      "label": "Michelin",
+      "file": "michelin.json",
+      "has_addresses": true,
+      "name_field": "name",
+      "note": "2025 NYC selection. Every record carries a street address, so these merge on name AND address and are the safest rows in the set."
+    },
+    "james_beard": {
+      "label": "James Beard",
+      "file": "james_beard.json",
+      "has_addresses": false,
+      "name_field": "restaurant",
+      "person_field": "name",
+      "note": "1991-2026, NYC only. The award is often to a CHEF, so `name` is a person and `restaurant` is the venue. No addresses at all, which is why these merge on a unique name or not at all."
+    },
+    "nyt": {
+      "label": "New York Times",
+      "file": "nyt100.json",
+      "has_addresses": true,
+      "name_field": "name",
+      "rank_from_notes": "Ranked No\\.? (\\d+)",
+      "note": "The 2026 Top 100 plus one starred review. Only 5 of 101 carry an address; the rank is recoverable from the notes field and is worth keeping, because No. 1 and No. 97 are not the same honor."
+    }
+  },
+
+  "honors": {
+    "_doc": "points = the venue's base score if this is its best honor. Ordered highest first within each source; `rank` orders the badge display.",
+    "michelin:3 stars":      {"points": 100, "rank": 1,  "label": "Three Michelin stars"},
+    "michelin:2 stars":      {"points": 93,  "rank": 2,  "label": "Two Michelin stars"},
+    "michelin:1 star":       {"points": 84,  "rank": 3,  "label": "One Michelin star"},
+    "michelin:bib_gourmand": {"points": 62,  "rank": 6,  "label": "Bib Gourmand"},
+    "michelin:recommended":  {"points": 44,  "rank": 9,  "label": "Michelin recommended"},
+
+    "james_beard:winner":       {"points": 88, "rank": 4,  "label": "James Beard winner"},
+    "james_beard:nominee":      {"points": 66, "rank": 5,  "label": "James Beard nominee"},
+    "james_beard:semifinalist": {"points": 48, "rank": 8,  "label": "James Beard semifinalist"},
+
+    "nyt:nyt_100_best":      {"points": 72, "rank": 7,  "label": "NYT Top 100"},
+    "nyt:nyt_starred_review":{"points": 70, "rank": 7,  "label": "NYT starred review"}
+  },
+
+  "nyt_rank_bonus": {
+    "_doc": "The Top 100 is a ranked list and the rank is public, so use it. A linear ramp: No. 1 earns the full bonus, No. 100 earns none.",
+    "max": 16
+  },
+
+  "breadth_bonus": {
+    "_doc": "Agreement between independent juries is evidence. Michelin, the Beard Foundation and the Times reaching the same restaurant separately says more than any one of them saying it twice.",
+    "per_extra_source": 7,
+    "max": 14
+  },
+
+  "recency": {
+    "_doc": "Multiplier applied to the total, keyed on years since the venue's most recent honor. A restaurant last recognised in 1998 is a piece of history, not a booking recommendation, and the roster should say so without hiding it.",
+    "reference_year": 2026,
+    "steps": [
+      {"within_years": 2,  "factor": 1.0},
+      {"within_years": 5,  "factor": 0.96},
+      {"within_years": 10, "factor": 0.88},
+      {"within_years": 20, "factor": 0.74},
+      {"within_years": 99, "factor": 0.6}
+    ]
+  },
+
+  "closed_penalty": {
+    "_doc": "A closed restaurant keeps its honors -- they were earned -- but must never outrank somewhere you can actually book. The multiplier is applied last and is deliberately blunt.",
+    "factor": 0.5
+  }
+}

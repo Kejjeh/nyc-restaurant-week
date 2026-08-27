@@ -455,7 +455,39 @@ def split_group(name):
     inner = re.search(r"\(([^)]*,[^)]*)\)", name or "")
     text = inner.group(1) if inner else (name or "")
     parts = [p.strip(" .\"") for p in re.split(r",|\band\b", text)]
+    # "Le Veau d' Or" is written with a stray space in the Beard file. Left
+    # alone it becomes a venue under that spelling and never meets the real
+    # name again -- norm_name keeps "d or" as two tokens and "dor" as one, so
+    # even the spelling-variant pass cannot reunite them.
+    parts = [re.sub(r"(?<=\b\w)['’]\s+", "'", p) for p in parts]
     return [p for p in parts if p and p.lower() not in GROUP_NOISE]
+
+
+# Parts that are not restaurant names. The award files pack extra information
+# into these strings -- a second city, a sister business -- and a part shaped
+# like that must never become a venue. Everything else in a confirmed list IS a
+# restaurant name, because the awarding body just said so.
+NOT_A_NAME = re.compile(r"^(?:\W*|.{,2}|[A-Z]{2,3})$")
+
+
+def plausible_venue_name(part):
+    """Is this part of a confirmed list a restaurant name?
+
+    "Nobu, NY/Matsuhisa, LA" is the case this exists for: a real restaurant, a
+    second location written with a slash, and a city abbreviation. Splitting it
+    once put a venue called "LA" on the roster.
+
+    Deliberately a test on the STRING, not on whether we have heard of it.
+    Whether the Beard Foundation named Morandi in a 2010 award is a fact about
+    the award, and making it depend on our own roster is what made this
+    season-dependent in the first place.
+    """
+    part = (part or "").strip()
+    if NOT_A_NAME.match(part):
+        return False
+    # A slash means the source packed two things into one part. We do not know
+    # which half is the restaurant, and guessing is how "NY/Matsuhisa" happens.
+    return "/" not in part and any(ch.isalpha() for ch in part)
 
 
 def group_marker(name):
@@ -476,6 +508,16 @@ def group_marker(name):
     return None
 
 
+def awarded_slugs(roster):
+    """Venue slugs holding at least one award, as of right now.
+
+    Recomputed rather than cached because resolve_group_awards() adds awards as
+    it goes, and a part vouched in by one portfolio string is legitimate
+    evidence for the next one.
+    """
+    return {a["venue_slug"] for a in roster.awards}
+
+
 def resolve_group_awards(roster, deferred, split_into=None):
     """Attach each deferred portfolio award to the restaurants it names.
 
@@ -485,6 +527,7 @@ def resolve_group_awards(roster, deferred, split_into=None):
     """
     split_into = split_into or {}
     attached, kept_whole, unresolved = [], [], []
+    created_from_groups = []
     for item in deferred:
         ruled = split_into.get(norm_name(item["name"]))
         parts = ruled or split_group(item["name"])
@@ -500,10 +543,18 @@ def resolve_group_awards(roster, deferred, split_into=None):
         for part in parts:
             venue, _, decision = match_name_only(roster, part)
             (hits if decision == "merge" else misses).append((part, venue))
+        # Evidence that this string is a LIST has to come from somewhere that
+        # does not change every summer. A venue holding an award of its own is
+        # in these files whatever Restaurant Week does; a venue that exists only
+        # because it joined this season's programme is not, and counting it made
+        # three of Keith McNally's restaurateur awards silently disappear when
+        # Morandi left the listing.
+        vouching = [pair for pair in hits
+                    if pair[1]["venue_slug"] in awarded_slugs(roster)]
         # Without a marker the string might be one restaurant, and only two
         # independent hits can rule that out. With one, it is a list either way,
         # so a single hit is enough and zero hits still must not become a venue.
-        if len(hits) < (1 if marker else 2):
+        if len(vouching) < (1 if marker else 2):
             if marker:
                 roster.refused.append({
                     "source": item["source"], "name": item["name"], "address": None,
@@ -514,6 +565,25 @@ def resolve_group_awards(roster, deferred, split_into=None):
             else:
                 kept_whole.append(item)
             continue
+        # The string is a confirmed list, so every part of it is a restaurant
+        # name unless its shape says otherwise. Creating the ones we have not
+        # met is the point: Pastis, Pravda, Lucky Strike, Reynard, Undercote,
+        # Cafe Zaffri and Le Veau d'Or are real restaurants that appear in these
+        # files ONLY inside a portfolio string, and never reached the roster.
+        for part, _ in misses:
+            if plausible_venue_name(part):
+                venue = roster.add(part, item["source"])
+                venue["resolution"] = (
+                    f"named in a group award alongside "
+                    f"{len(vouching)} award-holding restaurants: {item['name']!r}")
+                hits.append((part, venue))
+                created_from_groups.append(part)
+            else:
+                unresolved.append({"group": item["name"], "part": part,
+                                   "marker": marker,
+                                   "year": item["award"].get("year"),
+                                   "reason": "named in a group award but does not "
+                                             "have the shape of a restaurant name"})
         for part, venue in hits:
             a = dict(item["award"])
             a.update(venue_slug=venue["venue_slug"], matched_name=part,
@@ -521,12 +591,7 @@ def resolve_group_awards(roster, deferred, split_into=None):
                      how=f"named in a group award: {item['name']!r}")
             roster.awards.append(a)
             attached.append((venue["venue_slug"], part))
-        for part, _ in misses:
-            unresolved.append({"group": item["name"], "part": part,
-                               "marker": marker,
-                               "year": item["award"].get("year"),
-                               "reason": "named in a group award but no venue matches"})
-    return attached, kept_whole, unresolved
+    return attached, kept_whole, unresolved, created_from_groups
 
 
 def nyt_rank(notes, pattern):
@@ -732,7 +797,7 @@ def build(con, cfg, quiet=False):
                   f"{refused} refused, {skipped} without a venue name")
 
     # Portfolio awards, now that every source has been folded in.
-    attached, kept_whole, unresolved = resolve_group_awards(
+    attached, kept_whole, unresolved, from_groups = resolve_group_awards(
         roster, deferred, split_into)
     for item in kept_whole:
         # Not a portfolio after all -- "Gage & Tollner" is one restaurant. Put
@@ -761,7 +826,8 @@ def build(con, cfg, quiet=False):
         print(f"\nportfolio awards: {len(deferred)} list-shaped names -> "
               f"{len(attached)} attachments across the restaurants they name, "
               f"{len(kept_whole)} were single names after all, "
-              f"{len(unresolved)} parts unmatched")
+              f"{len(set(from_groups))} restaurants vouched into existence by "
+              f"the parts around them, {len(unresolved)} parts still unmatched")
 
     folded = merge_spelling_variants(roster)
     if folded and not quiet:

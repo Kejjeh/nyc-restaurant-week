@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 195 tests, ~0.5s, no network
+python -m pytest -q tests/             # 200 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -97,6 +97,14 @@ shows zero changes — and there is no need to repeat that: the previous payload
 already stored, versioned and immutable in HEAD. No previous payload (a first
 run, a shallow checkout) is reported as such, not as an error.
 
+It closes with **what a human owes the pipeline**: the count still waiting in
+`recognition_review.json` and `venue_merge_review.json`, and which file to open.
+Both had been quietly accumulating decisions nobody was ever told about, and a
+refused merge is not a curiosity — it is an award that is *not on the roster*
+until someone rules on it. Records that are already settled (applied spelling
+folds, rulings written into `venue_aliases.json`) are excluded from the count,
+because reporting them as waiting trains people to ignore the number.
+
 The comparison itself is a pure function, `roster_changes()`, tested against
 hand-built payloads. The listing half is not, and the price of that was a wrong
 `parents[]` index that silently skipped the entire `SHORTLIST ALERTS` block on
@@ -116,7 +124,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 195 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 200 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -508,7 +516,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 195 tests
+1. the 200 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -886,7 +894,10 @@ recognition badges (3 rows suppressed) · 137 licensed outdoor. Payload
 - **2 restaurants have NULL address**: `alta-calidad`, `catria-nyc` — their
   nyctourism detail pages 404/500 server-side. (`casa-brazilian` and `wagamama`
   carried this until they left the program.)
-- **14 pending recognition matches** in `data/processed/recognition_review.json`
+- **Pending human rulings** in `data/processed/recognition_review.json` and
+  `data/processed/venue_merge_review.json`. The weekly report prints the live
+  count; do not trust a number written here, which is what this line used to be.
+  Originally 14 pending recognition matches
   (Masa, Roberta's, Tonchin, Ci Siamo, Madre, Carlo Mirarchi ×2, Max Sussman,
   Masa Takayama, Anne Rosenzweig ×4, Mắm) — scored below the acceptance
   threshold or name-matched with a contradicting address, awaiting a human
@@ -1007,7 +1018,7 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli)
-tests/      195 pytest tests, no network; run in CI before the crawl
+tests/      200 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights

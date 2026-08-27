@@ -867,18 +867,29 @@ def build(con, cfg, quiet=False):
     con.executemany(
         f"INSERT INTO venue_awards ({','.join(acols)}) VALUES ({','.join('?' * len(acols))})",
         [tuple(a.get(c) for c in acols) for a in roster.awards])
-    REVIEW.write_text(json.dumps(
-        {"_doc": "refused: no venue was touched and the award was DROPPED -- rule "
-                 "on these or they stay missing. confirm: the merge WAS made on "
-                 "weaker-than-usual evidence (same name and postal code, "
-                 "different street number) -- check that it is really one "
-                 "restaurant and not two.",
-         "refused": roster.refused, "confirm": roster.confirm,
-         "folded_spelling_variants": getattr(roster, "folded", []),
-         "group_award_parts_unmatched": getattr(roster, "group_unresolved", []),
-         "ruled_out_by_venue_aliases": getattr(roster, "ruled_out", [])},
-        indent=1, ensure_ascii=False), encoding="utf-8")
-    return roster, seeded, stats
+    # NOT written here. build() takes whatever connection it is handed --
+    # including a temp copy in a test or a changeover simulation -- and a
+    # module-level path does not care which. It wrote the committed review file
+    # from a mutated database and nobody noticed until the Ci Siamo entry it
+    # should have contained had quietly become an empty list. main() writes it;
+    # build() only says what it would contain.
+    return roster, seeded, stats, review_payload(roster)
+
+
+def review_payload(roster):
+    """Everything a human still has to rule on, as data rather than a file."""
+    return {
+        "_doc": "refused: no venue was touched and the award was DROPPED -- rule "
+                "on these or they stay missing. confirm: the merge WAS made on "
+                "weaker-than-usual evidence (same name and postal code, "
+                "different street number) -- check that it is really one "
+                "restaurant and not two.",
+        "refused": roster.refused,
+        "confirm": roster.confirm,
+        "folded_spelling_variants": getattr(roster, "folded", []),
+        "group_award_parts_unmatched": getattr(roster, "group_unresolved", []),
+        "ruled_out_by_venue_aliases": getattr(roster, "ruled_out", []),
+    }
 
 
 def main():
@@ -887,8 +898,10 @@ def main():
     tmp = Path(tempfile.mkdtemp()) / DB.name
     shutil.copyfile(DB, tmp)
     con = sqlite3.connect(tmp)
-    roster, seeded, _ = build(con, cfg, quiet=quiet)
+    roster, seeded, _, review = build(con, cfg, quiet=quiet)
     con.commit()
+    REVIEW.write_text(json.dumps(review, indent=1, ensure_ascii=False),
+                      encoding="utf-8")
 
     awarded = con.execute(
         "SELECT COUNT(*) FROM venues WHERE award_count > 0").fetchone()[0]

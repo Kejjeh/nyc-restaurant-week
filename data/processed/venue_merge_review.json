@@ -59,7 +59,18 @@
    ]
   }
  ],
- "confirm": [],
+ "confirm": [
+  {
+   "source": "michelin",
+   "name": "Ci Siamo",
+   "external_address": "440 W. 33rd St., Ste. 100, New York, NY 10001",
+   "merged_into": "ci-siamo",
+   "our_address": "385 Ninth Ave., Manhattan, NY, 10001",
+   "year": 2025,
+   "level": "recommended",
+   "reason": "exact name, same postal code, different street entrance"
+  }
+ ],
  "folded_spelling_variants": [
   {
    "kept": "locanda-verde",

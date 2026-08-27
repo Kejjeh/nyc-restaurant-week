@@ -97,3 +97,38 @@ def test_previous_payload_returns_none_rather_than_raising_when_git_cannot_help(
     from pathlib import Path
     from diff_report import previous_payload
     assert previous_payload(Path("/nonexistent/never/venues.json")) is None
+
+
+# --------------------------------------------------------------------------
+# rulings a human owes the pipeline
+# --------------------------------------------------------------------------
+
+def test_count_rulings_reads_both_file_shapes():
+    """recognition_review.json is {source: [...]}, venue_merge_review.json is
+    {section: [...]} with a _doc string mixed in. Same question either way."""
+    from diff_report import count_rulings
+    assert count_rulings({"michelin": [1, 2], "nyt": [], "james_beard": [1]}) == {
+        "michelin": 2, "james_beard": 1}
+    assert count_rulings({"_doc": "words", "refused": [1], "confirm": []}) == {"refused": 1}
+    assert count_rulings([1, 2, 3]) == {"items": 3}
+    assert count_rulings(None) == {"items": 0}
+
+
+def test_settled_records_are_not_counted_as_waiting():
+    """A fold already applied and a ruling already written into
+    venue_aliases.json are recorded for auditing, not waiting on anyone.
+    Reporting them as waiting trains people to ignore the number."""
+    from diff_report import pending_rulings
+    lines = pending_rulings()
+    joined = " ".join(lines)
+    assert "folded_spelling_variants" not in joined
+    assert "ruled_out_by_venue_aliases" not in joined
+
+
+def test_pending_rulings_names_the_file_to_open():
+    """A file nothing points at is a file nobody opens."""
+    from diff_report import pending_rulings
+    lines = pending_rulings()
+    assert lines, "the review files exist; the report must mention them"
+    for line in lines:
+        assert "nothing waiting" in line or line.rstrip().endswith(".json")

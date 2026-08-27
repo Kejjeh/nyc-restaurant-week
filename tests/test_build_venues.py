@@ -584,3 +584,58 @@ def test_no_award_on_the_roster_depends_on_this_season_being_this_season():
     finally:
         con.close()
     assert rows == 0
+
+
+def test_build_does_not_write_the_review_file():
+    """build() takes whatever connection it is handed, including a temp copy in
+    a test or a changeover simulation. A module-level output path does not care
+    which, so it wrote the COMMITTED review file from a mutated database --
+    caught only because the Ci Siamo entry it should have contained had quietly
+    become an empty list. main() writes it now; build() only returns it."""
+    import shutil
+    import sqlite3 as sq
+    import tempfile
+
+    import build_venues
+
+    review = ROOT / "data" / "processed" / "venue_merge_review.json"
+    before = review.read_bytes() if review.exists() else None
+
+    tmp = Path(tempfile.mkdtemp()) / "sim.sqlite"
+    shutil.copyfile(DB, tmp)
+    con = sq.connect(tmp)
+    # a changeover: most of the listing replaced
+    con.execute("DELETE FROM restaurants WHERE slug NOT IN"
+                " (SELECT slug FROM restaurants ORDER BY slug LIMIT 50)")
+    con.commit()
+    roster, _, _, payload = build_venues.build(con, load_awards_config(), quiet=True)
+    con.close()
+
+    assert review.read_bytes() == before, (
+        "build() wrote over the committed review file from a simulated database")
+    # and it still reports what a human has to rule on, as data
+    assert set(payload) >= {"refused", "confirm", "folded_spelling_variants"}
+
+
+def test_the_committed_review_file_matches_the_committed_database():
+    """A stale review file is a list of rulings that no longer correspond to
+    anything, which is worse than no list."""
+    import build_venues
+    review = json.loads(
+        (ROOT / "data" / "processed" / "venue_merge_review.json").read_text(encoding="utf-8"))
+    con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+    try:
+        # every confirm entry must name a venue that really is one row
+        for entry in review.get("confirm", []):
+            row = con.execute("SELECT COUNT(*) FROM venues WHERE venue_slug = ?",
+                              (entry["merged_into"],)).fetchone()[0]
+            assert row == 1, f"{entry['merged_into']} in confirm is not a venue"
+        for entry in review.get("folded_spelling_variants", []):
+            kept = con.execute("SELECT name FROM venues WHERE venue_slug = ?",
+                               (entry["kept"],)).fetchone()
+            assert kept, f"{entry['kept']} was folded into a venue that is gone"
+            gone = con.execute("SELECT COUNT(*) FROM venues WHERE venue_slug = ?",
+                               (entry["folded"],)).fetchone()[0]
+            assert gone == 0, f"{entry['folded']} was folded but is still a venue"
+    finally:
+        con.close()

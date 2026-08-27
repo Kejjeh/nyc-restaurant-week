@@ -66,9 +66,33 @@ function weightedRating(v) {
 
 /* ---------- facets ------------------------------------------------------ */
 
+/* Every honour a venue holds, in the payload's own English.
+   `top_honor_label` is the single HIGHEST one, which is a different question:
+   Daniel holds a Michelin star, but its highest honour is a Beard win, because
+   a Beard win scores 88 and one star scores 84 (config/awards.json). Filtering
+   on the highest honour therefore hid 7 of the 69 starred restaurants, 12 of
+   the 80 Bib Gourmands, 8 of the 194 Beard winners, and 24 of the NYT's own
+   Top 100 — a control named "NYT Top 100" that returned 76 rows.
+   app.js made this call correctly for the dashboard already ("By TIER, not by
+   source"); this is the roster catching up. */
+function honoursHeld(v) {
+  if (v._honours) return v._honours;
+  const out = [];
+  for (const a of v.recognition) {
+    const h = STATE.data.honors[`${a.source}:${a.level}`];
+    if (h && h.label && !out.includes(h.label)) out.push(h.label);
+  }
+  v._honours = out;
+  return out;
+}
+
 const FACETS = [
   { key: 'top_honor_label', label: 'Highest honour',
     get: (v) => (v.top_honor_label ? [v.top_honor_label] : []) },
+  /* Not a duplicate of the group above: this one answers "has it ever been
+     given X", the other "what is the best it holds". A venue appears once in
+     the first and once per honour here. */
+  { key: 'honour_held', label: 'Honours held (any)', get: honoursHeld },
   { key: 'award_source', label: 'Named by',
     get: (v) => v.award_sources.map((s) => STATE.data.source_labels[s] || s) },
   { key: 'borough', label: 'Borough', get: (v) => (v.borough ? [v.borough] : []) },
@@ -85,12 +109,15 @@ const FACETS = [
     get: (v) => v.dishes || [] },
 ];
 
+/* Every preset here names an honour ("Michelin starred", "NYT Top 100"), so
+   every one of them filters on honours HELD. None of them means "and nothing
+   better" — which is what filtering on `top_honor_label` quietly meant. */
 const PRESETS = [
-  { label: 'Michelin starred', apply: () => setFilter('top_honor_label',
+  { label: 'Michelin starred', apply: () => setFilter('honour_held',
       ['One Michelin star', 'Two Michelin stars', 'Three Michelin stars']) },
-  { label: 'Bib Gourmand', apply: () => setFilter('top_honor_label', ['Bib Gourmand']) },
-  { label: 'NYT Top 100', apply: () => setFilter('top_honor_label', ['NYT Top 100']) },
-  { label: 'Beard winners', apply: () => setFilter('top_honor_label', ['James Beard winner']) },
+  { label: 'Bib Gourmand', apply: () => setFilter('honour_held', ['Bib Gourmand']) },
+  { label: 'NYT Top 100', apply: () => setFilter('honour_held', ['NYT Top 100']) },
+  { label: 'Beard winners', apply: () => setFilter('honour_held', ['James Beard winner']) },
   { label: 'All three juries agree', apply: () => { clearFilters(); STATE.threeWay = true; } },
   { label: 'In Restaurant Week', apply: () => setFilter('rw', ['In this season']) },
   { label: 'Open', apply: () => setFilter('status', ['Open']) },

@@ -636,7 +636,12 @@ status     TEXT   -- 'open' | 'closed' | 'unknown'; unknown means UNCONFIRMED, n
 status_source TEXT              -- what established it; never a guess
 place_id, rating, user_ratings_total
 first_award_year, last_award_year, award_sources (JSON), award_count
-top_honor, top_honor_label      -- the best single honour held
+top_honor, top_honor_label      -- the best single honour held. NOT the set it
+                                -- holds: a Beard win scores above one Michelin
+                                -- star, so Daniel's best honour is the Beard
+                                -- one. The roster's "Honours held (any)" facet
+                                -- is derived from venue_awards for that reason,
+                                -- and every preset named after an honour uses it.
 prestige   INTEGER              -- 0-100, per config/awards.json
 seeded_from, resolution         -- which source created the row, and how identity was settled
 ```

@@ -73,58 +73,13 @@ jobs:
           if [ "${{ inputs.force_menus }}" = "true" ]; then ARGS="--force-menus"; fi
           python src/refresh.py $ARGS 2>&1 | tee refresh.log
 
+      # The logic lives in src/job_summary.py, not inline here, so it can be
+      # run and tested without pushing a commit and waiting for Monday. Inline
+      # is how the SHORTLIST ALERTS block came to be silently skipped on every
+      # run for weeks while the report printed everything else.
       - name: Build job summary
         if: always()
-        run: |
-          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
-          import pathlib, re
-          log = pathlib.Path("refresh.log")
-          text = log.read_text(encoding="utf-8", errors="replace") if log.exists() else ""
-
-          # refresh.py prints "=== <script> <args> ===" before each step.
-          sections, cur = {}, "start"
-          for line in text.splitlines():
-              m = re.match(r"^=== (\S+?)\.py.*===$", line)
-              if m:
-                  cur = m.group(1)
-                  sections[cur] = []
-              else:
-                  sections.setdefault(cur, []).append(line)
-
-          diff = "\n".join(sections.get("diff_report", [])).strip()
-          export = "\n".join(sections.get("export_site_data", [])).strip()
-
-          # Shortlist alerts lead — they are the booking-relevant changes.
-          alerts = []
-          grab = False
-          for line in diff.splitlines():
-              if "SHORTLIST ALERTS" in line:
-                  grab = True
-                  continue
-              if grab:
-                  if line.startswith("#" * 10):
-                      break
-                  if line.strip():
-                      alerts.append(line.strip())
-
-          print("# NYC Restaurant Week — weekly refresh\n")
-          changed = [a for a in alerts if a.startswith("!!")]
-          if changed:
-              print("## ⚠️ Shortlist changes — booking-relevant\n")
-              for a in changed:
-                  print(f"- **{a.lstrip('! ').strip()}**")
-              print()
-          else:
-              print("## Shortlist: unchanged\n")
-
-          if export:
-              print("## Dashboard payload\n")
-              print("```\n" + export + "\n```\n")
-          if diff:
-              print("<details><summary>Full program diff</summary>\n")
-              print("```\n" + diff[:50000] + "\n```\n")
-              print("</details>\n")
-          PY
+        run: python src/job_summary.py refresh.log >> "$GITHUB_STEP_SUMMARY"
 
       # The one thing NYC Tourism prohibits is hosting the exact PDFs. The repo
       # is public, so a stray `git add` of data/raw/menus would publish 470 of

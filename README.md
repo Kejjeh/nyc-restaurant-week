@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 200 tests, ~0.5s, no network
+python -m pytest -q tests/             # 204 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -124,7 +124,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 200 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 204 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -516,7 +516,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 200 tests
+1. the 204 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -657,6 +657,21 @@ key, so a viewer's choice survives the hop between them.
   carried by shape as much as colour: open is quiet, closed is struck through,
   unverified is dashed, matching the grammar the dashboard already uses for an
   estimated price.
+
+  **Dish tags** are the only thing on the roster that answers *what does this
+  place actually cook*. The cuisine facet cannot: cuisines come from the
+  Restaurant Week listing, so the 778 venues that were never in the programme
+  have none. Tags come from the parsed menus — `game meats`, `foie gras`,
+  `snails`, `sweetbreads` — and are searchable, filterable, and printed on the
+  row. There is a `Game, offal & odd cuts` preset because that is the question
+  the roster was first asked.
+
+  The payload carries the tag **name** only, never the snippet `restaurants.json`
+  carries with each one. A name is a derived fact and holds none of the menu, so
+  this file stays free of menu text entirely rather than living inside the
+  5%-of-a-menu budget the dashboard has to manage. A test asserts every
+  published name is a configured tag and that nothing longer than a tag name
+  gets through.
 
   Two links per row, where the data supports them. A Restaurant Week badge is a
   deep link — `restaurant-week.html#r=<slug>`, which the dashboard reads and
@@ -998,6 +1013,10 @@ extracted menu TEXT is acceptable; **hosting the exact PDFs is not**.
    keyword-centred snippets (≤5% of a menu, or 40 chars, whichever is greater),
    and the same bar applies to the off-site website snippets.
 5. `docs/data/venues.json` carries **no menu text at all** — not even a snippet.
+   Dish tags appear as bare configured names (`game meats`), which are derived
+   facts rather than menu text; `export_venues.validate()` rejects a `dishes`
+   entry that is not a short string, and a test checks every published name
+   against `config/dish_tags.json`.
    The roster has no use for one, so the safest thing is for the file never to
    contain the field. `export_venues.validate()` refuses to publish a row with a
    `menu`, `menu_items`, `raw_text` or `dishes` key, and a test checks the built
@@ -1018,7 +1037,7 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli)
-tests/      200 pytest tests, no network; run in CI before the crawl
+tests/      204 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights

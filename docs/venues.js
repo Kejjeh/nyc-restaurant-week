@@ -78,6 +78,11 @@ const FACETS = [
     get: (v) => [v.rw ? 'In this season' : 'Not participating'] },
   { key: 'cuisine', label: 'Cuisine (Restaurant Week rows only)',
     get: (v) => (v.rw ? v.rw.cuisines : []) },
+  /* The only thing on the roster that answers "what does this place actually
+     cook". Parsed from Restaurant Week menus, so it exists for those rows and
+     not for the 778 that were never in the programme. */
+  { key: 'dish', label: 'On the menu (Restaurant Week rows only)',
+    get: (v) => v.dishes || [] },
 ];
 
 const PRESETS = [
@@ -89,6 +94,9 @@ const PRESETS = [
   { label: 'All three juries agree', apply: () => { clearFilters(); STATE.threeWay = true; } },
   { label: 'In Restaurant Week', apply: () => setFilter('rw', ['In this season']) },
   { label: 'Open', apply: () => setFilter('status', ['Open']) },
+  { label: 'Game, offal & odd cuts',
+    apply: () => setFilter('dish', ['game meats', 'foie gras', 'bone marrow',
+                                    'sweetbreads', 'snails', 'steak tartare']) },
 ];
 
 function setFilter(key, values) {
@@ -107,6 +115,7 @@ function haystack(v) {
   const parts = [v.name, v.borough, v.neighborhood, v.address, v.top_honor_label];
   for (const a of v.recognition) parts.push(a.award, a.person, a.level);
   if (v.rw) parts.push(...v.rw.cuisines);
+  if (v.dishes) parts.push(...v.dishes);
   v._hay = fold(parts.filter(Boolean).join(' '));
   return v._hay;
 }
@@ -233,6 +242,16 @@ function renderRow(v) {
      Restaurant Week rows carry a link -- the award files have no websites in
      them -- so this renders for those and is simply absent for the rest,
      rather than a dead control that looks the same for everyone. */
+  if (v.dishes && v.dishes.length) {
+    /* Six is where the line wraps on a phone; the row says how many it kept
+       back rather than trailing off. */
+    const head = v.dishes.slice(0, 6);
+    const rest = v.dishes.length - head.length;
+    const d = el('span', 'dishes', head.join(' · ') + (rest ? ` +${rest}` : ''));
+    d.title = `Dishes matched on this restaurant's Restaurant Week menu: `
+            + v.dishes.join(', ');
+    meta.append(d);
+  }
   if (v.rw && v.rw.reserve) {
     const book = el('a', 'reserve', 'Book');
     book.href = v.rw.reserve;

@@ -354,7 +354,11 @@ def test_the_payload_never_carries_menu_text():
     if not out.exists():
         pytest.skip("payload not built")
     payload = json.loads(out.read_text(encoding="utf-8"))
-    banned = {"menu", "menus", "menu_items", "raw_text", "dishes", "menu_state"}
+    # `dishes` was banned here too until it started carrying tag NAMES, which
+    # are derived facts and not menu text. The stricter contract it lives under
+    # now -- configured names only, nothing longer than a tag -- is enforced by
+    # test_dishes_are_tag_names_and_never_menu_text below.
+    banned = {"menu", "menus", "menu_items", "raw_text", "menu_state", "snippet"}
     for v in payload["venues"]:
         assert not (banned & set(v)), f"{v['slug']} carries menu data"
     errors, _ = export_venues.validate(payload["venues"], load_awards_config())
@@ -639,3 +643,58 @@ def test_the_committed_review_file_matches_the_committed_database():
             assert gone == 0, f"{entry['folded']} was folded but is still a venue"
     finally:
         con.close()
+
+
+# --------------------------------------------------------------------------
+# dish tags on the roster
+# --------------------------------------------------------------------------
+
+def _payload():
+    out = ROOT / "docs" / "data" / "venues.json"
+    if not out.exists():
+        pytest.skip("payload not built")
+    return json.loads(out.read_text(encoding="utf-8"))
+
+
+def test_dishes_are_tag_names_and_never_menu_text():
+    """restaurants.json carries a snippet with each tag, under a 5%-of-a-menu
+    budget. This payload carries the NAME only, so it holds no menu text at all
+    and has no budget to manage. A dict here would mean somebody started
+    copying the snippet across."""
+    payload = _payload()
+    vocabulary = set()
+    for v in payload["venues"]:
+        for d in (v.get("dishes") or []):
+            assert isinstance(d, str), f"{v['slug']}: dish is a {type(d).__name__}"
+            assert len(d) <= 40, f"{v['slug']}: {d!r} is too long to be a tag name"
+            vocabulary.add(d)
+    # every published name must be a configured tag, not a phrase off a menu
+    configured = set(json.loads(
+        (ROOT / "config" / "dish_tags.json").read_text(encoding="utf-8"))) - {"_doc"}
+    assert vocabulary <= configured, f"not configured tags: {vocabulary - configured}"
+
+
+def test_dishes_are_absent_rather_than_empty_where_there_is_no_menu():
+    """Only Restaurant Week rows have a parsed menu. An empty list would read as
+    'we looked and this menu has none of them', which is a different claim."""
+    payload = _payload()
+    for v in payload["venues"]:
+        if not v["rw"]:
+            assert v.get("dishes") is None, f"{v['slug']} is not in RW but has dishes"
+
+
+def test_the_dish_facet_counts_match_the_rows():
+    payload = _payload()
+    from collections import Counter
+    counted = Counter(d for v in payload["venues"] for d in (v.get("dishes") or []))
+    assert payload["facets"]["dish"] == dict(
+        sorted(counted.items(), key=lambda kv: (-kv[1], kv[0])))
+
+
+def test_the_dish_tags_still_answer_the_question_they_were_added_for():
+    """The roster exists to answer 'what does this place actually cook', which
+    the cuisine facet cannot answer for the 778 venues never in the programme.
+    Game meats is the sharpest of the tags and the reason this was built."""
+    payload = _payload()
+    game = [v["name"] for v in payload["venues"] if "game meats" in (v.get("dishes") or [])]
+    assert len(game) >= 5, f"only {len(game)} venues tagged with game meats"

@@ -601,6 +601,15 @@ key, so a viewer's choice survives the hop between them.
   unverified is dashed, matching the grammar the dashboard already uses for an
   estimated price.
 
+  Two links per row, where the data supports them. A Restaurant Week badge is a
+  deep link — `restaurant-week.html#r=<slug>`, which the dashboard reads and
+  `openRestaurant()` honours by clearing whatever was filtered, so the link
+  wins. Landing someone on a 636-row list and leaving them to find the name
+  again is a hint, not a link. A **Book** link goes to the restaurant's
+  reservation partner or its own site. Only the 636 Restaurant Week rows carry
+  one — the award files hold no websites — so it is absent on the rest rather
+  than a dead control that looks identical for everyone.
+
   It loads no map and no third-party anything, so its CSP is tighter than the
   dashboard's: no unpkg, no CARTO.
 

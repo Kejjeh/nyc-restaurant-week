@@ -968,6 +968,20 @@ the issue was then attributed to a pull request whose own text says it did not d
 the work. Say `Closes #2` to close one and `issue 2` to mention one;
 `.github/pull_request_template.md` carries the rule where it will be read.
 
+**A programme has two ends and the planner guards both.** `dateIssue` refused a
+date in the past and a date after the restaurant's window closed; it never
+refused one *before the programme opened*. The listing appears when a season is
+announced, weeks ahead, so between announcement and opening day every date from
+today onwards was offered as bookable — on 1 December, for a season starting 19
+January, the planner offered Tue Dec 1 and 63 more. `season_start` had been in
+the payload the whole time and nothing read it.
+
+Not only a changeover problem: driving the live payload at 1 July, three weeks
+before this season's own 20 July start, showed the same thing. Note that
+`seasonPhase()` still has no *upcoming* state — before a season opens the page
+reads "core" and the countdown tile counts down to `program_end` — which is a
+separate judgement about copy and is left as it is.
+
 **Sunday and Sunday dinner are different facts, and the listing carries both.**
 Its whole meal-type vocabulary is four strings — `$N Dinner Price`, `$N Lunch
 Price`, `$N Sunday Dinner Price`, `$N Sunday Lunch/Brunch Price` — so it already

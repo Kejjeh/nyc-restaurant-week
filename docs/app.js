@@ -1863,6 +1863,15 @@ function dateIssue(r, iso) {
   // The window, the Saturday exclusion and the Sunday rule are all rules OF
   // the programme. Your own places are not in it, so none of them binds here.
   if (isMine(r)) return null;
+  /* A programme has two ends and this only ever guarded one of them. The
+     listing appears when the season is announced, weeks before it opens, so
+     between announcement and opening day the planner offered every date from
+     today onwards: on 1 December, for a season starting 19 January, it offered
+     Tue Dec 1 and 63 more. `season_start` was in the payload the whole time
+     and nothing read it. */
+  if (DATA.season_start && iso < DATA.season_start) {
+    return `before the programme opens (${fmtDate(DATA.season_start)})`;
+  }
   if (r.end_date && iso > r.end_date) return `after it closes (${fmtDate(r.end_date)})`;
   const dow = dowOf(iso);
   if (dow === 6 && !(r.flags || []).includes('saturday_service')) {

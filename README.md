@@ -968,6 +968,17 @@ the issue was then attributed to a pull request whose own text says it did not d
 the work. Say `Closes #2` to close one and `issue 2` to mention one;
 `.github/pull_request_template.md` carries the rule where it will be read.
 
+**An empty result says which thing found nothing.** Every zero-row state used
+to read "Nothing matches those filters." beside a Clear filters button —
+including a typo in the search box, which is the commonest way to reach zero
+rows and the one case where clearing filters cannot help. The branch turns on
+whether the term matches anything *ignoring* the filters, not on whether
+filters are set: `bookableBy` is on by default, so "are filters set" is always
+true and distinguishes nothing. A term that matches nothing is sent to the
+spelling; a term the filters removed says so and counts them
+(*"'ai fiori' matches 1 restaurant, but the filters remove them all"*), which
+is the case where Clear filters is the right move.
+
 **The map fails visibly or not at all.** Leaflet and CARTO are the only
 third-party assets on the site and they load on first opening the map. A script
 tag fires `error` when a request is *refused* and nothing at all when it is

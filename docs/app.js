@@ -1408,14 +1408,37 @@ function apply() {
   const urgent = RESULTS.filter(isUrgent).length;
   $('#urgentCount').textContent = urgent ? `· ${urgent} ending by ${fmtDate(urgencyHorizon())}` : '';
   $('#empty').hidden = RESULTS.length !== 0;
-  // A date past the last window can never match, whatever else is set, so
-  // "nothing matches those filters" would send you loosening the wrong ones.
+  /* Say which thing found nothing. The principle is already stated for the
+     dead-date case below -- blaming the wrong control sends you loosening the
+     wrong one -- and it applies just as much to a typo in the search box,
+     which is the commonest way to reach zero rows at all. Searching "le pigen"
+     used to answer "Nothing matches those filters." beside a Clear filters
+     button, with no filters set and nothing for that button to clear. */
   const deadDate = FILTERS.bookableBy && DATA.program_end
     && FILTERS.bookableBy > DATA.program_end;
-  $opt('#emptyMsg').textContent = deadDate
-    ? `No window reached ${fmtDate(FILTERS.bookableBy)} — the season ended `
-      + `${fmtDate(DATA.program_end)}. Clear the date filter to see the full season.`
-    : 'Nothing matches those filters.';
+  /* Whether the SEARCH found anything, ignoring every filter. That is the
+     question that decides which advice is useful: if the term matches rows
+     the filters then removed, Clear filters is the fix; if it matches nothing
+     at all, only the spelling is. Counting whether filters happen to be set
+     answers neither -- the date filter is on by default, so a plain typo was
+     blamed on filters the reader never touched. Costs one pass over 636 rows,
+     and only when there is nothing to show. */
+  const queryHits = QUERY ? ROWS.filter((r) => r._hay.includes(QUERY)).length : 0;
+  const term = QUERY ? `\u201c${$('#q').value.trim()}\u201d` : '';
+  $opt('#emptyMsg').textContent =
+    ROWS.length === 0
+      ? 'This season\u2019s data loaded, but it lists no restaurants. '
+        + 'That is a problem with the data, not with anything you set.'
+    : deadDate
+      ? `No window reached ${fmtDate(FILTERS.bookableBy)} — the season ended `
+        + `${fmtDate(DATA.program_end)}. Clear the date filter to see the full season.`
+    : QUERY && !queryHits
+      ? `Nothing matches ${term}. Check the spelling, or search a cuisine, `
+        + 'a neighbourhood or a dish.'
+    : QUERY
+      ? `${term} matches ${queryHits} restaurant${queryHits === 1 ? '' : 's'}, `
+        + 'but the filters remove them all.'
+      : 'Nothing matches those filters.';
 
   const n = activeCount();
   const badge = $('#filterCount');

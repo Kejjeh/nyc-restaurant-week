@@ -1358,6 +1358,20 @@ function groupHeader(key) {
 }
 
 /** Append the next chunk — first render, Show more, and scroll all use this. */
+/* Emptying #rows is only half of it. RENDERED is the cursor renderPage()
+   appends from, so clearing the list without resetting it leaves the two out
+   of step -- and the IntersectionObserver watching #showMore then fires into
+   a now-short page and appends the NEXT page rather than the first.
+   A failed season switch did exactly that: the error said "Still showing
+   Summer 2026" and the list came back starting at row 51, with Yingtao,
+   53 and David Burke Tavern -- the top three ranked picks -- silently absent.
+   Pairing the two here means a caller cannot do one without the other. */
+function clearRows() {
+  $('#rows').textContent = '';
+  RENDERED = 0;
+  LAST_GROUP = null;
+}
+
 function renderPage() {
   const frag = document.createDocumentFragment();
   const slice = RESULTS.slice(RENDERED, RENDERED + PAGE_SIZE);
@@ -1387,9 +1401,7 @@ function apply() {
   RESULTS = ROWS.filter(matches)
     .sort(QUERY ? (a, b) => relevance(a) - relevance(b) || cmp(a, b) : cmp);
 
-  $('#rows').textContent = '';
-  RENDERED = 0;
-  LAST_GROUP = null;
+  clearRows();
   renderPage();
 
   // Filtering from deep in the list otherwise strands you mid-page — often
@@ -2606,7 +2618,7 @@ async function switchSeason(code) {
     // Nothing has changed yet, so put the control back on the season that is
     // actually on screen rather than letting it name one that failed to load.
     renderSeasonChrome();
-    $('#rows').textContent = '';
+    clearRows();
     $('#rows').append(Object.assign(el('div', 'empty'), { textContent:
       `Could not load ${entry.label || entry.code} — ${err.message}. `
       + `Still showing ${DATA.season_label || 'the season already open'}.` }));
@@ -2666,7 +2678,7 @@ async function boot() {
   try {
     DATA = await fetchJSON(url);
   } catch (err) {
-    $('#rows').textContent = '';
+    clearRows();
     $('#rows').append(Object.assign(el('div', 'empty'), { textContent:
       `Could not load ${url} — ${err.message}. Run: python src/export_site_data.py` }));
     return;

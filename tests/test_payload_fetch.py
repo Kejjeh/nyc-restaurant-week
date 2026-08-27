@@ -70,8 +70,14 @@ def test_the_dashboard_still_says_something_while_it_waits():
 
 
 def test_both_failure_paths_clear_the_loading_line():
-    """Otherwise the error prints under a line still claiming it is loading."""
+    """Otherwise the error prints under a line still claiming it is loading.
+
+    Either spelling counts: the dashboard now goes through clearRows(), which
+    empties #rows AND resets the pagination cursor -- doing only the first is
+    its own bug and has its own test.
+    """
     i = VENUES.index("Could not load the roster")
-    assert "$('#rows').textContent = ''" in VENUES[max(0, i - 400):i]
+    assert "$('#rows').textContent = ''" in VENUES[max(0, i - 500):i]
     j = APP.index("Could not load ${url}")
-    assert "$('#rows').textContent = ''" in APP[max(0, j - 400):j]
+    before = APP[max(0, j - 500):j]
+    assert "clearRows()" in before or "$('#rows').textContent = ''" in before

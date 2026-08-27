@@ -989,6 +989,15 @@ spelling; a term the filters removed says so and counts them
 (*"'ai fiori' matches 1 restaurant, but the filters remove them all"*), which
 is the case where Clear filters is the right move.
 
+**Emptying the results list is only half of clearing it.** `RENDERED` is the
+cursor `renderPage()` appends from, and an IntersectionObserver on `#showMore`
+fires whenever the page gets short. A path that emptied `#rows` without
+resetting the cursor therefore got the *next* page appended into an empty
+list — a failed season switch said "Still showing Summer 2026" and came back
+starting at row 51, with the top three ranked picks silently absent.
+`clearRows()` pairs the two so a caller cannot do one without the other, and a
+test asserts nothing else spells the clear out.
+
 **So does the payload fetch, on both pages.** `res.ok` needs a response and a
 thrown network error needs a response; neither arrives when a request is
 accepted and then abandoned, so a fetch with no deadline waits without limit.

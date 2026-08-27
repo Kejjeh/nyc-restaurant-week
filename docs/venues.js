@@ -201,9 +201,13 @@ function renderRow(v) {
   if (v.rw) {
     const tiers = v.rw.price_tiers.join(' / ') || 'Restaurant Week';
     const rw = el('a', 'pill rw', `Restaurant Week ${tiers}`);
-    rw.href = 'restaurant-week.html';
-    rw.title = 'This one is also in the current Restaurant Week season — '
-             + 'the value dashboard has its prix fixe, menu and gap.';
+    /* Straight to this restaurant on the dashboard, not to the top of it. The
+       dashboard reads `#r=<slug>` and openRestaurant() clears whatever was
+       filtered so the link wins -- landing someone on a 636-row list and
+       leaving them to find the name again is not a link, it is a hint. */
+    rw.href = `restaurant-week.html#r=${encodeURIComponent(v.rw.slug)}`;
+    rw.title = 'Open this restaurant on the value dashboard — its prix fixe, '
+             + 'menu, gap against à la carte and subway walk.';
     head.append(rw);
   }
   row.append(head);
@@ -222,6 +226,18 @@ function renderRow(v) {
   if (span) meta.append(el('span', 'era', `recognised ${span}`));
   if (v.award_sources.length > 1) {
     meta.append(el('span', 'juries', `${v.award_sources.length} juries`));
+  }
+  /* The one thing a person actually wants to DO with a row. Only the 636
+     Restaurant Week rows carry a link -- the award files have no websites in
+     them -- so this renders for those and is simply absent for the rest,
+     rather than a dead control that looks the same for everyone. */
+  if (v.rw && v.rw.reserve) {
+    const book = el('a', 'reserve', 'Book');
+    book.href = v.rw.reserve;
+    book.rel = 'noreferrer noopener';
+    book.target = '_blank';
+    book.title = `Reservations or website for ${v.name}`;
+    meta.append(book);
   }
   row.append(meta);
 

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Same policy as restaurant-week.html and for the same reason: it must sit
+     ahead of every link and script below, or they are fetched before it exists.
+     This page loads no map and no third-party anything, so unlike the dashboard
+     it needs no unpkg or CARTO origins at all. -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'none';
+  script-src 'self';
+  style-src 'self';
+  img-src 'self' data:;
+  connect-src 'self';
+  base-uri 'none';
+  form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
+<meta name="referrer" content="no-referrer">
+<title>NYC award-recognised restaurants</title>
+<meta name="description" content="Personal sort/filter tool: every NYC restaurant named by Michelin, the James Beard Foundation or the New York Times. Not a publication.">
+<meta name="theme-color" content="#0d6a5f" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#151d1c" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="styles.css?v=4">
+<link rel="stylesheet" href="venues.css?v=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230d6a5f'/%3E%3Ctext x='8' y='12' font-family='monospace' font-size='10' font-weight='bold' fill='%23fff' text-anchor='middle'%3E%E2%98%85%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <h1>NYC dining</h1>
+    <span class="season" id="rosterCount">the recognised roster</span>
+    <span class="spacer"></span>
+    <a class="crosslink" href="restaurant-week.html">Restaurant Week value dashboard →</a>
+    <button type="button" class="themeToggle" id="themeToggle" aria-label="Switch colour theme">Theme</button>
+  </div>
+</header>
+
+<noscript>
+  <div class="wrap">
+    <div class="banner">
+      <p><strong>This page needs JavaScript.</strong> It is a client-side tool: the
+         roster, the filters and the counts are assembled in the browser from a JSON
+         file. The underlying data lives in <code>docs/data/venues.json</code> in the
+         repository.</p>
+    </div>
+  </div>
+</noscript>
+
+<div class="controls">
+  <div class="wrap">
+    <div class="searchRow">
+      <input type="search" class="search" id="q" autocomplete="off" spellcheck="false"
+             placeholder="Search name, neighborhood, chef, award…  (press /)"
+             aria-label="Search venues">
+      <button type="button" class="btn" id="filterBtn" aria-expanded="false" aria-controls="panel">
+        Filters<span class="n" id="filterCount" hidden>0</span>
+      </button>
+      <label class="sr-only" for="sort">Sort by</label>
+      <select class="sortSel" id="sort" aria-label="Sort by">
+        <option value="prestige">Standing — strongest recognition first</option>
+        <option value="recent">Most recently recognised</option>
+        <option value="awards">Most awards held</option>
+        <option value="rating">Google rating — weighted</option>
+        <option value="name">Name — A to Z</option>
+        <option value="oldest">Longest-recognised — first award</option>
+      </select>
+    </div>
+
+    <section class="panel" id="panel" hidden aria-label="Filters">
+      <div class="facets" id="facets"></div>
+    </section>
+  </div>
+</div>
+
+<div class="subbar">
+  <div class="wrap">
+    <div class="presets" id="presets" role="group" aria-label="Quick views"></div>
+    <div class="activeFilters" id="activeFilters" hidden aria-label="Active filters"></div>
+    <div class="statusbar" role="status" aria-live="polite" aria-atomic="true">
+      <span><strong id="shown">0</strong> of <strong id="total">0</strong> restaurants</span>
+      <button type="button" class="linkish" id="clearBtn" hidden>Clear filters</button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap results">
+  <div class="banner quiet" id="coverage" hidden></div>
+  <div id="rows" class="venueRows"></div>
+  <button type="button" class="showMore" id="showMore" hidden></button>
+  <div class="empty" id="empty" hidden>
+    <p id="emptyMsg">Nothing matches those filters.</p>
+    <button type="button" class="btn" id="clearBtn2">Clear filters</button>
+  </div>
+</main>
+
+<button type="button" class="toTop" id="toTop" hidden aria-label="Back to top">↑ Top</button>
+
+<footer class="foot">
+  <div class="wrap">
+    <p id="footProvenance"></p>
+    <p><strong>Standing</strong> is a composite of the honours a restaurant holds, how many
+       independent juries named it, and how recently — the weights are published in
+       <code>config/awards.json</code> and are meant to be argued with, not trusted.
+       A <strong>closed</strong> restaurant keeps its awards and is scored below one you can book.</p>
+    <p><strong>Unverified</strong> means nothing has confirmed the restaurant is still trading —
+       it is not a claim that it closed. Menus are linked to the official PDF, never reproduced
+       here. Personal, non-commercial tool.</p>
+  </div>
+</footer>
+
+<!-- ?v= is bumped whenever venues.js or venues.css changes, for the same
+     cached-document reason the dashboard's script tag carries one. -->
+<script src="venues.js?v=1"></script>
+</body>
+</html>

@@ -1,7 +1,8 @@
-# NYC Restaurant Week — Summer 2026 tracker
+# NYC dining — award roster + Restaurant Week tracker
 
-**PUBLIC REPO as of 2026-08-02.** Dashboard:
-<https://kejjeh.github.io/nyc-restaurant-week/>
+**PUBLIC REPO as of 2026-08-02.** Site:
+<https://kejjeh.github.io/nyc-restaurant-week/> (roster) ·
+<https://kejjeh.github.io/nyc-restaurant-week/restaurant-week.html> (value dashboard)
 
 This repo was private until 2026-08-02. It was opened after the owner spoke to
 NYC Tourism, who said the only violation would be **hosting the exact PDFs** —
@@ -12,10 +13,22 @@ it is ever contradicted, revert to private and re-read "ToS rules" below.
 `data/raw/menus/*.pdf` is gitignored and 0 PDFs are tracked — keep it that way.
 Menus are linked to the official S3 URL, never copied.
 
-Local dataset + pipeline tracking all **636** participants in NYC Restaurant Week
-Summer 2026 (Jul 20–Aug 16, extension weeks through Sep 6; Saturdays excluded,
-Sundays optional per restaurant). Built to re-run weekly. This README is the full
-context for operating the repo — no session memory is assumed.
+Local dataset + pipeline over **1,408 NYC restaurants**: every one named by
+Michelin, the James Beard Foundation or the New York Times, plus all **636**
+participants in NYC Restaurant Week Summer 2026 (Jul 20–Aug 16, extension weeks
+through Sep 6; Saturdays excluded, Sundays optional per restaurant). Built to
+re-run weekly. This README is the full context for operating the repo — no
+session memory is assumed.
+
+**The roster is the spine; Restaurant Week is a column on it.** That is a change
+from how this repo started. The universe used to be "the restaurants in this
+season's listing", and an award was a badge one of them might carry — which had
+the relationship backwards. An award is the durable fact: the same restaurants
+are recognised for decades. Participating in Restaurant Week is a marketing
+decision one restaurant makes in one summer. So `venues` is the roster and
+`venues.rw_slug` is nullable, and the site's front door
+(`docs/index.html`) is the roster. The prix-fixe value dashboard still exists
+in full, at `docs/restaurant-week.html`.
 
 Season facts live in exactly one file, `config/season.json`. Nothing else in the
 repo hard-codes a season, a year or a deadline. See "Season changeover" below.
@@ -33,6 +46,10 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 - Outdoor dining: NYC DOT licensed setups from NY Open Data (`fpeh-f7ci`).
 - Google ratings: Places API, keyed (never committed). Restaurants' own sites are
   crawled for prices (`price_sweep`) and menu terms (`menu_term_sweep`).
+- Awards: `data/raw/recognition/` — the Michelin 2025 NYC selection (362, all with
+  addresses), James Beard Foundation awards 1991–2026 (1,440 records, NYC only,
+  **no addresses at all**), and the NYT Top 100 for 2026 plus one starred review.
+  `config/awards.json` registers the three sources and prices every honour.
 - Politeness: global ≤1 req/sec throttle (`config.throttle()`), browser UA.
   robots.txt allows everything used (`/*.json$` is disallowed; the pipeline
   deliberately avoids `_next/data` routes).
@@ -41,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 46 tests, ~0.5s, no network
+python -m pytest -q tests/             # 153 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -53,12 +70,18 @@ python src/refresh.py --force-menus    # also re-download PDFs (catches in-place
 `price_sweep` from cached sweep files) → `tag_dishes` → `enrich_recognition`
 (re-matches from `data/raw/recognition/*.json`) → `fetch_outdoor_dining --refresh`
 → `fetch_google_ratings` (**only when `GOOGLE_PLACES_KEY` is in the env — it is
-not in CI**) → `export_site_data` → `export_places` → `diff_report`.
+not in CI**) → `build_venues` → `resolve_venues` → `export_venues` →
+`export_site_data` → `export_places` → `diff_report`.
 
 `export_site_data` MUST stay after both `tag_dishes` and `enrich_recognition`:
 `build_db` drops and recreates the DB, wiping the tag and recognition tables.
 `export_places` MUST stay after `export_site_data`: it imports the exporter's
 enrichment and shrinks its Google scores toward the *roster* mean.
+
+`build_venues` MUST stay after `build_db` for the same reason `export_site_data`
+does: it seeds the roster from the freshly rebuilt `restaurants` table, and
+`build_db` drops the database first. `resolve_venues` with no flags only APPLIES
+the committed Places cache — no key, no network — so CI runs it unchanged.
 
 **Diff report** compares the two latest snapshots: a `SHORTLIST ALERTS` block
 first (any change to `config/shortlist.json` restaurants' meal types, weeks, or
@@ -74,12 +97,14 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 46 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 153 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
 export transition guards, the menu cache key, parsed-progress pruning, the diff
-boundary, the seasons registry, Google matching, and places.
+boundary, the seasons registry, Google matching, and places. `test_build_venues`
+and `test_resolve_venues` cover the roster's merge rules, every one of them
+written as a real pair from the award files rather than a made-up example.
 
 On Windows pytest prints a `PermissionError: [WinError 5] ... pytest-current`
 from an `atexit` callback *after* the run reports success. It is temp-dir
@@ -225,6 +250,102 @@ weight rewarded thin data, and shrinking the total toward the overall mean
 punished it. Every imputation is disclosed — `rubric_parts` marks it and
 `rubric_completeness` reports the share of the score that rested on real data.
 
+## The venue roster (`venues`, `venue_awards`)
+
+`src/build_venues.py` builds the roster: one row per real restaurant, whether or
+not it is in Restaurant Week, whether or not it is still open. It seeds from the
+`restaurants` table — those rows are the only ones that arrive with verified
+coordinates and a neighborhood — then folds in the three award files, addresses
+first (Michelin, then NYT, then James Beard).
+
+**Merging is the whole problem, and the two failure modes are not symmetrical.**
+A wrong merge silently turns two restaurants into one row, and nobody notices
+until they book the wrong one. A missed merge shows the same restaurant twice,
+which is ugly and obvious. The thresholds are set against the invisible one, and
+anything the rules will not decide is written to
+`data/processed/venue_merge_review.json` rather than guessed.
+
+The rules, strongest evidence first:
+
+| Situation | Rule |
+| --- | --- |
+| Source has an address, street number agrees | merge, confidence 1.0 |
+| Source has an address, our row has none | merge and adopt it — an absent address is not a contradiction |
+| Same name, same ZIP, different street number | merge, but logged under `confirm` for a human. This is the Ci Siamo case: Manhattan West publishes it as both 385 Ninth Ave. and 440 W. 33rd St. |
+| Same name, different building | a **new** venue — Fish Cheeks and Tonchin genuinely have two |
+| Source has no address (all 1,363 Beard records) | merge only onto a name that is unique in the roster; two candidates is a review row, not a coin flip |
+
+Two more passes run after every source is in, because both need the whole roster:
+
+**Spelling variants.** `Momfuku Ssam Bar` and `Momofuku Ssam Bar` are one
+restaurant; `La Pecora Bianca Upper East Side` and `...Upper West Side` are two.
+A similarity ratio cannot tell them apart — it scores the pair that must stay
+apart (0.969) *higher* than the pair that must fold (0.963). What separates them
+is which token differs and whether it is a spelling of the other or a word chosen
+to contrast with it. So exactly one token may differ on each side, those two
+tokens must share a first letter and score ≥ 0.85, **and the names must share at
+least one other token**: `isa`/`insa`, `mam`/`mamo` and `sevilla`/`semilla` are
+all one edit apart and all different restaurants, and what they have in common is
+that the differing token is the entire name. The surviving row is chosen for its
+data; the surviving *spelling* is whichever the sources use more often, which is
+why Uncle Boons is no longer displayed as "Uncle Boon".
+
+**Portfolio awards.** Outstanding Restaurateur is recorded as one string listing
+every room the winner runs — `"Frenchette, Le Veau d' Or, and Le Rock"` — and
+left alone it becomes a venue with that name while the actual restaurants never
+receive the award. Splitting is easy; the hard part is that Gage & Tollner, Milk
+& Honey and Grand Central Oyster Bar and Restaurant are single names with the
+same punctuation. So a split is only accepted when the parts prove it: two of
+them must already be restaurants on the roster. A string carrying an unambiguous
+group marker — a parenthesised list, "and others", or two or more commas — needs
+only one, because no real name has those; if none of its parts resolve it becomes
+a review row rather than a venue. Parts that never resolve are recorded, never
+invented.
+
+### Standing (`prestige`)
+
+A 0–100 composite, defined entirely in `config/awards.json` — change a weight
+and re-run `build_venues.py`; there is nothing to edit in Python. Base is the
+single best honour held, plus a linear bonus for NYT rank (No. 1 earns the most),
+plus a breadth bonus for each independent jury beyond the first, multiplied by a
+recency factor keyed on the most recent honour, multiplied last by a closed
+penalty. Unlike `rubric.json` there is **no imputation**: an award is a fact or it
+is absent, and absence is not an average.
+
+Recency keys on the venue's most recent honour of any kind, not on each award's
+own age — a 1995 Beard winner that took a 2025 Michelin star is a current
+restaurant, and is scored as one.
+
+### Resolving venues against Google (`src/resolve_venues.py`)
+
+772 venues arrive with no coordinates and no confirmed open/closed status,
+because the Beard file carries no addresses. `resolve_venues.py --fetch` looks
+them up — roughly 700–800 Text Search calls, billed once and then cached in
+`data/raw/venues_google/` exactly like `data/raw/google/`.
+
+```
+python src/resolve_venues.py --report            # what is still unresolved
+python src/resolve_venues.py --fetch --limit 50  # needs GOOGLE_PLACES_KEY
+python src/resolve_venues.py                     # apply the cache; no key, no network
+```
+
+`fetch_google_ratings.py` can judge a candidate on **distance**, because every
+Restaurant Week row has coordinates. Nothing here does, so this file's rule is
+weaker and refuses far more readily: the result must land inside the five
+boroughs, and either an address we already hold must agree (street number, or ZIP
+for a second entrance) or the name must carry it alone at ≥ 0.62 similarity.
+Everything else is left unresolved *with its reason recorded*. An unresolved
+venue is a visible gap someone can fix; a wrongly resolved one silently attaches
+a rating, a location and an "open" badge to the wrong restaurant.
+
+**`unknown` status is not a claim that a restaurant closed.** It means nothing has
+confirmed either way, and the site labels it "Unverified" and says so on hover.
+Google returning `ZERO_RESULTS` is suggestive for a 1994 award and meaningless
+for a 2026 one, so it is recorded, not acted on.
+
+Closed venues stay on the roster with their awards intact — they were earned —
+and the closed penalty keeps them below anywhere you can actually book.
+
 ## Season changeover (winter 2027)
 
 Ordered. This is the section that will actually be used in January.
@@ -346,6 +467,38 @@ participants
   verified**. Known biases: understates expensive kitchens (mains capped at $70),
   overstates casual formats. Hand-verified findings live in `reports/`, not here.
 
+
+### `venues` — the roster (1,408 rows)
+
+```sql
+venue_slug TEXT PRIMARY KEY      -- equals rw_slug where the restaurant is in the programme
+name, address, lat, lng, borough, neighborhood
+rw_slug    TEXT REFERENCES restaurants(slug)   -- NULL = not in Restaurant Week
+status     TEXT   -- 'open' | 'closed' | 'unknown'; unknown means UNCONFIRMED, not closed
+status_source TEXT              -- what established it; never a guess
+place_id, rating, user_ratings_total
+first_award_year, last_award_year, award_sources (JSON), award_count
+top_honor, top_honor_label      -- the best single honour held
+prestige   INTEGER              -- 0-100, per config/awards.json
+seeded_from, resolution         -- which source created the row, and how identity was settled
+```
+
+### `venue_awards` — one row per award record (1,920 rows)
+
+```sql
+venue_slug, source, level, award, year
+rank      INTEGER   -- NYT Top 100 position, parsed out of the notes field
+person    TEXT      -- Beard awards are frequently to a CHEF, not to a room;
+                    -- hiding that would have the roster claim a restaurant won
+                    -- things its chef did
+source_url, matched_name, match_confidence, how
+```
+
+`recognition` (the older, Restaurant-Week-scoped table) is untouched and still
+feeds the dashboard's rubric. `venue_awards` is the superset: it keeps the 1,000+
+award records belonging to restaurants that have never been in the programme,
+which `recognition` drops on the floor by design.
+
 ## Reports (`reports/`)
 
 - `rw-final-bookings.md` — **the decision doc**: 15 ranked bookings with
@@ -356,7 +509,39 @@ participants
 - `rw-summer-2026-value-report.md` — archive: full value analysis, traps,
   evidence grades ([A] own menu … [D] uncorroborated), 3 addenda, source tables.
 
-## Dashboard (`docs/`, served by GitHub Pages)
+## The site (`docs/`, served by GitHub Pages)
+
+Two pages, one design system. `styles.css` owns the palette, the masthead and the
+controls; both pages read it, and the theme toggle writes the same `rw-theme`
+key, so a viewer's choice survives the hop between them.
+
+- **`index.html` + `venues.js` + `venues.css` — the roster.** The front door.
+  All 1,408 venues, searchable and filterable by highest honour, jury, borough,
+  trading status, Restaurant Week participation and cuisine; sortable by
+  standing, recency, award count, weighted rating, name or how long the
+  restaurant has been recognised. Each row expands to every award record it
+  holds, with the year, the chef where the award was to a person, and a link to
+  the awarding body.
+
+  The design problem here is **absence**. A dashboard row has a price, a menu, a
+  gap and a subway walk; most roster rows have a name, some awards and nothing
+  else. So elements do not render at all when their field is missing, rather
+  than printing a dash or a zero that looks like a measurement. Honour colour is
+  by *jury*, not by rank, and never carries meaning alone — the badge always
+  spells the honour out, so the page works in greyscale. Trading state is
+  carried by shape as much as colour: open is quiet, closed is struck through,
+  unverified is dashed, matching the grammar the dashboard already uses for an
+  estimated price.
+
+  It loads no map and no third-party anything, so its CSP is tighter than the
+  dashboard's: no unpkg, no CARTO.
+
+- **`restaurant-week.html` + `app.js` — the value dashboard**, unchanged. Prices,
+  menus, gaps, the rubric, the map, the planner. It is the prix-fixe drilldown
+  for the 636 restaurants in the current season, and it is linked from the
+  roster's masthead and footer (and back).
+
+## Dashboard details (`app.js`)
 
 Static sort/filter dashboard over the 636 participants. No backend, no build
 step: `docs/index.html` + `docs/app.js` + `docs/styles.css`. Preview locally with
@@ -621,6 +806,29 @@ recognition badges (3 rows suppressed) · 137 licensed outdoor. Payload
   them nor lets one bad point wreck its auto-fit. With the 2 NULL-address rows
   that leaves 631 of 636 mappable.
 
+### The roster specifically
+
+- **772 of 1,408 venues have never been checked against anything but a name.**
+  They came from the James Beard file, which carries no addresses, so they have
+  no coordinates, no rating, and an `unknown` trading status until someone spends
+  a Places lookup on them. Only 634 venues can be plotted on a map at all.
+- **`unknown` is not `closed`.** It means nobody has looked. The site says
+  "Unverified" and explains that on hover; do not read it as a claim either way.
+- **The Beard file goes back to 1991**, so the roster deliberately includes
+  restaurants that closed decades ago. That is the archive working as intended —
+  they keep their awards and score below anywhere still trading — but it means
+  "1,408 restaurants" is not "1,408 places you can book tonight".
+- **A Beard award is often to a person, not a room.** `venue_awards.person`
+  carries the chef, sommelier or restaurateur, and the site prints it, because a
+  roster that quietly credits the restaurant with its chef's Rising Star is
+  lying by omission.
+- **Michelin here is the 2025 selection only.** There is no historical Michelin
+  data in this repo, so a restaurant that held a star in 2016 and lost it shows
+  no Michelin recognition at all.
+- **Three venues are still list-shaped names** the group-award rules could not
+  resolve (`Zaab Zaab, Zaab Zaab Talay` and two award-body entities). They are
+  visible in the roster and recorded; they are not restaurants.
+
 ## ToS rules — HARD REQUIREMENTS for any output built from this repo
 
 Position as of **2026-08-02**, per the owner's conversation with NYC Tourism:
@@ -645,6 +853,12 @@ extracted menu TEXT is acceptable; **hosting the exact PDFs is not**.
    still enforces it over all of them. Menu text appears only as short
    keyword-centred snippets (≤5% of a menu, or 40 chars, whichever is greater),
    and the same bar applies to the off-site website snippets.
+5. `docs/data/venues.json` carries **no menu text at all** — not even a snippet.
+   The roster has no use for one, so the safest thing is for the file never to
+   contain the field. `export_venues.validate()` refuses to publish a row with a
+   `menu`, `menu_items`, `raw_text` or `dishes` key, and a test checks the built
+   payload as well as the code path. The award records in it are public facts and
+   ship with the awarding body's own URL attached.
 
 Superseded: before 2026-08-02 this section required the repo to stay private
 because `menus.raw_text` lives in the committed SQLite. That requirement is
@@ -655,13 +869,15 @@ lifted by the NYC Tourism conversation above; rule 1 is not.
 ```
 src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             parse_menus, build_db, tag_dishes, enrich_recognition,
-            fetch_outdoor_dining, fetch_google_ratings, export_site_data,
+            fetch_outdoor_dining, fetch_google_ratings, build_venues,
+            resolve_venues, export_venues, export_site_data,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli)
-tests/      46 pytest tests, no network; run in CI before the crawl
+tests/      153 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
+            awards.json      award sources, honour points, standing weights
             dish_tags.json   RW-menu tag rules
             offsite_tags.json / offsite_verified.json  own-website terms + 56 hand checks
             google_place_ids.json  14 hand-pinned place_ids
@@ -670,7 +886,10 @@ config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             verified_values.json   hand-verified facts, merged over the API
             recognition_suppress.json  known-bad recognition matches
             secrets.example.py     (secrets.py is gitignored)
-docs/       the dashboard (index.html, app.js, styles.css)
+docs/       the roster (index.html, venues.js, venues.css) — the front door
+            the dashboard (restaurant-week.html, app.js) — prix-fixe drilldown
+            styles.css                shared by both
+            data/venues.json          the roster payload
             data/seasons/<code>.json  per-season payloads
             data/seasons.json         registry
             data/places.json          my list
@@ -679,11 +898,14 @@ docs/       the dashboard (index.html, app.js, styles.css)
 data/raw/   listing snapshots+page cache · details (addresses) · recognition
             (Michelin/JB/NYT source data) · pricesweep (heuristic crawl cache) ·
             menusweep (own-website term crawl) · google (ratings cache) ·
+            venues_google (roster Places cache) ·
             subway (stations) · outdoor (DOT licences) · menus/manifest.json +
             manifest_history.json + parsed.json + parsed-progress.json
             (the PDFs themselves are gitignored)
 data/processed/  restaurant_week.sqlite · restaurants.csv ·
-                 recognition_review.json (pending human rulings)
+                 recognition_review.json (pending human rulings) ·
+                 venue_merge_review.json (refused merges, merges made on weaker
+                 evidence, folded spellings, unmatched group parts)
 reports/    final bookings (decision doc) + value report (archive)
 ```
 

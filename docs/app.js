@@ -2250,20 +2250,45 @@ const isDark = () =>
   (document.documentElement.dataset.theme
     || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';
 
+/* A script tag fires `error` when the request is REFUSED. It fires nothing at
+   all when the request is accepted and never answered — a stalled CDN, a
+   captive portal, a proxy that swallows it, a phone that has one bar. That is
+   the common failure, and it left this promise pending forever: the map panel
+   sat blank, no message, no spinner, indefinitely. Measured at 25 seconds
+   against a route that accepts and never replies: zero child elements, empty
+   text. The honest failure copy below existed the whole time and could not be
+   reached by the way maps actually fail. */
+const LEAFLET_TIMEOUT_MS = 10000;
+
 function loadLeaflet() {
   if (window.L) return Promise.resolve();
   if (MAP_LOADING) return MAP_LOADING;
   MAP_LOADING = new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = (fn, arg) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      fn(arg);
+    };
+    const timer = setTimeout(
+      () => finish(reject, new Error('it did not answer within ten seconds')),
+      LEAFLET_TIMEOUT_MS);
     const css = document.createElement('link');
     css.rel = 'stylesheet';
     css.href = LEAFLET_CSS;
     document.head.append(css);
     const js = document.createElement('script');
     js.src = LEAFLET_JS;
-    js.onload = resolve;
-    js.onerror = () => reject(new Error('could not load the map library'));
+    js.onload = () => finish(resolve);
+    js.onerror = () => finish(reject, new Error('could not load the map library'));
     document.head.append(js);
   });
+  /* A rejected promise must not stay cached, or one bad moment on the network
+     breaks the map for the rest of the session with no way to retry. Clearing
+     it lets switching back to the map try again — and if the slow script does
+     eventually arrive, `window.L` short-circuits the whole thing. */
+  MAP_LOADING.catch(() => { MAP_LOADING = null; });
   return MAP_LOADING;
 }
 
@@ -2379,6 +2404,12 @@ function paintTiles() {
 
 async function openMap() {
   const wrap = $('#mapWrap');
+  /* Never a blank panel. Leaflet is fetched on first open, so there is always
+     a wait here, and an empty box says nothing about whether it is coming. */
+  if (!MAP && !window.L) {
+    $('#map').textContent = '';
+    $('#map').append(el('div', 'mapFail', 'Loading the map\u2026'));
+  }
   try {
     await loadLeaflet();
   } catch (err) {
@@ -2389,6 +2420,7 @@ async function openMap() {
     return;
   }
   if (!MAP) {
+    $('#map').textContent = '';          // clear the loading line for Leaflet
     MAP = L.map('map', { scrollWheelZoom: false, zoomControl: true });
     MAP.setView([40.7549, -73.9840], 12);
     paintTiles();

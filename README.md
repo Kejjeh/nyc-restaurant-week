@@ -968,6 +968,16 @@ the issue was then attributed to a pull request whose own text says it did not d
 the work. Say `Closes #2` to close one and `issue 2` to mention one;
 `.github/pull_request_template.md` carries the rule where it will be read.
 
+**The map fails visibly or not at all.** Leaflet and CARTO are the only
+third-party assets on the site and they load on first opening the map. A script
+tag fires `error` when a request is *refused* and nothing at all when it is
+accepted and never answered — which is how a stalled CDN, a captive portal or a
+phone on one bar actually behaves — so `loadLeaflet` could hang forever and the
+panel sat blank with no message. It now has a deadline
+(`LEAFLET_TIMEOUT_MS`), says "Loading the map…" while it waits, and does not
+cache a rejection, so switching back to the map retries instead of failing
+instantly for the rest of the session.
+
 **A programme has two ends and the planner guards both.** `dateIssue` refused a
 date in the past and a date after the restaurant's window closed; it never
 refused one *before the programme opened*. The listing appears when a season is

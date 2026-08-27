@@ -278,8 +278,8 @@ re-run `src/export_site_data.py`; no code edits.
 |---|---|---|
 | `rating` | 30 | percentile of the weighted Google score |
 | `award` | 30 | strongest distinction held, decayed by its age |
-| `lex` | 20 | walk to the 4/5/6 (no line nearby scores a neutral 50, not 0) |
-| `window` | 10 | days left to book — flexibility, not urgency |
+| `lex` | 20 | walk to the 4/5/6 — a **bonus above** a neutral 50, never a penalty: the ramp runs 50 → 100 from a 12-minute walk to a 2-minute one, so no line nearby and the longest walk score the same |
+| `window` | 10 | days left to book — flexibility, not urgency; **inclusive** of the end date, so a window closing today is one day, not zero |
 
 **The weights total 90, deliberately.** Each score divides by the weight actually
 in play, so the numbers are read against each other; dropping a component raises

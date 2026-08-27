@@ -1,57 +1,57 @@
 {
-  "_doc": {
-    "purpose": "A transparent composite grade. Every component is normalised to 0-100, weighted, and PUBLISHED alongside the total so the score can be argued with rather than taken on faith. Change the weights here and re-run src/export_site_data.py; no code edits.",
-    "missing_data_rule": "A component scores 0 only when the zero is a FACT (holds no award). When it is UNKNOWN the component is IMPUTED at the mean of that same component across every restaurant that has it -- so a missing value figure is treated as an average value figure, not as a bad one and not as a free pass. Earlier versions got this wrong twice: redistributing the weight REWARDED thin data, and then shrinking the total toward the overall mean PUNISHED it, because the overall mean (41) sits far below the mean of the component actually missing (value, 58). Imputing per component is neutral in both directions.",
-    "completeness": "Each restaurant also carries the share of weight that rested on real data. A 78 built on 100% evidence is not the same claim as a 78 built on 60%.",
-    "not_a_ranking_of_quality": "This grades fit against these seven axes only. It is not a claim about which food is better.",
-    "weights_rationale": "Tuned for the stated goal: the best dinner reachable without an awkward journey. Rating (30) and award (30) are the two independent reads on how good the food and service actually are -- one from thousands of diners, one from critics. Transit (20) because the commute is a real constraint. Value was REMOVED: see the disabled block below.",
-    "weights_are_relative": "These need not sum to 100. Each score divides by the weight in play, so the numbers are read against each other. They currently total 90, and dropping value raised every other component's share proportionally -- transit went from a fifth of the grade to 22%.",
-    "imputation_is_disclosed": "rubric_parts marks every imputed component, and rubric_completeness still reports the share of the score that rested on real data."
+ "_doc": {
+  "purpose": "A transparent composite grade. Every component is normalised to 0-100, weighted, and PUBLISHED alongside the total so the score can be argued with rather than taken on faith. Change the weights here and re-run src/export_site_data.py; no code edits.",
+  "missing_data_rule": "A component scores 0 only when the zero is a FACT (holds no award). When it is UNKNOWN the component is IMPUTED at the mean of that same component across every restaurant that has it -- so a missing value figure is treated as an average value figure, not as a bad one and not as a free pass. Earlier versions got this wrong twice: redistributing the weight REWARDED thin data, and then shrinking the total toward the overall mean PUNISHED it, because the overall mean (41) sits far below the mean of the component actually missing (value, 58). Imputing per component is neutral in both directions.",
+  "completeness": "Each restaurant also carries the share of weight that rested on real data. A 78 built on 100% evidence is not the same claim as a 78 built on 60%.",
+  "not_a_ranking_of_quality": "This grades fit against these seven axes only. It is not a claim about which food is better.",
+  "weights_rationale": "Tuned for the stated goal: the best dinner reachable without an awkward journey. Rating (30) and award (30) are the two independent reads on how good the food and service actually are -- one from thousands of diners, one from critics. Transit (20) because the commute is a real constraint. Value was REMOVED: see the disabled block below.",
+  "weights_are_relative": "These need not sum to 100. Each score divides by the weight in play, so the numbers are read against each other. They currently total 90, and dropping value raised every other component's share proportionally -- transit went from a fifth of the grade to 22%.",
+  "imputation_is_disclosed": "rubric_parts marks every imputed component, and rubric_completeness still reports the share of the score that rested on real data."
+ },
+ "weights": {
+  "rating": 30,
+  "award": 30,
+  "lex": 20,
+  "window": 10
+ },
+ "award": {
+  "_doc": "Value of the strongest distinction held, DECAYED by how old it is. Recency used to be a component of its own, which asked the wrong question: recency is not a thing a restaurant has, it is a discount on the thing it has. A 1991 James Beard semifinalist and a 2026 one are not the same claim, and scoring them 50 apiece and then arguing about it in a separate 10-point row let a stale award keep most of its force. No award still scores 0 -- a fact, not missing data. Michelin and the NYT 100 are annual guides, so they are always current and the decay only ever bites James Beard.",
+  "tiers": {
+   "Michelin star": 100,
+   "NYT 100 Best": 92,
+   "James Beard winner": 85,
+   "Michelin Bib Gourmand": 72,
+   "James Beard nominee": 60,
+   "James Beard semifinalist": 50,
+   "Michelin Plate": 40
   },
-  "weights": {
-    "rating": 30,
-    "award": 30,
-    "lex": 20,
-    "window": 10
-  },
-  "award": {
-    "_doc": "Value of the strongest distinction held, DECAYED by how old it is. Recency used to be a component of its own, which asked the wrong question: recency is not a thing a restaurant has, it is a discount on the thing it has. A 1991 James Beard semifinalist and a 2026 one are not the same claim, and scoring them 50 apiece and then arguing about it in a separate 10-point row let a stale award keep most of its force. No award still scores 0 -- a fact, not missing data. Michelin and the NYT 100 are annual guides, so they are always current and the decay only ever bites James Beard.",
-    "tiers": {
-      "Michelin star": 100,
-      "NYT 100 Best": 92,
-      "James Beard winner": 85,
-      "Michelin Bib Gourmand": 72,
-      "James Beard nominee": 60,
-      "James Beard semifinalist": 50,
-      "Michelin Plate": 40
-    },
-    "recency_decay": {
-      "current": 1.0,
-      "recent": 0.9,
-      "past": 0.75,
-      "historic": 0.6
-    }
-  },
-  "lex": {
-    "_doc": "Walk to the 4/5/6. Not being near it now scores NEUTRAL, not 0. The 4/5/6 runs Manhattan and the Bronx only, so a 0 was a fixed 15-point tax on 100% of Queens and Staten Island and 78% of Brooklyn -- a fact about the MTA, not about the restaurant. Proximity is now a bonus above neutral and distance costs nothing. If you need the Lex line as a hard requirement, the subway facet already does that exactly, and a filter beats a weighting for a constraint.",
-    "best_minutes": 2,
-    "worst_minutes": 12,
-    "no_lex_score": 50
-  },
-  "value": {
-    "_disabled": true,
-    "_doc": "REMOVED from weights, deliberately, and kept here so it is a one-line change to restore. Measured before removal at weight 10: dropping it entirely left the rank correlation at 0.9915 and the top 15 completely unchanged. Three reasons it could not earn its place. Only 351 of 645 had a figure at all, so 294 were imputed at a constant that discriminates nothing. Of those 351, just 14 were verified and 337 were heuristic estimates, which this project's own notes say overstate casual kitchens. And the confidence multiplier compressed estimates into a 20-80 band, capping the whole component's swing at 6 grade points against 30 for rating. There was no weight at which it was both meaningful and trustworthy. Value is not lost from the site -- it has the gap column, both gap sorts, the best-value sort and the verified-gaps preset, all of which show it honestly instead of burying a heuristic inside a composite. The grade answers WHICH DINNER, not which deal; Restaurant Week already fixes the price.",
-    "zero_at_pct": 0,
-    "full_at_pct": 55,
-    "neutral": 50,
-    "confidence": {
-      "verified": 1.0,
-      "estimate": 0.6
-    }
-  },
-  "window": {
-    "_doc": "Days still left to book. Flexibility, NOT urgency -- a closing deadline is time pressure, not merit, and the site already flags it separately.",
-    "zero_at_days": 0,
-    "full_at_days": 30
+  "recency_decay": {
+   "current": 1.0,
+   "recent": 0.9,
+   "past": 0.75,
+   "historic": 0.6
   }
+ },
+ "lex": {
+  "_doc": "Walk to the 4/5/6. Not being near it scores NEUTRAL (no_lex_score), not 0: the 4/5/6 runs Manhattan and the Bronx only, so a 0 was a fixed 15-point tax on 100% of Queens and Staten Island and 78% of Brooklyn -- a fact about the MTA, not about the restaurant. Proximity is a BONUS ABOVE that neutral and distance costs nothing: the ramp runs from no_lex_score at worst_minutes to 100 at best_minutes, so the worst walk scores exactly what having no line scores. That is deliberate -- subway_for drops anything past MAX_WALK_MIN, so a restaurant at the cap and one past it are the same restaurant as far as this data goes. Scoring the ramp from 0 instead put 129 restaurants BELOW the no-line neutral for being near the line. If you need the Lex line as a hard requirement, the subway facet does that exactly, and a filter beats a weighting for a constraint.",
+  "best_minutes": 2,
+  "worst_minutes": 12,
+  "no_lex_score": 50
+ },
+ "value": {
+  "_disabled": true,
+  "_doc": "REMOVED from weights, deliberately, and kept here so it is a one-line change to restore. Measured before removal at weight 10: dropping it entirely left the rank correlation at 0.9915 and the top 15 completely unchanged. Three reasons it could not earn its place. Only 351 of 645 had a figure at all, so 294 were imputed at a constant that discriminates nothing. Of those 351, just 14 were verified and 337 were heuristic estimates, which this project's own notes say overstate casual kitchens. And the confidence multiplier compressed estimates into a 20-80 band, capping the whole component's swing at 6 grade points against 30 for rating. There was no weight at which it was both meaningful and trustworthy. Value is not lost from the site -- it has the gap column, both gap sorts, the best-value sort and the verified-gaps preset, all of which show it honestly instead of burying a heuristic inside a composite. The grade answers WHICH DINNER, not which deal; Restaurant Week already fixes the price.",
+  "zero_at_pct": 0,
+  "full_at_pct": 55,
+  "neutral": 50,
+  "confidence": {
+   "verified": 1.0,
+   "estimate": 0.6
+  }
+ },
+ "window": {
+  "_doc": "Days still left to book, INCLUSIVE of the end date -- a window that ends today is one day, not zero, which is how every other date test on this site counts. Flexibility, NOT urgency: a closing deadline is time pressure, not merit, and the site already flags it separately.",
+  "zero_at_days": 0,
+  "full_at_days": 30
+ }
 }

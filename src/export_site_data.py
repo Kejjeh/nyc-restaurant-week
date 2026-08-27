@@ -469,10 +469,25 @@ def rubric_for(r, cfg, today):
     # about the MTA, not about the restaurant. Use the subway facet if you need
     # the line as a hard requirement -- a filter beats a weighting for that.
     c = cfg["lex"]
+    neutral = float(c["no_lex_score"])
     lex = [r["subway"].get(k) for k in ("4", "5", "6") if r.get("subway")]
     lex = [x for x in lex if x is not None]
-    parts["lex"] = (_ramp(min(lex), c["worst_minutes"], c["best_minutes"])
-                    if lex else float(c["no_lex_score"]))
+    if not lex:
+        parts["lex"] = neutral
+    else:
+        # The ramp is a BONUS ABOVE NEUTRAL, which is what this component has
+        # claimed to be since the fixed-tax problem was found -- and it was
+        # only half fixed. The no-line case was moved to neutral (50) but the
+        # ramp still ran from 0, so a restaurant twelve minutes from the 6
+        # scored 0.0 while one with no 4/5/6 within walking distance scored 50.
+        # 129 restaurants scored BELOW the no-line neutral for being NEAR the
+        # line, 24 of them at exactly zero. Scaling the bonus into
+        # [neutral, 100] makes "distance costs nothing" literally true and
+        # closes the discontinuity at the 12-minute walk cap: at the far end of
+        # the ramp a restaurant now scores exactly what having no line scores,
+        # which is the same thing MAX_WALK_MIN already says about it.
+        parts["lex"] = neutral + (100.0 - neutral) * _ramp(
+            min(lex), c["worst_minutes"], c["best_minutes"]) / 100.0
 
     # value — gap PERCENT (comparable across the price tiers), then shrunk
     # toward neutral by how much that figure actually rests on. Evidence used
@@ -488,14 +503,24 @@ def rubric_for(r, cfg, today):
         parts["value"] = k * v + (1 - k) * float(c["neutral"])
 
     # window — days left to book. Flexibility, not urgency.
+    #
+    # INCLUSIVE of the end date, because every other date test on this site is
+    # and this one alone was not. A restaurant whose window ends today has not
+    # ended (hasEnded), still counts as urgent (isUrgent), is still offered a
+    # date by the planner (dateIssue/validDates), and the countdown tile says
+    # "1 day left". The rubric scored it 0.0 on a component the row detail
+    # labels "Days left to book" — the same number it gives a restaurant that
+    # closed three weeks ago, printed beside a page saying you can still book.
+    # 191 restaurants read that way on 16 August; 401 do on the last day of the
+    # season.
     if r.get("end_date"):
         try:
             left = (date.fromisoformat(r["end_date"]) - today).days
         except ValueError:
             left = None
         c = cfg["window"]
-        parts["window"] = _ramp(max(0, left), c["zero_at_days"], c["full_at_days"]) \
-            if left is not None else None
+        parts["window"] = _ramp(max(0, left + 1), c["zero_at_days"],
+                                c["full_at_days"]) if left is not None else None
     else:
         parts["window"] = None
 

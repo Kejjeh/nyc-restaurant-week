@@ -989,6 +989,15 @@ spelling; a term the filters removed says so and counts them
 (*"'ai fiori' matches 1 restaurant, but the filters remove them all"*), which
 is the case where Clear filters is the right move.
 
+**No URL reaches an `href` without its scheme being checked.** Two do on the
+roster: an award record's `source_url`, and `rw.reserve`, which falls back to
+`restaurants.website` — a field the listing API supplies and the weekly refresh
+writes into the payload with nobody reading it. `app.js` guards this in eight
+places with `isHttpURL`; `venues.js` guarded it in none, on the same data. A
+poisoned payload put two live `javascript:` links on the page, one of them the
+Book button. Today's payload is clean (2,576 https, one http), so this was
+latent — which is the only reason it survived being read this many times.
+
 **Neither page scrolls sideways on a phone.** Both did at 320px — an iPhone SE
 — and it was one element on each, the same one: `select.sortSel`. A `<select>`
 is as wide as its longest option ("Standing — strongest recognition first"

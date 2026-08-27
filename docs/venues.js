@@ -40,6 +40,18 @@ const fold = (s) =>
     .replace(/[“”]/g, '"')
     .toLowerCase();
 
+/* Every URL on this page comes from outside it: an award record's source_url
+   from the crawled award files, and `rw.reserve` from the Restaurant Week
+   listing API — which is re-pulled weekly and reaches the payload without a
+   human reading it. A `javascript:` or `data:` value arriving in either would
+   become a live link on a Book button. The dashboard checks this in eight
+   places and this file checked it in none, on the same data. */
+const isHttpURL = (u) => {
+  if (!u) return false;
+  try { return /^https?:$/.test(new URL(u, location.href).protocol); }
+  catch { return false; }
+};
+
 const STATE = {
   data: null,
   rows: [],
@@ -239,7 +251,7 @@ function awardLine(a) {
     ? `${a.award} · ${a.level}`
     : (honour ? honour.label : a.level) || 'recognised';
   const label = a.rank ? `${what} (no. ${a.rank})` : what;
-  if (a.url) {
+  if (isHttpURL(a.url)) {
     const link = el('a', 'awardWhat', label);
     link.href = a.url;
     link.rel = 'noreferrer noopener';
@@ -318,7 +330,7 @@ function renderRow(v) {
             + '. The filters deliberately do not count these.';
     meta.append(m);
   }
-  if (v.rw && v.rw.reserve) {
+  if (v.rw && isHttpURL(v.rw.reserve)) {
     const book = el('a', 'reserve', 'Book');
     book.href = v.rw.reserve;
     book.rel = 'noreferrer noopener';

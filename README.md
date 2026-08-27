@@ -195,6 +195,16 @@ succeeds, the payload is well-formed, and the site is wrong.
   hours for ONE restaurant (own-site JSON-LD, then text heuristics), cached in
   `data/cache/hours.json`. Deliberately never run in bulk.
 - `python src/price_sweep.py --report` — ranked heuristic gaps from cached sweep.
+- `node tools/verify_ui_counts.mjs` — drives a headless Chromium over both
+  pages and checks that **every** facet chip, chart bar and roster facet value
+  delivers exactly the number of rows it prints. Not in CI (no browser there);
+  run it after touching `app.js`, `venues.js` or anything feeding a count into
+  either. It runs the check twice: once on a clean page, and once with a filter
+  already applied — which is the only pass that can catch a facet counted
+  against the whole roster instead of against the rows surviving every *other*
+  facet. Reintroducing that bug makes it print 16 mismatches, `Borough /
+  Manhattan prints 1104, delivers 81` among them. Needs an existing Playwright:
+  `PLAYWRIGHT_MODULE=... CHROMIUM_PATH=... node tools/verify_ui_counts.mjs`.
 - `price_sweep.py --shard=i/k` / `price_rescue.py [--render] --shard=i/k` —
   one-off website price crawls (rescue's `--render` mode needs
   `playwright install chromium`). Results cache per slug in `data/raw/pricesweep/`.

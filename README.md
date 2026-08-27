@@ -961,6 +961,13 @@ the API's claim next to the verified one rather than overwriting it · `flags` �
 `config/recognition_suppress.json` drops recognition rows that are in the DB but
 demonstrably wrong (see caveats). Set `active: false` to restore them.
 
+**Issue links in a pull request body are load-bearing.** GitHub closes an issue
+on merge when a closing keyword sits next to its number, and it does not read
+negations — a PR body containing *"This does not close #2"* closed issue #2, and
+the issue was then attributed to a pull request whose own text says it did not do
+the work. Say `Closes #2` to close one and `issue 2` to mention one;
+`.github/pull_request_template.md` carries the rule where it will be read.
+
 **ToS enforcement is in code, not convention.** `assert_tos_clean()` fails the
 export rather than publish a banned field. Menu text may leave only as dish-tag
 snippets, and the rule is: **at most 5% of a menu's extracted text, or 40

@@ -7,6 +7,8 @@ from config import LISTING_DIR, MENUS_DIR
 
 ROOT = LISTING_DIR.parents[2]
 VENUES = ROOT / "docs" / "data" / "venues.json"
+REVIEWS = (("recognition", ROOT / "data" / "processed" / "recognition_review.json"),
+           ("roster merges", ROOT / "data" / "processed" / "venue_merge_review.json"))
 LIST_CAP = 25   # rows printed per section before the report says how many it hid
 
 
@@ -41,6 +43,51 @@ def previous_payload(path=VENUES):
         return json.loads(raw)
     except (subprocess.SubprocessError, OSError, ValueError):
         return None
+
+
+def count_rulings(doc):
+    """-> {section: n} for a review file, whatever shape it happens to be.
+
+    The two files disagree: recognition_review.json is {source: [...]} and
+    venue_merge_review.json is {section: [...]} with a _doc string mixed in.
+    Counting is the same question either way, so it is asked once here.
+    """
+    if not isinstance(doc, dict):
+        return {"items": len(doc or [])}
+    return {k: len(v) for k, v in doc.items() if isinstance(v, list) and v}
+
+
+def pending_rulings():
+    """Say out loud that a human owes the pipeline some answers.
+
+    Both review files have been accumulating decisions nobody was ever told
+    about. A refused merge is not a curiosity -- it is an award that is NOT on
+    the roster until someone rules on it, and a file nothing points at is a file
+    nobody opens. The README carried a hand-written "14 pending" that was
+    already drifting.
+    """
+    lines = []
+    for label, path in REVIEWS:
+        if not path.exists():
+            continue
+        try:
+            doc = json.loads(path.read_text(encoding="utf-8"))
+        except ValueError:
+            lines.append(f"  {label}: {path.name} is unreadable")
+            continue
+        counts = count_rulings(doc)
+        # Folds and rulings already applied are recorded for auditing, not
+        # waiting on anyone. Saying "18 waiting" when 8 are already settled
+        # trains people to ignore the number.
+        settled = {"folded_spelling_variants", "ruled_out_by_venue_aliases", "_doc"}
+        waiting = {k: n for k, n in counts.items() if k not in settled}
+        total = sum(waiting.values())
+        if not total:
+            lines.append(f"  {label}: nothing waiting")
+            continue
+        detail = ", ".join(f"{k} {n}" for k, n in sorted(waiting.items()))
+        lines.append(f"  {label}: {total} waiting ({detail}) -> {path.name}")
+    return lines
 
 
 def roster_changes(now, was):
@@ -94,6 +141,8 @@ def roster_diff():
         c = now["counts"]
         print(f"  no previous payload in HEAD to compare against — "
               f"{c['venues']} venues, {c['with_recognition']} recognised")
+        for line in pending_rulings():
+            print(line)
         print("#" * 60)
         return
 
@@ -144,6 +193,11 @@ def roster_diff():
     if not any(d[k] for k in ("closed", "reopened", "gained", "lost",
                               "added", "removed")):
         print("  no change to the roster")
+    rulings = pending_rulings()
+    if rulings:
+        print("  --")
+        for line in rulings:
+            print(line)
     print("#" * 60)
 
 

@@ -290,16 +290,22 @@ def test_a_restaurateur_award_reaches_every_restaurant_it_names():
     restaurant."""
     r = roster_with(("Frenchette", {"seeded_from": "james_beard"}),
                     ("Le Rock", {"seeded_from": "michelin"}))
+    r.awards = [{"venue_slug": "frenchette", "source": "james_beard",
+                 "level": "winner", "year": 2019, "matched_name": "Frenchette"},
+                {"venue_slug": "le-rock", "source": "michelin",
+                 "level": "recommended", "year": 2025, "matched_name": "Le Rock"}]
     deferred = [{"name": "Frenchette, Le Veau d' Or, and Le Rock",
                  "source": "james_beard",
                  "award": {"source": "james_beard", "level": "winner",
                            "award": "Outstanding Restaurateur", "year": 2025}}]
-    attached, kept_whole, unresolved = resolve_group_awards(r, deferred)
-    assert sorted(slug for slug, _ in attached) == ["frenchette", "le-rock"]
+    attached, kept_whole, unresolved, created = resolve_group_awards(r, deferred)
+    # Le Veau d'Or is a real restaurant that appears in these files only inside
+    # this string. It used to be dropped; now the list vouches it into existence
+    # with its apostrophe tidied.
+    assert sorted(slug for slug, _ in attached) == ["frenchette", "le-rock", "le-veau-dor"]
+    assert created == ["Le Veau d'Or"]
     assert kept_whole == []
-    # the part we could not resolve is recorded, never invented as a venue
-    assert [u["part"] for u in unresolved] == ["Le Veau d' Or"]
-    assert len(r.venues) == 2
+    assert unresolved == []
 
 
 def test_a_real_name_that_looks_like_a_list_is_left_alone():
@@ -308,8 +314,8 @@ def test_a_real_name_that_looks_like_a_list_is_left_alone():
     r = roster_with(("Gage & Tollner", {"seeded_from": "james_beard"}))
     deferred = [{"name": "Gage & Tollner", "source": "james_beard",
                  "award": {"source": "james_beard", "level": "nominee", "year": 2022}}]
-    attached, kept_whole, _ = resolve_group_awards(r, deferred)
-    assert attached == []
+    attached, kept_whole, _, created = resolve_group_awards(r, deferred)
+    assert attached == [] and created == []
     assert [k["name"] for k in kept_whole] == ["Gage & Tollner"]
 
 
@@ -318,8 +324,8 @@ def test_a_marked_list_matching_nothing_becomes_a_review_row_not_a_venue():
     deferred = [{"name": "B.R. Guests Restaurants (Fiamma, Ruby Foo's, Vento)",
                  "source": "james_beard",
                  "award": {"source": "james_beard", "level": "winner", "year": 2007}}]
-    attached, kept_whole, _ = resolve_group_awards(r, deferred)
-    assert (attached, kept_whole) == ([], [])
+    attached, kept_whole, _, created = resolve_group_awards(r, deferred)
+    assert (attached, kept_whole, created) == ([], [], [])
     assert len(r.refused) == 1
     assert len(r.venues) == 1
 
@@ -348,7 +354,11 @@ def test_the_payload_never_carries_menu_text():
     if not out.exists():
         pytest.skip("payload not built")
     payload = json.loads(out.read_text(encoding="utf-8"))
-    banned = {"menu", "menus", "menu_items", "raw_text", "dishes", "menu_state"}
+    # `dishes` was banned here too until it started carrying tag NAMES, which
+    # are derived facts and not menu text. The stricter contract it lives under
+    # now -- configured names only, nothing longer than a tag -- is enforced by
+    # test_dishes_are_tag_names_and_never_menu_text below.
+    banned = {"menu", "menus", "menu_items", "raw_text", "menu_state", "snippet"}
     for v in payload["venues"]:
         assert not (banned & set(v)), f"{v['slug']} carries menu data"
     errors, _ = export_venues.validate(payload["venues"], load_awards_config())
@@ -479,3 +489,241 @@ def test_recency_still_separates_an_old_award_from_a_current_one_after_the_chang
     now = [{"source": "james_beard", "level": "winner", "year": SEASON_YEAR}]
     then = [{"source": "james_beard", "level": "winner", "year": SEASON_YEAR - 25}]
     assert prestige_for(now, cfg, closed=False)[0] > prestige_for(then, cfg, closed=False)[0]
+
+
+# --------------------------------------------------------------------------
+# portfolio awards must not depend on who joined Restaurant Week this summer
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("part,ok", [
+    ("Pastis", True),
+    ("Le Veau d'Or", True),
+    ("The Breslin", True),
+    ("Tosca Cafe", True),
+    # the three shapes that are not restaurant names
+    ("LA", False),              # a city abbreviation
+    ("NY", False),
+    ("NY/Matsuhisa", False),    # two things packed into one part
+    ("", False),
+    ("  ", False),
+    ("--", False),
+])
+def test_plausible_venue_name(part, ok):
+    """Splitting 'Nobu, NY/Matsuhisa, LA' once put a venue called 'LA' on the
+    roster. This is the test on the STRING that stops it, and deliberately not
+    a test on whether we have heard of the name."""
+    from build_venues import plausible_venue_name
+    assert plausible_venue_name(part) is ok
+
+
+def test_a_portfolio_part_does_not_need_to_be_in_restaurant_week_to_get_its_award():
+    """Morandi holds no award of its own and appears only inside Keith
+    McNally's restaurateur awards. It was a venue solely because it joined this
+    summer's programme, so dropping it from the listing silently deleted three
+    real awards. Whether the Beard Foundation named a restaurant is a fact about
+    the award, not about Restaurant Week."""
+    from build_venues import resolve_group_awards
+    # Only Balthazar is known, and it holds an award of its own.
+    r = roster_with(("Balthazar", {"seeded_from": "michelin"}))
+    r.awards = [{"venue_slug": "balthazar", "source": "michelin",
+                 "level": "recommended", "year": 2025, "matched_name": "Balthazar"}]
+    deferred = [{"name": "Balthazar, Lucky Strike, Morandi, Pastis, and Pravda",
+                 "source": "james_beard",
+                 "award": {"source": "james_beard", "level": "winner",
+                           "award": "Outstanding Restaurateur", "year": 2010}}]
+    attached, kept_whole, unresolved, created = resolve_group_awards(r, deferred)
+    got = {slug for slug, _ in attached}
+    assert got == {"balthazar", "lucky-strike", "morandi", "pastis", "pravda"}
+    assert sorted(created) == ["Lucky Strike", "Morandi", "Pastis", "Pravda"]
+    assert unresolved == []
+
+
+def test_a_city_abbreviation_in_a_confirmed_list_is_still_refused():
+    from build_venues import resolve_group_awards
+    r = roster_with(("Nobu", {"seeded_from": "michelin"}))
+    r.awards = [{"venue_slug": "nobu", "source": "michelin", "level": "recommended",
+                 "year": 2025, "matched_name": "Nobu"}]
+    deferred = [{"name": "Nobu, NY/Matsuhisa, LA", "source": "james_beard",
+                 "award": {"source": "james_beard", "level": "winner", "year": 2003}}]
+    attached, _, unresolved, created = resolve_group_awards(r, deferred)
+    assert [slug for slug, _ in attached] == ["nobu"]
+    assert created == []
+    assert sorted(u["part"] for u in unresolved) == ["LA", "NY/Matsuhisa"]
+
+
+def test_a_venue_that_only_joined_the_programme_cannot_vouch_for_a_list():
+    """Without a marker, two parts must resolve to AWARD-HOLDING venues before
+    the string counts as a list. A Restaurant Week row holds no award and so
+    proves nothing -- which is what keeps this stable across a changeover."""
+    from build_venues import resolve_group_awards
+    r = roster_with(("Clover Club", {"seeded_from": "rw"}),
+                    ("Flatiron Lounge", {"seeded_from": "rw"}))
+    r.awards = []            # neither holds an award of its own
+    deferred = [{"name": "Clover Club and Flatiron Lounge", "source": "james_beard",
+                 "award": {"source": "james_beard", "level": "nominee", "year": 2011}}]
+    attached, kept_whole, _, created = resolve_group_awards(r, deferred)
+    assert attached == [] and created == []
+    assert [k["name"] for k in kept_whole] == ["Clover Club and Flatiron Lounge"]
+
+
+def test_the_source_apostrophe_typo_is_tidied_when_splitting():
+    """The Beard file writes "Le Veau d' Or". Left alone it becomes a venue
+    under that spelling and never meets the real name again -- norm_name keeps
+    "d or" as two tokens and "dor" as one, so even the spelling-variant pass
+    cannot reunite them."""
+    assert "Le Veau d'Or" in split_group("Frenchette, Le Veau d' Or, and Le Rock")
+
+
+def test_no_award_on_the_roster_depends_on_this_season_being_this_season():
+    """The property, checked against the real database: every award record is
+    attached to a venue that either holds it directly or was named in a list
+    alongside award-holding restaurants. None of them rest on a Restaurant Week
+    row that will not be there next summer."""
+    con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+    try:
+        rows = con.execute(
+            "SELECT COUNT(*) FROM venue_awards a JOIN venues v"
+            " ON v.venue_slug = a.venue_slug"
+            " WHERE v.rw_slug IS NOT NULL AND v.award_count = 0").fetchone()[0]
+    finally:
+        con.close()
+    assert rows == 0
+
+
+def test_build_does_not_write_the_review_file():
+    """build() takes whatever connection it is handed, including a temp copy in
+    a test or a changeover simulation. A module-level output path does not care
+    which, so it wrote the COMMITTED review file from a mutated database --
+    caught only because the Ci Siamo entry it should have contained had quietly
+    become an empty list. main() writes it now; build() only returns it."""
+    import shutil
+    import sqlite3 as sq
+    import tempfile
+
+    import build_venues
+
+    review = ROOT / "data" / "processed" / "venue_merge_review.json"
+    before = review.read_bytes() if review.exists() else None
+
+    tmp = Path(tempfile.mkdtemp()) / "sim.sqlite"
+    shutil.copyfile(DB, tmp)
+    con = sq.connect(tmp)
+    # a changeover: most of the listing replaced
+    con.execute("DELETE FROM restaurants WHERE slug NOT IN"
+                " (SELECT slug FROM restaurants ORDER BY slug LIMIT 50)")
+    con.commit()
+    roster, _, _, payload = build_venues.build(con, load_awards_config(), quiet=True)
+    con.close()
+
+    assert review.read_bytes() == before, (
+        "build() wrote over the committed review file from a simulated database")
+    # and it still reports what a human has to rule on, as data
+    assert set(payload) >= {"refused", "confirm", "folded_spelling_variants"}
+
+
+def test_the_committed_review_file_matches_the_committed_database():
+    """A stale review file is a list of rulings that no longer correspond to
+    anything, which is worse than no list."""
+    import build_venues
+    review = json.loads(
+        (ROOT / "data" / "processed" / "venue_merge_review.json").read_text(encoding="utf-8"))
+    con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+    try:
+        # every confirm entry must name a venue that really is one row
+        for entry in review.get("confirm", []):
+            row = con.execute("SELECT COUNT(*) FROM venues WHERE venue_slug = ?",
+                              (entry["merged_into"],)).fetchone()[0]
+            assert row == 1, f"{entry['merged_into']} in confirm is not a venue"
+        for entry in review.get("folded_spelling_variants", []):
+            kept = con.execute("SELECT name FROM venues WHERE venue_slug = ?",
+                               (entry["kept"],)).fetchone()
+            assert kept, f"{entry['kept']} was folded into a venue that is gone"
+            gone = con.execute("SELECT COUNT(*) FROM venues WHERE venue_slug = ?",
+                               (entry["folded"],)).fetchone()[0]
+            assert gone == 0, f"{entry['folded']} was folded but is still a venue"
+    finally:
+        con.close()
+
+
+# --------------------------------------------------------------------------
+# dish tags on the roster
+# --------------------------------------------------------------------------
+
+def _payload():
+    out = ROOT / "docs" / "data" / "venues.json"
+    if not out.exists():
+        pytest.skip("payload not built")
+    return json.loads(out.read_text(encoding="utf-8"))
+
+
+def test_a_tag_is_never_both_the_confident_claim_and_the_unsure_one():
+    """A tag counts as confident when ANY of its matches on that menu was high.
+    Appearing in both lists would mean the row asserts and hedges the same
+    thing, which is worse than doing either."""
+    for v in _payload()["venues"]:
+        both = set(v.get("dishes") or []) & set(v.get("dishes_maybe") or [])
+        assert not both, f"{v['slug']}: {sorted(both)} is both confident and unsure"
+
+
+def test_the_unsure_tags_are_the_ones_worth_hedging():
+    """50 of the 64 low-only pairs are truffle -- truffle honey, truffle mayo,
+    truffle sour cream -- where the word is on the menu but the dish is not
+    about it. Marking those rather than blending them into the confident list
+    is the same distinction the dashboard draws between a verified gap and an
+    estimated one."""
+    payload = _payload()
+    hedged = [d for v in payload["venues"] for d in (v.get("dishes_maybe") or [])]
+    assert hedged, "nothing is hedged; the confidence split is not reaching the payload"
+    assert hedged.count("truffle") > len(hedged) / 3
+
+
+def test_filters_use_the_confident_claim_only():
+    """The dish facet must count `dishes`, not `dishes_maybe`. Someone filtering
+    for snails wants escargot, not a menu that says the word once."""
+    payload = _payload()
+    from collections import Counter
+    confident = Counter(d for v in payload["venues"] for d in (v.get("dishes") or []))
+    assert payload["facets"]["dish"] == dict(
+        sorted(confident.items(), key=lambda kv: (-kv[1], kv[0])))
+
+
+def test_dishes_are_tag_names_and_never_menu_text():
+    """restaurants.json carries a snippet with each tag, under a 5%-of-a-menu
+    budget. This payload carries the NAME only, so it holds no menu text at all
+    and has no budget to manage. A dict here would mean somebody started
+    copying the snippet across."""
+    payload = _payload()
+    vocabulary = set()
+    for v in payload["venues"]:
+        for d in (v.get("dishes") or []) + (v.get("dishes_maybe") or []):
+            assert isinstance(d, str), f"{v['slug']}: dish is a {type(d).__name__}"
+            assert len(d) <= 40, f"{v['slug']}: {d!r} is too long to be a tag name"
+            vocabulary.add(d)
+    # every published name must be a configured tag, not a phrase off a menu
+    configured = set(json.loads(
+        (ROOT / "config" / "dish_tags.json").read_text(encoding="utf-8"))) - {"_doc"}
+    assert vocabulary <= configured, f"not configured tags: {vocabulary - configured}"
+
+
+def test_dishes_are_absent_rather_than_empty_where_there_is_no_menu():
+    """Only Restaurant Week rows have a parsed menu. An empty list would read as
+    'we looked and this menu has none of them', which is a different claim."""
+    payload = _payload()
+    for v in payload["venues"]:
+        if not v["rw"]:
+            assert v.get("dishes") is None, f"{v['slug']} is not in RW but has dishes"
+
+
+def test_dishes_maybe_is_absent_rather_than_empty_where_there_is_no_menu():
+    for v in _payload()["venues"]:
+        if not v["rw"]:
+            assert v.get("dishes_maybe") is None, f"{v['slug']} is not in RW"
+
+
+def test_the_dish_tags_still_answer_the_question_they_were_added_for():
+    """The roster exists to answer 'what does this place actually cook', which
+    the cuisine facet cannot answer for the 778 venues never in the programme.
+    Game meats is the sharpest of the tags and the reason this was built."""
+    payload = _payload()
+    game = [v["name"] for v in payload["venues"] if "game meats" in (v.get("dishes") or [])]
+    assert len(game) >= 5, f"only {len(game)} venues tagged with game meats"

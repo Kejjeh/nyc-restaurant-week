@@ -48,6 +48,31 @@ def load(con):
             "url": a["source_url"],
         })
 
+    # Dish tags: the NAMES only, never the snippets restaurants.json carries.
+    #
+    # A tag name is a derived fact -- "this menu mentions game meats" -- and
+    # carries none of the menu with it, so this payload stays free of menu text
+    # entirely rather than living inside the 5%-of-a-menu snippet budget the
+    # dashboard has to manage. It is also the only thing on the roster that
+    # answers "what does this place actually cook", which is the question the
+    # cuisine facet cannot answer for the 778 venues that were never in
+    # Restaurant Week.
+    # Split by confidence, the same way the dashboard separates a verified gap
+    # from an estimated one. A tag counts as confident when ANY of its matches
+    # on that menu was high; low-only means the word is there but the dish may
+    # not be about it -- 50 of the 64 low-only pairs are `truffle`, which is
+    # usually truffle honey or truffle mayo rather than a truffle dish. Seven
+    # are `snails`, where the same softness matters much more to somebody
+    # filtering for escargot.
+    dishes, maybe = {}, {}
+    for slug, tag, confident in con.execute(
+        "SELECT restaurant_slug, tag,"
+        "       MAX(CASE WHEN confidence = 'high' THEN 1 ELSE 0 END)"
+        "  FROM menu_item_tags WHERE tag IS NOT NULL"
+        " GROUP BY restaurant_slug, tag ORDER BY tag"
+    ):
+        (dishes if confident else maybe).setdefault(slug, []).append(tag)
+
     # Price tiers and meal periods come from the Restaurant Week listing and
     # only exist for the venues that are in it. Left absent, not zero: "no
     # prix fixe" and "not participating" are different facts and the site
@@ -81,6 +106,13 @@ def load(con):
             "rating": v["rating"],
             "ratings_total": v["user_ratings_total"],
             "resolution": v["resolution"],
+            # Only Restaurant Week rows have a parsed menu to tag, so this is
+            # absent rather than empty on the rest -- the same rule the row
+            # already follows for a missing field.
+            "dishes": dishes.get(v["rw_slug"]) if v["rw_slug"] else None,
+            # The weaker claim, kept separate rather than blended in. Filters
+            # use `dishes`; search matches both; the row marks these as unsure.
+            "dishes_maybe": maybe.get(v["rw_slug"]) if v["rw_slug"] else None,
             "rw": None if not r else {
                 "slug": v["rw_slug"],
                 "price_tiers": json.loads(r["price_tiers"] or "[]"),
@@ -96,8 +128,10 @@ def load(con):
 def facets(rows):
     """Precomputed filter vocabularies, so the page does not have to derive them
     from 1,400 rows before it can draw a single control."""
-    honors, sources, boroughs, cuisines = {}, {}, {}, {}
+    honors, sources, boroughs, cuisines, dishes = {}, {}, {}, {}, {}
     for r in rows:
+        for d in (r.get("dishes") or []):
+            dishes[d] = dishes.get(d, 0) + 1
         if r["top_honor_label"]:
             honors[r["top_honor_label"]] = honors.get(r["top_honor_label"], 0) + 1
         for s in r["award_sources"]:
@@ -108,7 +142,8 @@ def facets(rows):
             cuisines[c] = cuisines.get(c, 0) + 1
     order = lambda d: dict(sorted(d.items(), key=lambda kv: (-kv[1], kv[0])))
     return {"top_honor": order(honors), "award_source": order(sources),
-            "borough": order(boroughs), "cuisine": order(cuisines)}
+            "borough": order(boroughs), "cuisine": order(cuisines),
+            "dish": order(dishes)}
 
 
 def validate(rows, cfg):
@@ -125,9 +160,25 @@ def validate(rows, cfg):
             errors.append(f"{r['slug']}: award_count disagrees with the records")
         if r["award_count"] == 0 and not r["rw"]:
             errors.append(f"{r['slug']}: no awards and not in Restaurant Week")
-        for k in ("menu", "menu_items", "raw_text", "dishes"):
+        for k in ("menu", "menus", "menu_items", "raw_text"):
             if k in r:
                 errors.append(f"{r['slug']}: {k} must never reach this payload")
+        # `dishes` is allowed, but ONLY as bare tag names. A dict here would
+        # mean somebody started carrying the snippet across from
+        # restaurants.json, and this payload's whole claim is that it holds no
+        # menu text at all.
+        for key in ("dishes", "dishes_maybe"):
+            for d in (r.get(key) or []):
+                if not isinstance(d, str):
+                    errors.append(f"{r['slug']}: {key} must be tag names, "
+                                  f"not {type(d).__name__}")
+                elif len(d) > 40:
+                    errors.append(f"{r['slug']}: {key} entry {d[:30]!r} is too long "
+                                  f"to be a tag name")
+        # A tag cannot be both the confident claim and the unsure one.
+        both = set(r.get("dishes") or []) & set(r.get("dishes_maybe") or [])
+        if both:
+            errors.append(f"{r['slug']}: {sorted(both)} appear as both confident and unsure")
     placed = sum(1 for r in rows if r["lat"] is not None)
     notes.append(f"{placed}/{len(rows)} venues have coordinates and can be mapped")
     unresolved = sum(1 for r in rows if r["status"] == "unknown")

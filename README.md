@@ -13,7 +13,7 @@ it is ever contradicted, revert to private and re-read "ToS rules" below.
 `data/raw/menus/*.pdf` is gitignored and 0 PDFs are tracked — keep it that way.
 Menus are linked to the official S3 URL, never copied.
 
-Local dataset + pipeline over **1,405 NYC restaurants**: every one named by
+Local dataset + pipeline over **1,414 NYC restaurants**: every one named by
 Michelin, the James Beard Foundation or the New York Times, plus all **636**
 participants in NYC Restaurant Week Summer 2026 (Jul 20–Aug 16, extension weeks
 through Sep 6; Saturdays excluded, Sundays optional per restaurant). Built to
@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 180 tests, ~0.5s, no network
+python -m pytest -q tests/             # 207 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -88,7 +88,7 @@ closed, and who arrived* — the questions that matter now that the roster is th
 spine. A closure is the most booking-relevant fact this repo holds and nothing
 else in the report would ever print it, because a restaurant closing is not a
 listing change. It also tracks whether the unverified count is going down, so
-769 unresolved rows do not quietly stay 769.
+778 unresolved rows do not quietly stay 778.
 
 Last week's roster is read from `git show HEAD:docs/data/venues.json` rather than
 from a sidecar history file. The menu-hash section keeps its own history and pays
@@ -96,6 +96,14 @@ for it with a documented wart — the report writes state, so a second run alway
 shows zero changes — and there is no need to repeat that: the previous payload is
 already stored, versioned and immutable in HEAD. No previous payload (a first
 run, a shallow checkout) is reported as such, not as an error.
+
+It closes with **what a human owes the pipeline**: the count still waiting in
+`recognition_review.json` and `venue_merge_review.json`, and which file to open.
+Both had been quietly accumulating decisions nobody was ever told about, and a
+refused merge is not a curiosity — it is an award that is *not on the roster*
+until someone rules on it. Records that are already settled (applied spelling
+folds, rulings written into `venue_aliases.json`) are excluded from the count,
+because reporting them as waiting trains people to ignore the number.
 
 The comparison itself is a pure function, `roster_changes()`, tested against
 hand-built payloads. The listing half is not, and the price of that was a wrong
@@ -116,7 +124,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 180 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 207 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -314,12 +322,34 @@ every room the winner runs — `"Frenchette, Le Veau d' Or, and Le Rock"` — an
 left alone it becomes a venue with that name while the actual restaurants never
 receive the award. Splitting is easy; the hard part is that Gage & Tollner, Milk
 & Honey and Grand Central Oyster Bar and Restaurant are single names with the
-same punctuation. So a split is only accepted when the parts prove it: two of
-them must already be restaurants on the roster. A string carrying an unambiguous
-group marker — a parenthesised list, "and others", or two or more commas — needs
-only one, because no real name has those; if none of its parts resolve it becomes
-a review row rather than a venue. Parts that never resolve are recorded, never
-invented.
+same punctuation.
+
+Two questions, answered separately, because conflating them made the roster
+depend on the season:
+
+*Is this string a list?* A group marker settles it — a parenthesised list, "and
+others", or two or more commas, none of which occur in a real name. Otherwise
+**two of its parts must resolve to venues that hold an award of their own.** Not
+merely to venues: a venue that exists only because it joined this summer's
+Restaurant Week is gone next summer, and gating on those meant the answer
+changed with the listing.
+
+*Which parts are restaurants?* Once the string is a confirmed list, **all of
+them**, unless the part's own shape says otherwise — under three characters, a
+bare `LA`-style abbreviation, or containing a slash, which means the source
+packed two things into one part and guessing which half is the restaurant is how
+a venue called `NY/Matsuhisa` happens. This is a test on the string, never on
+whether we have heard of the name: whether the Beard Foundation named Morandi in
+a 2010 award is a fact about the award.
+
+That second rule is what puts Pastis, Pravda, Lucky Strike, Reynard, Undercote,
+Cafe Zaffri, Etérea, The Breslin, Tosca Cafe and Le Veau d'Or on the roster at
+all. Every one is a real restaurant that appears in these files *only* inside a
+portfolio string, and every one used to be dropped.
+
+The property this buys is worth stating: **no award on the roster depends on who
+joined Restaurant Week this summer.** A simulated changeover — 516 of the 636
+participants replaced — loses zero award records. It used to lose twelve.
 
 ### When the rules will not decide (`config/venue_aliases.json`)
 
@@ -486,7 +516,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 180 tests
+1. the 207 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -563,7 +593,7 @@ participants
   overstates casual formats. Hand-verified findings live in `reports/`, not here.
 
 
-### `venues` — the roster (1,405 rows)
+### `venues` — the roster (1,414 rows)
 
 ```sql
 venue_slug TEXT PRIMARY KEY      -- equals rw_slug where the restaurant is in the programme
@@ -578,7 +608,7 @@ prestige   INTEGER              -- 0-100, per config/awards.json
 seeded_from, resolution         -- which source created the row, and how identity was settled
 ```
 
-### `venue_awards` — one row per award record (1,918 rows)
+### `venue_awards` — one row per award record (1,941 rows)
 
 ```sql
 venue_slug, source, level, award, year
@@ -627,6 +657,31 @@ key, so a viewer's choice survives the hop between them.
   carried by shape as much as colour: open is quiet, closed is struck through,
   unverified is dashed, matching the grammar the dashboard already uses for an
   estimated price.
+
+  **Dish tags** are the only thing on the roster that answers *what does this
+  place actually cook*. The cuisine facet cannot: cuisines come from the
+  Restaurant Week listing, so the 778 venues that were never in the programme
+  have none. Tags come from the parsed menus — `game meats`, `foie gras`,
+  `snails`, `sweetbreads` — and are searchable, filterable, and printed on the
+  row. There is a `Game, offal & odd cuts` preset because that is the question
+  the roster was first asked; it returns 38 restaurants, not the 44 it returned
+  before the confidence split, because six of those rested on a weak match.
+
+  Tags are split by confidence, the same way the dashboard separates a verified
+  gap from an estimated one. A tag is the **confident** claim when any of its
+  matches on that menu was high; `dishes_maybe` holds the rest and the row marks
+  them with a dashed underline and a `?`. 50 of the 64 low-only pairs are
+  `truffle` — truffle honey, truffle mayo, truffle sour cream — where the word
+  is on the menu but the dish is not about it. Seven are `snails`, where the
+  same softness matters much more to somebody filtering for escargot. **Filters
+  count only the confident claim; search matches both.**
+
+  The payload carries the tag **name** only, never the snippet `restaurants.json`
+  carries with each one. A name is a derived fact and holds none of the menu, so
+  this file stays free of menu text entirely rather than living inside the
+  5%-of-a-menu budget the dashboard has to manage. A test asserts every
+  published name is a configured tag and that nothing longer than a tag name
+  gets through.
 
   Two links per row, where the data supports them. A Restaurant Week badge is a
   deep link — `restaurant-week.html#r=<slug>`, which the dashboard reads and
@@ -864,7 +919,10 @@ recognition badges (3 rows suppressed) · 137 licensed outdoor. Payload
 - **2 restaurants have NULL address**: `alta-calidad`, `catria-nyc` — their
   nyctourism detail pages 404/500 server-side. (`casa-brazilian` and `wagamama`
   carried this until they left the program.)
-- **14 pending recognition matches** in `data/processed/recognition_review.json`
+- **Pending human rulings** in `data/processed/recognition_review.json` and
+  `data/processed/venue_merge_review.json`. The weekly report prints the live
+  count; do not trust a number written here, which is what this line used to be.
+  Originally 14 pending recognition matches
   (Masa, Roberta's, Tonchin, Ci Siamo, Madre, Carlo Mirarchi ×2, Max Sussman,
   Masa Takayama, Anne Rosenzweig ×4, Mắm) — scored below the acceptance
   threshold or name-matched with a contradicting address, awaiting a human
@@ -927,7 +985,7 @@ recognition badges (3 rows suppressed) · 137 licensed outdoor. Payload
 - **The Beard file goes back to 1991**, so the roster deliberately includes
   restaurants that closed decades ago. That is the archive working as intended —
   they keep their awards and score below anywhere still trading — but it means
-  "1,405 restaurants" is not "1,405 places you can book tonight".
+  "1,414 restaurants" is not "1,414 places you can book tonight".
 - **A Beard award is often to a person, not a room.** `venue_awards.person`
   carries the chef, sommelier or restaurateur, and the site prints it, because a
   roster that quietly credits the restaurant with its chef's Rising Star is
@@ -965,6 +1023,10 @@ extracted menu TEXT is acceptable; **hosting the exact PDFs is not**.
    keyword-centred snippets (≤5% of a menu, or 40 chars, whichever is greater),
    and the same bar applies to the off-site website snippets.
 5. `docs/data/venues.json` carries **no menu text at all** — not even a snippet.
+   Dish tags appear as bare configured names (`game meats`), which are derived
+   facts rather than menu text; `export_venues.validate()` rejects a `dishes`
+   entry that is not a short string, and a test checks every published name
+   against `config/dish_tags.json`.
    The roster has no use for one, so the safest thing is for the file never to
    contain the field. `export_venues.validate()` refuses to publish a row with a
    `menu`, `menu_items`, `raw_text` or `dishes` key, and a test checks the built
@@ -985,7 +1047,7 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli)
-tests/      180 pytest tests, no network; run in CI before the crawl
+tests/      207 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights

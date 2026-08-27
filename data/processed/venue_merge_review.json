@@ -107,207 +107,46 @@
  ],
  "group_award_parts_unmatched": [
   {
-   "group": "Elizabeth Street Hospitality (The Musket Room, Raf's, and Cafe Zaffri)",
-   "part": "Cafe Zaffri",
-   "marker": "parenthesised list",
-   "year": 2026,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Elizabeth Street Hospitality (The Musket Room, Raf's, and Cafe Zaffri)",
-   "part": "Cafe Zaffri",
-   "marker": "parenthesised list",
-   "year": 2026,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Gracious Hospitality (COTE, Undercote, and COQODAQ)",
-   "part": "Undercote",
-   "marker": "parenthesised list",
-   "year": 2026,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Frenchette, Le Veau d' Or, and Le Rock",
-   "part": "Le Veau d' Or",
-   "marker": "comma list",
-   "year": 2025,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Frenchette, Le Veau d' Or, and Le Rock",
-   "part": "Le Veau d' Or",
-   "marker": "comma list",
-   "year": 2025,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Gracious Hospitality Management (COTE, Undercote, and  COQODAQ)",
-   "part": "Undercote",
-   "marker": "parenthesised list",
-   "year": 2025,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Overthrow Hospitality (Cadence, Etérea, Avant Garden)",
-   "part": "Etérea",
-   "marker": "parenthesised list",
-   "year": 2024,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Overthrow Hospitality (Cadence, Etérea, Avant Garden)",
-   "part": "Etérea",
-   "marker": "parenthesised list",
-   "year": 2022,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "(Diner, Marlow & Sons, Reynard, and others)",
-   "part": "Reynard",
-   "marker": "names 'and others'",
-   "year": 2018,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Diner, Marlow & Sons, Reynard, and others",
-   "part": "Reynard",
-   "marker": "names 'and others'",
-   "year": 2017,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "The Spotted Pig, The Breslin, Tosca Cafe, and others",
-   "part": "The Breslin",
-   "marker": "names 'and others'",
-   "year": 2016,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "The Spotted Pig, The Breslin, Tosca Cafe, and others",
-   "part": "Tosca Cafe",
-   "marker": "names 'and others'",
-   "year": 2016,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "(Diner, Marlow & Sons, Reynard, and others)",
-   "part": "Reynard",
-   "marker": "names 'and others'",
-   "year": 2016,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "(Diner, Marlow & Sons, Reynard, and others)",
-   "part": "Reynard",
-   "marker": "names 'and others'",
-   "year": 2015,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Balthazar, Lucky Strike, Minetta Tavern, Morandi, Pastis, Pravda, and Schiller's Liquor Bar",
-   "part": "Lucky Strike",
-   "marker": "comma list",
-   "year": 2010,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Balthazar, Lucky Strike, Minetta Tavern, Morandi, Pastis, Pravda, and Schiller's Liquor Bar",
-   "part": "Pastis",
-   "marker": "comma list",
-   "year": 2010,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Balthazar, Lucky Strike, Minetta Tavern, Morandi, Pastis, Pravda, and Schiller's Liquor Bar",
-   "part": "Pravda",
-   "marker": "comma list",
-   "year": 2010,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Balthazar, Lucky Strike, Morandi, Pastis, Pravda, and Schiller's Liquor Bar",
-   "part": "Lucky Strike",
-   "marker": "comma list",
-   "year": 2009,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Balthazar, Lucky Strike, Morandi, Pastis, Pravda, and Schiller's Liquor Bar",
-   "part": "Pastis",
-   "marker": "comma list",
-   "year": 2009,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Balthazar, Lucky Strike, Morandi, Pastis, Pravda, and Schiller's Liquor Bar",
-   "part": "Pravda",
-   "marker": "comma list",
-   "year": 2009,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Balthazar, Schiller's Liquor Bar, Pastis, Morandi, Lucky Strike, and Pravda",
-   "part": "Pastis",
-   "marker": "comma list",
-   "year": 2008,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Balthazar, Schiller's Liquor Bar, Pastis, Morandi, Lucky Strike, and Pravda",
-   "part": "Lucky Strike",
-   "marker": "comma list",
-   "year": 2008,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
-   "group": "Balthazar, Schiller's Liquor Bar, Pastis, Morandi, Lucky Strike, and Pravda",
-   "part": "Pravda",
-   "marker": "comma list",
-   "year": 2008,
-   "reason": "named in a group award but no venue matches"
-  },
-  {
    "group": "Nobu, NY/Matsuhisa, LA",
    "part": "NY/Matsuhisa",
    "marker": "comma list",
    "year": 2001,
-   "reason": "named in a group award but no venue matches"
+   "reason": "named in a group award but does not have the shape of a restaurant name"
   },
   {
    "group": "Nobu, NY/Matsuhisa, LA",
    "part": "LA",
    "marker": "comma list",
    "year": 2001,
-   "reason": "named in a group award but no venue matches"
+   "reason": "named in a group award but does not have the shape of a restaurant name"
   },
   {
    "group": "Nobu, NY/Matsuhisa, LA",
    "part": "NY/Matsuhisa",
    "marker": "comma list",
    "year": 2000,
-   "reason": "named in a group award but no venue matches"
+   "reason": "named in a group award but does not have the shape of a restaurant name"
   },
   {
    "group": "Nobu, NY/Matsuhisa, LA",
    "part": "LA",
    "marker": "comma list",
    "year": 2000,
-   "reason": "named in a group award but no venue matches"
+   "reason": "named in a group award but does not have the shape of a restaurant name"
   },
   {
    "group": "Nobu, NY/Matsuhisa, LA",
    "part": "NY/Matsuhisa",
    "marker": "comma list",
    "year": 1999,
-   "reason": "named in a group award but no venue matches"
+   "reason": "named in a group award but does not have the shape of a restaurant name"
   },
   {
    "group": "Nobu, NY/Matsuhisa, LA",
    "part": "LA",
    "marker": "comma list",
    "year": 1999,
-   "reason": "named in a group award but no venue matches"
+   "reason": "named in a group award but does not have the shape of a restaurant name"
   }
  ],
  "ruled_out_by_venue_aliases": [

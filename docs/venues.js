@@ -19,6 +19,8 @@
 
 const DATA_URL = 'data/venues.json';
 const PAGE = 120;
+/* Values listed per filter group before the group says how many it is hiding. */
+const FACET_LIMIT = 14;
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, cls, text) => {
@@ -268,7 +270,18 @@ function renderFacets() {
     group.append(el('h3', null, f.label));
     const chosen = STATE.filters.get(f.key);
     const sorted = [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-    for (const [val, n] of sorted.slice(0, 14)) {
+    /* Cuisine has far more values than fit, so the list is cut -- but a cut
+       list that does not say it was cut reads as "those are all of them", and
+       someone looking for Georgian would conclude the roster has none. Any
+       chosen value is kept regardless of where it sorts, or ticking it and
+       then searching would make the tick vanish. */
+    const shown = sorted.slice(0, FACET_LIMIT);
+    const shownVals = new Set(shown.map(([v]) => v));
+    for (const [val, n] of sorted) {
+      if (chosen && chosen.has(val) && !shownVals.has(val)) shown.push([val, n]);
+    }
+    const hidden = sorted.length - shown.length;
+    for (const [val, n] of shown) {
       const id = `f-${f.key}-${fold(val).replace(/\W+/g, '-')}`;
       const label = el('label', 'facetOpt');
       const cb = el('input');
@@ -284,6 +297,13 @@ function renderFacets() {
       });
       label.append(cb, el('span', 'facetName', val), el('span', 'facetN', String(n)));
       group.append(label);
+    }
+    if (hidden > 0) {
+      const note = el('p', 'facetMore',
+        `+${hidden} more — use the search box`);
+      note.title = `${sorted.length} values in total; the ${shown.length} `
+                 + `commonest are listed. Search matches all of them.`;
+      group.append(note);
     }
     box.append(group);
   }

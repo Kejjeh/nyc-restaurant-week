@@ -195,6 +195,13 @@ a.awardWhat:hover { text-decoration: underline; }
   color: var(--ink-3);
 }
 
+/* A cut list must say it was cut. Quiet, but never absent. */
+.facetMore {
+  margin: 6px 0 0;
+  font: 400 11.5px/1.4 var(--sans);
+  color: var(--ink-3);
+}
+
 .preset {
   font: 500 12.5px/1 var(--sans);
   color: var(--ink-2);

@@ -1,11 +1,13 @@
 """Resolve award venues against Google Places: address, coordinates, open/closed.
 
-Usage: python src/resolve_venues.py [--fetch] [--force] [--report] [--limit N]
+Usage: python src/resolve_venues.py [--fetch] [--force] [--report] [--dry-run] [--limit N]
   (no flag)  apply whatever is already cached to the DB -- no network, no key
   --fetch    look up venues that are still unresolved (needs GOOGLE_PLACES_KEY)
+  --dry-run  print the exact queries --fetch would send, and what they would
+             cost, without sending any of them or needing a key
   --force    re-fetch venues that are already cached; this re-bills
   --report   print the cache's state and stop
-  --limit N  fetch at most N venues this run
+  --limit N  fetch (or dry-run) at most N venues this run
 
 Why this is a separate script from fetch_google_ratings.py, which does a very
 similar thing: that one resolves Restaurant Week participants, and every one of
@@ -28,6 +30,7 @@ Cache: data/raw/venues_google/{venue_slug}.json, in the same record shape
 data/raw/google/ uses, so a venue and a participant read through one code path.
 """
 import json
+import re
 import shutil
 import sqlite3
 import sys
@@ -53,6 +56,11 @@ NYC_BOUNDS = (40.45, 41.02, -74.30, -73.65)
 # so the bar is higher than fetch_google_ratings.py's 0.55 rescue threshold.
 NAME_MIN_NO_COORDS = 0.62
 PAUSE = 0.12
+
+# Places Text Search, US list price at the time of writing, per 1,000 calls.
+# Only ever used to print an estimate before spending anything; nothing in the
+# pipeline depends on it being current.
+TEXT_SEARCH_USD_PER_1000 = 32.0
 
 STATUS_FROM_GOOGLE = {
     "OPERATIONAL": "open",
@@ -90,6 +98,62 @@ def judge_no_coords(cand, name, address):
     return False, f"name similarity {sim:.2f} is too low to identify on its own"
 
 
+# Anything that already places the query in the city, so "New York" is not
+# stapled onto the end of a string that ends in "New York, NY 10022".
+PLACED = re.compile(r"\b(new york|manhattan|brooklyn|queens|bronx|staten island)\b",
+                    re.I)
+
+
+def query_for(venue):
+    """The exact Text Search string fetch_one() would send for this venue.
+
+    Shared with --dry-run rather than reimplemented there, so what the dry run
+    shows is what the billed run sends. A dry run that builds its own query is
+    worse than no dry run: it invites confidence in something never tested --
+    and this function's duplicate-city bug is exactly what the dry run caught,
+    on its first execution, before a cent had been spent.
+
+    The city is appended only when nothing already supplies it. A venue with a
+    full address does not need "New York" bolted onto a string that already ends
+    in "New York, NY 10022"; a Beard venue with nothing but a name does.
+    """
+    hint = venue.get("address") or venue.get("borough") or ""
+    parts = [venue["name"], hint]
+    if not PLACED.search(f"{venue['name']} {hint}"):
+        parts.append("New York")
+    return " ".join(x for x in parts if x)
+
+
+def dry_run(con, limit=None):
+    """What --fetch would do, and what it would cost, without doing any of it.
+
+    This exists because the run it previews costs real money and cannot be
+    undone, and the person paying should be able to read the queries first --
+    a venue with no address and a generic name is exactly where a Text Search
+    goes somewhere unexpected.
+    """
+    todo = [v for v in unresolved(con)
+            if not (CACHE / f"{v['venue_slug']}.json").exists()]
+    total = len(todo)
+    shown = todo[:limit] if limit else todo
+    print(f"{total} venues would be looked up "
+          f"({sum(1 for v in todo if v.get('address'))} of them with an address "
+          f"to corroborate the result, {sum(1 for v in todo if not v.get('address'))} "
+          f"on the name alone).")
+    print(f"estimated cost: ${total * TEXT_SEARCH_USD_PER_1000 / 1000:.2f} "
+          f"at ${TEXT_SEARCH_USD_PER_1000:.0f}/1000 Text Search calls, "
+          f"billed once — results cache per slug.\n")
+    for v in shown:
+        flag = " " if v.get("address") else "!"
+        print(f" {flag} {v['venue_slug'][:30]:31} {query_for(v)}")
+    if limit and total > len(shown):
+        print(f"\n… and {total - len(shown)} more not listed "
+              f"(drop --limit to see them all)")
+    print("\n! = no address on our side, so only the name and the NYC bounds "
+          "can confirm the match.\n  Those are the ones worth reading before "
+          "you spend anything.")
+
+
 def fetch_one(venue, key):
     slug, name = venue["venue_slug"], venue["name"]
     rec = {"slug": slug, "query_name": name, "matched": None, "accepted": False,
@@ -105,9 +169,7 @@ def fetch_one(venue, key):
             rec.update(matched=flatten(d["result"]), accepted=True,
                        reason="hand-verified place_id", source="place_id")
             return rec
-        hint = venue.get("address") or venue.get("borough") or ""
-        q = " ".join(x for x in (name, hint, "New York") if x)
-        d = get(TEXT_URL, {"query": q, "key": key})
+        d = get(TEXT_URL, {"query": query_for(venue), "key": key})
         rec["source"] = "textsearch"
         if d.get("status") == "ZERO_RESULTS":
             # Google not knowing a restaurant is suggestive for a 1994 award
@@ -207,16 +269,21 @@ def main():
     con = sqlite3.connect(tmp)
     con.row_factory = sqlite3.Row
 
+    limit = (int(sys.argv[sys.argv.index("--limit") + 1])
+             if "--limit" in sys.argv else None)
+
     if "--report" in sys.argv:
         return report(con)
+    if "--dry-run" in sys.argv:
+        return dry_run(con, limit)
 
     if "--fetch" in sys.argv:
         key = api_key()
         force = "--force" in sys.argv
         todo = [v for v in unresolved(con)
                 if force or not (CACHE / f"{v['venue_slug']}.json").exists()]
-        if "--limit" in sys.argv:
-            todo = todo[:int(sys.argv[sys.argv.index("--limit") + 1])]
+        if limit:
+            todo = todo[:limit]
         print(f"{len(todo)} venues to look up", flush=True)
         for n, v in enumerate(todo, 1):
             rec = fetch_one(v, key)

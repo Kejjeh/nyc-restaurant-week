@@ -140,3 +140,13 @@ def api_post(body, retry_on_403=True):
             discover_api_key()
             return api_post(body, retry_on_403=False)
         raise
+
+
+# How many reviews of doubt a rating is shrunk by, before we mostly believe a
+# restaurant's own average. Lives here rather than in export_site_data because
+# THREE payloads publish a score computed with it -- restaurants.json,
+# places.json and venues.json -- and the roster page had drifted to its own
+# value of 300 while its comment said it used "the same treatment". Chosen
+# against the actual review distribution; the reasoning is in the README and in
+# the block above bayesian_score().
+GOOGLE_PRIOR = 150

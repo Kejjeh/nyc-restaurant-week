@@ -30,8 +30,8 @@ from pathlib import Path
 # BOOK_BY is the program's headline deadline (drives the badge); PROGRAM_END is
 # the last extension week (drives the countdown). Both live in config/season.json,
 # which is the only file a season changeover edits.
-from config import (BOOK_BY, NYC_BOUNDS, PROGRAM_END, SEASON, SEASON_LABEL,
-                    SEASON_START, SEASON_YEAR, sane_coords)
+from config import (BOOK_BY, GOOGLE_PRIOR, NYC_BOUNDS, PROGRAM_END, SEASON,
+                    SEASON_LABEL, SEASON_START, SEASON_YEAR, sane_coords)
 
 ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / "data" / "processed" / "restaurant_week.sqlite"
@@ -353,7 +353,8 @@ def build_offsite():
 # The raw rating and the count are BOTH published alongside the score. The
 # weighting is there to make sorting honest, not to hide the input.
 GOOGLE = ROOT / "data" / "raw" / "google"
-GOOGLE_PRIOR = 150
+# GOOGLE_PRIOR now lives in config.py -- three payloads publish a score that
+# depends on it, and it had already drifted in one of them.
 
 
 def bayesian_score(rating, reviews, mean, prior=GOOGLE_PRIOR):

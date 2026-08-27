@@ -47,6 +47,9 @@ from fetch_google_ratings import (DETAIL_FIELDS, DETAILS_URL, TEXT_URL, api_key,
 ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / "data" / "processed" / "restaurant_week.sqlite"
 CACHE = ROOT / "data" / "raw" / "venues_google"
+# The participants' own cache, written by fetch_google_ratings.py in the
+# SAME record shape -- which is the whole reason this file can read it.
+PARTICIPANTS = ROOT / "data" / "raw" / "google"
 
 # With no coordinate to corroborate, the name has to carry the identification,
 # so the bar is higher than fetch_google_ratings.py's 0.55 rescue threshold.
@@ -237,6 +240,55 @@ def apply_cache(con, quiet=False):
     return applied, rejected, closed
 
 
+def apply_participant_cache(con, quiet=False):
+    """Fold the Restaurant Week participants' Google records into venues.
+
+    `unresolved()` skips those rows on purpose -- they arrive from the listing
+    with coordinates, so they never needed a Places lookup. But coordinates
+    are not the only thing a Places record carries, and the ratings for 629 of
+    them have been sitting in data/raw/google/ all along, published on the
+    dashboard next door, while `venues.rating` was NULL for all 1,414 rows.
+
+    The roster offers a "Rating" sort. With no venue rated, weightedRating()
+    returned null for every row, the sort silently fell through to prestige,
+    and the star line on the row never rendered once.
+
+    Only the rating, the review count and the place_id are folded. NOT the
+    address or the coordinates, which the listing already supplies and
+    build_venues already vets; and NOT the status, because these restaurants
+    are in this season's programme and "restaurant week listing" is better
+    evidence that they are trading than one Google CLOSED_TEMPORARILY badge.
+
+    Idempotent, no network, no key. Existing values win, so a hand-run
+    resolution is never overwritten by this.
+    """
+    by_rw = {r["rw_slug"]: r["venue_slug"] for r in con.execute(
+        "SELECT rw_slug, venue_slug FROM venues WHERE rw_slug IS NOT NULL")}
+    applied = 0
+    if not PARTICIPANTS.exists():
+        return 0
+    for f in sorted(PARTICIPANTS.glob("*.json")):
+        rec = json.loads(f.read_text(encoding="utf-8"))
+        slug = by_rw.get(rec.get("slug"))
+        if not slug or not rec.get("accepted"):
+            continue
+        m = rec.get("matched") or {}
+        if m.get("rating") is None:
+            continue
+        con.execute(
+            "UPDATE venues SET rating = COALESCE(rating, ?),"
+            " user_ratings_total = COALESCE(user_ratings_total, ?),"
+            " place_id = COALESCE(place_id, ?)"
+            " WHERE venue_slug = ?",
+            (m.get("rating"), m.get("user_ratings_total"), m.get("place_id"),
+             slug))
+        applied += 1
+    if not quiet:
+        print(f"applied {applied} participant ratings from "
+              f"{PARTICIPANTS.relative_to(ROOT)}")
+    return applied
+
+
 def report(con):
     cached = list(CACHE.glob("*.json"))
     todo = unresolved(con)
@@ -284,6 +336,7 @@ def main():
                   f"{rec['reason'] or rec['error'] or ''}", flush=True)
             time.sleep(PAUSE)
 
+    apply_participant_cache(con)
     apply_cache(con)
     con.commit()
     con.close()

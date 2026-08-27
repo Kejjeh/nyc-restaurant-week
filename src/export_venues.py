@@ -25,7 +25,7 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-from config import PROGRAM_END, SEASON_LABEL
+from config import GOOGLE_PRIOR, PROGRAM_END, SEASON_LABEL
 
 ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / "data" / "processed" / "restaurant_week.sqlite"
@@ -146,6 +146,21 @@ def facets(rows):
             "dish": order(dishes)}
 
 
+def google_stats(rows):
+    """The mean the roster's ratings are shrunk toward, and the weight of doubt.
+
+    The corpus is the roster's own rated venues, which is the right corpus for
+    the roster -- but the FORMULA and its prior are the project's, not this
+    file's, so the prior comes from config alongside every other consumer.
+    """
+    rated = [r["rating"] for r in rows if r["rating"] is not None]
+    return {
+        "google_prior": GOOGLE_PRIOR,
+        "google_mean": round(sum(rated) / len(rated), 3) if rated else None,
+        "google_rated": len(rated),
+    }
+
+
 def validate(rows, cfg):
     """Problems that must stop a publish, and notes that merely want saying."""
     errors, notes = [], []
@@ -231,6 +246,13 @@ def main():
         "season_label": SEASON_LABEL,
         "program_end": PROGRAM_END,
         "honors": {k: v for k, v in cfg["honors"].items() if not k.startswith("_")},
+        # Published for the same reason places.json publishes them: a shrunk
+        # rating is unreadable without the mean it was shrunk toward and the
+        # weight of doubt it was shrunk by -- and a page that hard-codes them
+        # is free to drift from the exporter, which is exactly what happened
+        # (the roster used m=300 while every payload used 150, reordering 452
+        # of the 629 rated rows against the dashboard's own ranking).
+        **google_stats(rows),
         "source_labels": {k: v["label"] for k, v in cfg["sources"].items()},
         "facets": facets(rows),
         "counts": {

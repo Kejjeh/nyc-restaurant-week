@@ -53,9 +53,17 @@ const STATE = {
 
 /* A 4.9 from 30 people is not better than a 4.5 from 3,000, so the rating sort
    shrinks each score toward the roster mean by how thin its sample is. Same
-   treatment export_places.py gives the dashboard's ratings, and for the same
-   reason: an unweighted star sort puts the least-known rooms on top. */
-const PRIOR = 300;
+   treatment the exporter gives the dashboard's ratings, and for the same
+   reason: an unweighted star sort puts the least-known rooms on top.
+
+   Both numbers come from the payload rather than being spelled out here. This
+   page used to hard-code a prior of three hundred and a 4.4 fallback, while
+   every payload in the project shrinks with m = 150 — so the roster ordered
+   452 of its 629 rated rows differently from the dashboard, under a comment
+   saying the treatment was the same. src/config.py:GOOGLE_PRIOR is the one
+   home for it now, and export_venues publishes it beside the mean it was
+   shrunk toward. */
+let PRIOR = 150;
 let RATING_MEAN = 4.4;
 
 function weightedRating(v) {
@@ -525,9 +533,17 @@ async function boot() {
   STATE.rows = payload.venues;
   for (const v of STATE.rows) STATE.bySlug.set(v.slug, v);
 
-  const rated = STATE.rows.filter((v) => v.rating != null);
-  if (rated.length) {
-    RATING_MEAN = rated.reduce((s, v) => s + v.rating, 0) / rated.length;
+  /* Published values win over the fallbacks above, so the roster and the
+     dashboard shrink by the same weight of doubt toward the same mean. Derived
+     here only if the payload predates those keys. */
+  if (payload.google_prior) PRIOR = payload.google_prior;
+  if (payload.google_mean != null) {
+    RATING_MEAN = payload.google_mean;
+  } else {
+    const rated = STATE.rows.filter((v) => v.rating != null);
+    if (rated.length) {
+      RATING_MEAN = rated.reduce((s, v) => s + v.rating, 0) / rated.length;
+    }
   }
 
   $('#rosterCount').textContent = `${payload.counts.venues.toLocaleString()} restaurants`;

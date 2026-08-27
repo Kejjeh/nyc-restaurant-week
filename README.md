@@ -679,10 +679,18 @@ controls; both pages read it, and the theme toggle writes the same `rw-theme`
 key, so a viewer's choice survives the hop between them.
 
 - **`index.html` + `venues.js` + `venues.css` — the roster.** The front door.
-  All 1,408 venues, searchable and filterable by highest honour, jury, borough,
-  trading status, Restaurant Week participation and cuisine; sortable by
-  standing, recency, award count, weighted rating, name or how long the
-  restaurant has been recognised. Each row expands to every award record it
+  All 1,414 venues, searchable and filterable by highest honour, honours held,
+  jury, borough, trading status, Restaurant Week participation and cuisine;
+  sortable by standing, recency, award count, weighted rating, name or how long
+  the restaurant has been recognised.
+
+  **Weighted rating** is the same shrinkage the dashboard and `places.json` use
+  — `src/config.py:GOOGLE_PRIOR`, published in the payload beside the mean it
+  shrinks toward, so the page never spells either number out. The ratings come
+  from the participants' own `data/raw/google/` cache, folded in by
+  `resolve_venues.apply_participant_cache()`: those 629 rows never needed a
+  Places lookup of their own, so nothing had been reading their records into
+  `venues`, and the sort had nothing to sort on. Each row expands to every award record it
   holds, with the year, the chef where the award was to a person, and a link to
   the awarding body.
 

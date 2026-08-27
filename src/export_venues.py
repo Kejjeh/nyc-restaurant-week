@@ -57,12 +57,21 @@ def load(con):
     # answers "what does this place actually cook", which is the question the
     # cuisine facet cannot answer for the 778 venues that were never in
     # Restaurant Week.
-    dishes = {}
-    for slug, tag in con.execute(
-        "SELECT DISTINCT restaurant_slug, tag FROM menu_item_tags"
-        " WHERE tag IS NOT NULL ORDER BY tag"
+    # Split by confidence, the same way the dashboard separates a verified gap
+    # from an estimated one. A tag counts as confident when ANY of its matches
+    # on that menu was high; low-only means the word is there but the dish may
+    # not be about it -- 50 of the 64 low-only pairs are `truffle`, which is
+    # usually truffle honey or truffle mayo rather than a truffle dish. Seven
+    # are `snails`, where the same softness matters much more to somebody
+    # filtering for escargot.
+    dishes, maybe = {}, {}
+    for slug, tag, confident in con.execute(
+        "SELECT restaurant_slug, tag,"
+        "       MAX(CASE WHEN confidence = 'high' THEN 1 ELSE 0 END)"
+        "  FROM menu_item_tags WHERE tag IS NOT NULL"
+        " GROUP BY restaurant_slug, tag ORDER BY tag"
     ):
-        dishes.setdefault(slug, []).append(tag)
+        (dishes if confident else maybe).setdefault(slug, []).append(tag)
 
     # Price tiers and meal periods come from the Restaurant Week listing and
     # only exist for the venues that are in it. Left absent, not zero: "no
@@ -101,6 +110,9 @@ def load(con):
             # absent rather than empty on the rest -- the same rule the row
             # already follows for a missing field.
             "dishes": dishes.get(v["rw_slug"]) if v["rw_slug"] else None,
+            # The weaker claim, kept separate rather than blended in. Filters
+            # use `dishes`; search matches both; the row marks these as unsure.
+            "dishes_maybe": maybe.get(v["rw_slug"]) if v["rw_slug"] else None,
             "rw": None if not r else {
                 "slug": v["rw_slug"],
                 "price_tiers": json.loads(r["price_tiers"] or "[]"),
@@ -155,11 +167,18 @@ def validate(rows, cfg):
         # mean somebody started carrying the snippet across from
         # restaurants.json, and this payload's whole claim is that it holds no
         # menu text at all.
-        for d in (r.get("dishes") or []):
-            if not isinstance(d, str):
-                errors.append(f"{r['slug']}: dishes must be tag names, not {type(d).__name__}")
-            elif len(d) > 40:
-                errors.append(f"{r['slug']}: dish tag {d[:30]!r} is too long to be a tag name")
+        for key in ("dishes", "dishes_maybe"):
+            for d in (r.get(key) or []):
+                if not isinstance(d, str):
+                    errors.append(f"{r['slug']}: {key} must be tag names, "
+                                  f"not {type(d).__name__}")
+                elif len(d) > 40:
+                    errors.append(f"{r['slug']}: {key} entry {d[:30]!r} is too long "
+                                  f"to be a tag name")
+        # A tag cannot be both the confident claim and the unsure one.
+        both = set(r.get("dishes") or []) & set(r.get("dishes_maybe") or [])
+        if both:
+            errors.append(f"{r['slug']}: {sorted(both)} appear as both confident and unsure")
     placed = sum(1 for r in rows if r["lat"] is not None)
     notes.append(f"{placed}/{len(rows)} venues have coordinates and can be mapped")
     unresolved = sum(1 for r in rows if r["status"] == "unknown")

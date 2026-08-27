@@ -116,6 +116,7 @@ function haystack(v) {
   for (const a of v.recognition) parts.push(a.award, a.person, a.level);
   if (v.rw) parts.push(...v.rw.cuisines);
   if (v.dishes) parts.push(...v.dishes);
+  if (v.dishes_maybe) parts.push(...v.dishes_maybe);
   v._hay = fold(parts.filter(Boolean).join(' '));
   return v._hay;
 }
@@ -248,9 +249,20 @@ function renderRow(v) {
     const head = v.dishes.slice(0, 6);
     const rest = v.dishes.length - head.length;
     const d = el('span', 'dishes', head.join(' · ') + (rest ? ` +${rest}` : ''));
-    d.title = `Dishes matched on this restaurant's Restaurant Week menu: `
+    d.title = "Matched on this restaurant's Restaurant Week menu: "
             + v.dishes.join(', ');
     meta.append(d);
+  }
+  /* The weaker claim, marked rather than blended in — the same grammar the
+     dashboard uses for an estimated price. The word is on the menu, but the
+     dish may not be about it: most of these are truffle honey or truffle mayo
+     rather than a truffle dish. Filters ignore these; search still finds them. */
+  if (v.dishes_maybe && v.dishes_maybe.length) {
+    const m = el('span', 'dishesMaybe', v.dishes_maybe.slice(0, 4).join(' · ') + '?');
+    m.title = 'Mentioned on the menu, but as a garnish or in passing rather '
+            + 'than as the dish: ' + v.dishes_maybe.join(', ')
+            + '. The filters deliberately do not count these.';
+    meta.append(m);
   }
   if (v.rw && v.rw.reserve) {
     const book = el('a', 'reserve', 'Book');

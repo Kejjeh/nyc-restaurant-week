@@ -656,6 +656,37 @@ def _payload():
     return json.loads(out.read_text(encoding="utf-8"))
 
 
+def test_a_tag_is_never_both_the_confident_claim_and_the_unsure_one():
+    """A tag counts as confident when ANY of its matches on that menu was high.
+    Appearing in both lists would mean the row asserts and hedges the same
+    thing, which is worse than doing either."""
+    for v in _payload()["venues"]:
+        both = set(v.get("dishes") or []) & set(v.get("dishes_maybe") or [])
+        assert not both, f"{v['slug']}: {sorted(both)} is both confident and unsure"
+
+
+def test_the_unsure_tags_are_the_ones_worth_hedging():
+    """50 of the 64 low-only pairs are truffle -- truffle honey, truffle mayo,
+    truffle sour cream -- where the word is on the menu but the dish is not
+    about it. Marking those rather than blending them into the confident list
+    is the same distinction the dashboard draws between a verified gap and an
+    estimated one."""
+    payload = _payload()
+    hedged = [d for v in payload["venues"] for d in (v.get("dishes_maybe") or [])]
+    assert hedged, "nothing is hedged; the confidence split is not reaching the payload"
+    assert hedged.count("truffle") > len(hedged) / 3
+
+
+def test_filters_use_the_confident_claim_only():
+    """The dish facet must count `dishes`, not `dishes_maybe`. Someone filtering
+    for snails wants escargot, not a menu that says the word once."""
+    payload = _payload()
+    from collections import Counter
+    confident = Counter(d for v in payload["venues"] for d in (v.get("dishes") or []))
+    assert payload["facets"]["dish"] == dict(
+        sorted(confident.items(), key=lambda kv: (-kv[1], kv[0])))
+
+
 def test_dishes_are_tag_names_and_never_menu_text():
     """restaurants.json carries a snippet with each tag, under a 5%-of-a-menu
     budget. This payload carries the NAME only, so it holds no menu text at all
@@ -664,7 +695,7 @@ def test_dishes_are_tag_names_and_never_menu_text():
     payload = _payload()
     vocabulary = set()
     for v in payload["venues"]:
-        for d in (v.get("dishes") or []):
+        for d in (v.get("dishes") or []) + (v.get("dishes_maybe") or []):
             assert isinstance(d, str), f"{v['slug']}: dish is a {type(d).__name__}"
             assert len(d) <= 40, f"{v['slug']}: {d!r} is too long to be a tag name"
             vocabulary.add(d)
@@ -683,12 +714,10 @@ def test_dishes_are_absent_rather_than_empty_where_there_is_no_menu():
             assert v.get("dishes") is None, f"{v['slug']} is not in RW but has dishes"
 
 
-def test_the_dish_facet_counts_match_the_rows():
-    payload = _payload()
-    from collections import Counter
-    counted = Counter(d for v in payload["venues"] for d in (v.get("dishes") or []))
-    assert payload["facets"]["dish"] == dict(
-        sorted(counted.items(), key=lambda kv: (-kv[1], kv[0])))
+def test_dishes_maybe_is_absent_rather_than_empty_where_there_is_no_menu():
+    for v in _payload()["venues"]:
+        if not v["rw"]:
+            assert v.get("dishes_maybe") is None, f"{v['slug']} is not in RW"
 
 
 def test_the_dish_tags_still_answer_the_question_they_were_added_for():

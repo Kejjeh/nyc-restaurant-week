@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 204 tests, ~0.5s, no network
+python -m pytest -q tests/             # 207 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -124,7 +124,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 204 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 207 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -516,7 +516,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 204 tests
+1. the 207 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -665,6 +665,15 @@ key, so a viewer's choice survives the hop between them.
   `snails`, `sweetbreads` — and are searchable, filterable, and printed on the
   row. There is a `Game, offal & odd cuts` preset because that is the question
   the roster was first asked.
+
+  Tags are split by confidence, the same way the dashboard separates a verified
+  gap from an estimated one. A tag is the **confident** claim when any of its
+  matches on that menu was high; `dishes_maybe` holds the rest and the row marks
+  them with a dashed underline and a `?`. 50 of the 64 low-only pairs are
+  `truffle` — truffle honey, truffle mayo, truffle sour cream — where the word
+  is on the menu but the dish is not about it. Seven are `snails`, where the
+  same softness matters much more to somebody filtering for escargot. **Filters
+  count only the confident claim; search matches both.**
 
   The payload carries the tag **name** only, never the snippet `restaurants.json`
   carries with each one. A name is a derived fact and holds none of the menu, so
@@ -1037,7 +1046,7 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli)
-tests/      204 pytest tests, no network; run in CI before the crawl
+tests/      207 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights

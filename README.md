@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 248 tests, ~0.5s, no network
+python -m pytest -q tests/             # 254 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -124,7 +124,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 248 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 254 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -549,7 +549,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 248 tests
+1. the 254 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -1007,6 +1007,24 @@ recognition badges (3 rows suppressed) · 137 licensed outdoor. Payload
   them nor lets one bad point wreck its auto-fit. With the 2 NULL-address rows
   that leaves 631 of 636 mappable.
 
+### Whose licence is it
+
+The outdoor register is matched on name similarity plus distance, and a
+restaurant's name frequently contains the neighbourhood it sits in — which is
+enough for two businesses a block apart to look like each other. `Boucherie
+Union Square` scores 0.50 against `UNION SQUARE CAFE/ DAILY PROVISIONS`, well
+over the 0.34 threshold.
+
+So the fold now takes only the rows belonging to the **same business** as the
+best match. One business appearing twice — once for the pavement, once for the
+roadway — is the case that fold exists for; two businesses is not. Boucherie was
+published with roadway seating it does not have, credited to a `licence_name` of
+`BOUCHERIE`, whose own licence is sidewalk-only. The row named its evidence and
+then contradicted it.
+
+A test checks the whole payload for that: every restaurant claiming outdoor
+seating must get it from a licence naming that same business.
+
 ### The countdown counts today
 
 `days left` is **inclusive**, because every other date test on the page is: a
@@ -1109,7 +1127,7 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli, job_summary)
-tests/      248 pytest tests, no network; run in CI before the crawl
+tests/      254 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights

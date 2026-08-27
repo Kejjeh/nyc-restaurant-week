@@ -136,6 +136,23 @@ def validate(rows, cfg):
     return errors, notes
 
 
+def _same_but_for_the_clock(path, payload):
+    """Would writing `payload` change anything except `generated_at`?
+
+    Compared as parsed JSON, not as text: key order and separators are this
+    script's business, and a formatting change should not read as a data change.
+    An unreadable or absent file counts as different, so a corrupted payload is
+    always replaced rather than silently kept.
+    """
+    try:
+        existing = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    a = {k: v for k, v in existing.items() if k != "generated_at"}
+    b = {k: v for k, v in payload.items() if k != "generated_at"}
+    return a == b
+
+
 def main():
     check = "--check" in sys.argv
     quiet = "--quiet" in sys.argv
@@ -192,6 +209,16 @@ def main():
         raise SystemExit(1)
     if check:
         print("--check: nothing written")
+        return
+
+    # `generated_at` is the wall clock and moves on every single export. Writing
+    # it out regardless would put a 1.2 MB diff in the weekly commit for a
+    # roster that did not change, and would bury a real change among 52 fake
+    # ones a year. When nothing but the clock moved, keep the file as it is --
+    # and the date the site prints then honestly says when the data last
+    # changed, rather than when this script last ran.
+    if OUT.exists() and _same_but_for_the_clock(OUT, payload):
+        print(f"{OUT.relative_to(ROOT)} unchanged; not rewritten")
         return
 
     OUT.parent.mkdir(parents=True, exist_ok=True)

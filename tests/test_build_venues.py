@@ -365,3 +365,21 @@ def test_every_payload_row_is_recognised_or_participating():
     orphans = [v["slug"] for v in payload["venues"]
                if not v["award_count"] and not v["rw"]]
     assert orphans == []
+
+
+def test_the_exporter_does_not_rewrite_a_payload_for_the_clock_alone():
+    """A 1.2 MB file rewritten every Monday for a timestamp buries the one week
+    something actually changed among fifty-one weeks that did not."""
+    from export_venues import _same_but_for_the_clock
+    out = ROOT / "docs" / "data" / "venues.json"
+    if not out.exists():
+        pytest.skip("payload not built")
+    payload = json.loads(out.read_text(encoding="utf-8"))
+
+    moved_on = dict(payload, generated_at="2099-01-01T00:00:00+00:00")
+    assert _same_but_for_the_clock(out, moved_on)
+
+    real_change = dict(payload, counts=dict(payload["counts"], venues=1))
+    assert not _same_but_for_the_clock(out, real_change)
+
+    assert not _same_but_for_the_clock(ROOT / "does-not-exist.json", payload)

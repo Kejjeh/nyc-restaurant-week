@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 153 tests, ~0.5s, no network
+python -m pytest -q tests/             # 154 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -97,7 +97,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 153 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 154 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -404,6 +404,31 @@ shortlist alerts, runs the PDF guard, and commits with rebase-and-retry.
 Two reasons: GitHub silently auto-disables scheduled workflows after 60 days of
 repo inactivity, and an explicit pause with a comment is self-documenting where a
 silent disable is not. Re-enabling it is step 5 of the changeover.
+
+### Checks on every pull request (`.github/workflows/checks.yml`)
+
+The tests used to run in exactly one place: inside the Monday refresh, before
+the crawl. That is the right place for them — a broken guard should fail in
+seconds rather than after ten minutes of polite fetching — but it meant a pull
+request got no CI at all, and a break introduced on a Tuesday was found by the
+cron the following Monday.
+
+`checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
+never crawls, never fetches and never commits:
+
+1. the 154 tests
+2. **no menu PDFs are tracked** — the same guard the refresh runs before it
+   commits, moved to before a branch can be merged
+3. **both payloads still validate** — `export_site_data.py --check` and
+   `export_venues.py --check`, which write nothing and exit non-zero on any error
+4. **the committed roster payload is up to date** — rebuilds and re-exports, then
+   compares field by field with `generated_at` dropped. That field is the wall
+   clock and changes on every export, so a plain `git diff` would fail this step
+   100% of the time and teach everyone to ignore it.
+
+Guard 4 works because `export_venues.py` skips the write entirely when nothing
+but the clock moved, which also keeps a 1.2 MB payload out of fifty-one of every
+fifty-two weekly commits.
 
 ## Database schema (`data/processed/restaurant_week.sqlite`)
 
@@ -874,7 +899,7 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli)
-tests/      153 pytest tests, no network; run in CI before the crawl
+tests/      154 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights
@@ -895,6 +920,7 @@ docs/       the roster (index.html, venues.js, venues.css) — the front door
             data/places.json          my list
             data/restaurants.json     TEMPORARY legacy fallback
 .github/    workflows/refresh.yml — Monday 07:00 ET cron (ACTIVE) + manual dispatch
+            workflows/checks.yml  — tests + offline guards on every PR and push
 data/raw/   listing snapshots+page cache · details (addresses) · recognition
             (Michelin/JB/NYT source data) · pricesweep (heuristic crawl cache) ·
             menusweep (own-website term crawl) · google (ratings cache) ·

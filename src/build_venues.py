@@ -42,7 +42,7 @@ from collections import Counter
 from difflib import SequenceMatcher
 from pathlib import Path
 
-from config import SEASON_YEAR
+from config import SEASON_YEAR, sane_coords
 from enrich_recognition import norm_name, street_key
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -691,6 +691,12 @@ def build(con, cfg, quiet=False):
         " FROM restaurants ORDER BY slug"
     ):
         slug, name, address, lat, lng, boro, hood = row
+        # The listing geocodes three plainly Manhattan restaurants to Oakland
+        # and San Angelo. The dashboard has always dropped those; the roster
+        # published them, because it took its coordinates straight from the
+        # table. Dropped at the seed rather than at export, so the venue also
+        # becomes a candidate for a Places lookup that could supply real ones.
+        lat, lng = sane_coords(lat, lng)
         v = roster.add(name, "rw", address=address, lat=lat, lng=lng,
                        borough=boro, neighborhood=hood)
         v["rw_slug"] = slug

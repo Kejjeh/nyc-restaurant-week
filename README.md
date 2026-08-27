@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 220 tests, ~0.5s, no network
+python -m pytest -q tests/             # 240 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -124,7 +124,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 220 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 240 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -157,6 +157,13 @@ succeeds, the payload is well-formed, and the site is wrong.
 - `scoring_day()` — the rubric's window component counts down from
   `min(today, PROGRAM_END)`, so a post-season re-export cannot silently reshuffle
   every published grade.
+- `assert_verified_gaps_reconcile()` — a hand-verified `comparable_usd` minus
+  `rw_price` must equal `gap_usd`, and likewise for the high figures. These are
+  printed as SOLID figures, the display state that means "checked against the
+  restaurant's own printed materials", so a pair that does not subtract is worse
+  there than anywhere else on the page. One entry breached it for weeks and
+  nothing failed. An absent figure is not a contradiction — the decision doc
+  often states a saving without stating a comparable.
 - `verified_asof()` — pulls the transcription date out of
   `verified_values.json` `_doc.provenance` **by regex, not by word position**;
   rewording the sentence used to change a published date instead of failing.
@@ -534,7 +541,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 220 tests
+1. the 240 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -992,6 +999,25 @@ recognition badges (3 rows suppressed) · 137 licensed outdoor. Payload
   them nor lets one bad point wreck its auto-fit. With the 2 NULL-address rows
   that leaves 631 of 636 mappable.
 
+### Numbers a reader can check
+
+Every figure printed beside another is derived so the two reconcile.
+
+- **The heuristic comparable and its gaps** are both rounded from the same
+  sweep figure, so they are rounded *once*: `price_sweep.py` derives each gap
+  from the already-rounded comparable. Rounding them independently gave a
+  comparable of 60 with a $45 gap of 16 — 29 rows that visibly did not subtract.
+  `build_db.reconciled_gaps()` re-derives the cached sweeps on the way in, so
+  the existing 600-odd cache files did not need re-crawling.
+- **The verified figures** are checked by the guard above rather than derived,
+  because they are transcriptions and the pipeline must not quietly rewrite a
+  human's number.
+- **Mark's Off Madison** has no `comparable_usd`. The decision doc states
+  `$57–68` as the **two-course** à la carte price and the saving as `$27–38
+  (38–46%)` *on three*; it gives no three-course comparable, and that is what
+  this field means everywhere else. It is null rather than carrying the
+  two-course number, which made the row read `57 − 45 = 27`.
+
 ### The roster specifically
 
 - **769 of 1,405 venues have never been checked against anything but a name.**
@@ -1065,7 +1091,7 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli, job_summary)
-tests/      220 pytest tests, no network; run in CI before the crawl
+tests/      240 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights

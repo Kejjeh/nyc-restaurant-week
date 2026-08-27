@@ -118,8 +118,8 @@
    "rank": 6,
    "meal": "dinner",
    "rw_price": 45,
-   "comparable_usd": 57,
-   "comparable_usd_high": 68,
+   "comparable_usd": null,
+   "comparable_usd_high": null,
    "end_date": "2026-08-31",
    "end_date_source": "api_fallback",
    "days": "Unprinted (API: Sundays)",
@@ -136,7 +136,7 @@
     "no_sunday_dinner",
     "sunday_api_contradicted"
    ],
-   "notes": "The RW dinner PDF prints NO dates or days. No Sunday DINNER service exists (Sunday brunch only) despite the API flagging Sunday - book a weekday."
+   "notes": "The RW dinner PDF prints NO dates or days. No Sunday DINNER service exists (Sunday brunch only) despite the API flagging Sunday - book a weekday. The report states the a la carte figure as TWO courses ($57-68) and the saving as $27-38 (38-46%) on three; it gives no three-course comparable. comparable_usd means a three-course comparable everywhere else in this repo, so it is null here rather than carrying the two-course number, which made the published pair read as 57 - 45 = 27."
   },
   "hawksmoor": {
    "rank": 7,

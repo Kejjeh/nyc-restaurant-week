@@ -17,6 +17,7 @@ Precedence rule for every field: the restaurant's own printed materials
 (config/verified_values.json) beat the listing API. price_sweep is heuristic
 triage and may NEVER populate a "verified" field.
 """
+import itertools
 import json
 import re
 import shutil
@@ -692,77 +693,108 @@ def build_tags(con, rules):
     text, so the export cannot be reassembled into a contiguous menu passage.
 
     raw_text is read here only to compute those positions. It is never emitted.
+
+    Candidates are walked per (restaurant, tag) and the FIRST one that survives
+    every guard is published. That grouping is the point: this used to walk the
+    rows flat, and a rejected first candidate was appended with snippet=None to
+    keep the tag filterable -- which then counted as "the tag is represented"
+    and locked out every later candidate for it. 152 tag/restaurant pairs went
+    out with no text behind 345 candidate rows, and none of the rejections were
+    about those later candidates. A snippet is refused for overlapping one
+    already published, for sitting within MIN_SOURCE_GAP of one in the same
+    menu, or for not fitting what is left of the coverage budget; a hit
+    somewhere else on the menu answers all three.
+
+    Nothing here relaxes a guard. Every candidate is checked against the same
+    overlap rule, the same source-position gap and the same budget, and the
+    budget is what actually bounds how much of a menu can be published.
     """
     by_slug, dropped = {}, 0
     raw_by_slug = {s: re.sub(r"\s+", " ", (t or "")).strip()
                    for s, t in con.execute(
                        "SELECT restaurant_slug, raw_text FROM menus")}
     spans = {}      # slug -> [(start, end)] of already-published source spans
-    # Confidence leads the ordering: only MAX_SNIPPETS_PER_TAG hits survive per
-    # tag, so whichever sorts first *represents* the tag in the UI. Sorting by
-    # source alone let a low-confidence hit mask a high one on the same menu --
-    # Yakiniku Futago reads "low confidence" off a bare "Negi Toro" while its
-    # Ootoro and Maguro (both high) sit unused two lines away.
+    # Confidence leads the ordering within a tag: only MAX_SNIPPETS_PER_TAG
+    # hits survive per tag, so whichever sorts first *represents* the tag in
+    # the UI. Sorting by source alone let a low-confidence hit mask a high one
+    # on the same menu -- Yakiniku Futago reads "low confidence" off a bare
+    # "Negi Toro" while its Ootoro and Maguro (both high) sit unused two lines
+    # away.
     rows = con.execute(
         "SELECT restaurant_slug, tag, confidence, matched_text, source "
         "FROM menu_item_tags ORDER BY restaurant_slug, tag, "
         "CASE confidence WHEN 'high' THEN 0 ELSE 1 END, "
         "CASE source WHEN 'item' THEN 0 ELSE 1 END, length(matched_text)").fetchall()
-    for slug, tag, conf, matched, source in rows:
-        if tag not in rules or not matched:
+
+    for (slug, tag), group in itertools.groupby(rows, key=lambda r: (r[0], r[1])):
+        candidates = [r for r in group if r[3]]
+        if tag not in rules or not candidates:
             continue
         kept = by_slug.setdefault(slug, [])
-        same_tag = [t for t in kept if t["tag"] == tag]
-        if len(same_tag) >= MAX_SNIPPETS_PER_TAG:
-            dropped += 1
-            continue
+        published = 0
+        best_conf, best_kw = None, None
 
-        kw, at = recover_keyword(matched, rules[tag])
-        snip = recentre(matched, at, len(kw) if kw else 0)
+        for _, _, conf, matched, source in candidates:
+            if published >= MAX_SNIPPETS_PER_TAG:
+                dropped += 1
+                continue
 
-        reject = False
+            kw, at = recover_keyword(matched, rules[tag])
+            snip = recentre(matched, at, len(kw) if kw else 0)
+            if best_conf is None:
+                best_conf, best_kw = conf, kw
 
-        # (a) textual overlap with anything already kept for this restaurant --
-        # two different tags can fire on one passage, and publishing both would
-        # republish it contiguously.
-        if any(_overlaps(snip, t["snippet"]) for t in kept if t["snippet"]):
-            reject = True
+            reject = False
 
-        # (b) source-position budget: where the snippet sits in the menu -------
-        raw = raw_by_slug.get(slug, "")
-        used = spans.setdefault(slug, [])
-        budget = max(COVERAGE_FLOOR, int(len(raw) * COVERAGE_CAP))
-        remaining = budget - sum(e - s for s, e in used)
-
-        if not reject and raw:
-            # Shrink the padding until the snippet fits what's left of the budget.
-            pad = SNIPPET_PAD
-            while pad > MIN_PAD and len(snip.strip("…").strip()) > remaining:
-                pad -= 4
-                snip = recentre(matched, at, len(kw) if kw else 0, pad=pad)
-            core = snip.strip("…").strip()
-            if len(core) > remaining:
+            # (a) textual overlap with anything already kept for this
+            # restaurant -- two different tags can fire on one passage, and
+            # publishing both would republish it contiguously.
+            if any(_overlaps(snip, t["snippet"]) for t in kept if t["snippet"]):
                 reject = True
-            else:
-                at_src = raw.find(core)
-                if at_src >= 0:
-                    end_src = at_src + len(core)
-                    if any(at_src < e + MIN_SOURCE_GAP and s - MIN_SOURCE_GAP < end_src
-                           for s, e in used):
-                        reject = True
-                    else:
-                        used.append((at_src, end_src))
+
+            # (b) source-position budget: where the snippet sits in the menu --
+            raw = raw_by_slug.get(slug, "")
+            used = spans.setdefault(slug, [])
+            budget = max(COVERAGE_FLOOR, int(len(raw) * COVERAGE_CAP))
+            remaining = budget - sum(e - s for s, e in used)
+
+            if not reject and raw:
+                # Shrink the padding until the snippet fits what is left.
+                pad = SNIPPET_PAD
+                while pad > MIN_PAD and len(snip.strip("…").strip()) > remaining:
+                    pad -= 4
+                    snip = recentre(matched, at, len(kw) if kw else 0, pad=pad)
+                core = snip.strip("…").strip()
+                if len(core) > remaining:
+                    reject = True
                 else:
-                    used.append((-1, -1 + len(core)))   # count it against the budget
+                    at_src = raw.find(core)
+                    if at_src >= 0:
+                        end_src = at_src + len(core)
+                        if any(at_src < e + MIN_SOURCE_GAP
+                               and s - MIN_SOURCE_GAP < end_src for s, e in used):
+                            reject = True
+                        else:
+                            used.append((at_src, end_src))
+                    else:
+                        used.append((-1, -1 + len(core)))  # counts against budget
 
-        if reject:
-            dropped += 1
-            if same_tag:
-                continue        # tag already represented; nothing lost
-            snip = None         # keep the tag (so it stays filterable), drop the text
+            if reject:
+                dropped += 1
+                continue        # try the next candidate for this same tag
 
-        kept.append({"tag": tag, "confidence": conf, "keyword": clean(kw),
-                     "snippet": snip, "source": source})
+            kept.append({"tag": tag, "confidence": conf, "keyword": clean(kw),
+                         "snippet": snip, "source": source})
+            published += 1
+
+        if not published:
+            # Nothing on this menu could be published for the tag. Keep the tag
+            # so it stays filterable and searchable, with the strongest match's
+            # confidence and keyword and no text -- which is what the row and
+            # the facet already know how to render.
+            kept.append({"tag": tag, "confidence": best_conf,
+                         "keyword": clean(best_kw), "snippet": None,
+                         "source": candidates[0][4]})
     return by_slug, dropped
 
 

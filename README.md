@@ -961,6 +961,15 @@ be stitched back into a passage. The exporter enforces a deliberately tighter
 passes with margin. The published payload carries no `raw_text`, no `menu_items`,
 and no dish/description fields.
 
+`build_tags()` walks **every** candidate match for a tag and publishes the first
+that clears all three guards, rather than stopping at the first one that fails.
+A refusal is about that particular snippet — it overlaps one already published,
+it sits too close to one in the same menu, or it does not fit what is left of
+the budget — and says nothing about a hit elsewhere on the menu. Stopping at the
+first refusal left 152 tag/restaurant pairs with no text behind 345 candidate
+rows. The guards themselves are unchanged, and the budget is what actually
+bounds how much of a menu can leave.
+
 Coverage today (`python src/export_site_data.py --check`): 636 rows · 14 verified
 gaps · 336 estimates · 286 with no comparable (left blank — never backfilled) ·
 15 ranked picks · 195 ending by Aug 16 · 631 mappable · 616 within 12 min of a

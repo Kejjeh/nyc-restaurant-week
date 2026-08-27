@@ -58,7 +58,7 @@ repo hard-codes a season, a year or a deadline. See "Season changeover" below.
 
 ```
 pip install -r requirements.txt        # pdfplumber, playwright, pytest
-python -m pytest -q tests/             # 158 tests, ~0.5s, no network
+python -m pytest -q tests/             # 168 tests, ~0.5s, no network
 python src/refresh.py                  # weekly refresh + diff report
 python src/refresh.py --force-menus    # also re-download PDFs (catches in-place edits)
 ```
@@ -83,7 +83,26 @@ does: it seeds the roster from the freshly rebuilt `restaurants` table, and
 `build_db` drops the database first. `resolve_venues` with no flags only APPLIES
 the committed Places cache — no key, no network — so CI runs it unchanged.
 
-**Diff report** compares the two latest snapshots: a `SHORTLIST ALERTS` block
+**Diff report** has two halves. The roster half answers *who got recognised, who
+closed, and who arrived* — the questions that matter now that the roster is the
+spine. A closure is the most booking-relevant fact this repo holds and nothing
+else in the report would ever print it, because a restaurant closing is not a
+listing change. It also tracks whether the unverified count is going down, so
+769 unresolved rows do not quietly stay 769.
+
+Last week's roster is read from `git show HEAD:docs/data/venues.json` rather than
+from a sidecar history file. The menu-hash section keeps its own history and pays
+for it with a documented wart — the report writes state, so a second run always
+shows zero changes — and there is no need to repeat that: the previous payload is
+already stored, versioned and immutable in HEAD. No previous payload (a first
+run, a shallow checkout) is reported as such, not as an error.
+
+The comparison itself is a pure function, `roster_changes()`, tested against
+hand-built payloads. The listing half is not, and the price of that was a wrong
+`parents[]` index that silently skipped the entire `SHORTLIST ALERTS` block on
+every run for weeks while the report cheerfully printed everything else.
+
+The listing half compares the two latest snapshots: a `SHORTLIST ALERTS` block
 first (any change to `config/shortlist.json` restaurants' meal types, weeks, or
 menu URL — booking-relevant), then program-wide added/dropped restaurants, field
 changes, and menu-PDF content changes by sha256. If the roster was replaced in
@@ -97,7 +116,7 @@ Everything else needed to rebuild the DB is committed.
 
 ### Tests
 
-`python -m pytest -q tests/` — 158 tests, no network, run in CI *before* the
+`python -m pytest -q tests/` — 168 tests, no network, run in CI *before* the
 crawl so a broken guard fails in seconds instead of after ten minutes of polite
 fetching. They cover the things that only bite at a season boundary and would
 otherwise be discovered live: season config validation, the listing guards, the
@@ -440,7 +459,7 @@ cron the following Monday.
 `checks.yml` is the fast half, on `pull_request` and on pushes to `main`. It
 never crawls, never fetches and never commits:
 
-1. the 158 tests
+1. the 168 tests
 2. **no menu PDFs are tracked** — the same guard the refresh runs before it
    commits, moved to before a branch can be merged
 3. **both payloads still validate** — `export_site_data.py --check` and
@@ -924,7 +943,7 @@ src/        pipeline (config, fetch_listing, fetch_details, download_menus,
             export_places, diff_report, refresh)
             one-off / on-demand (fetch_subway, hours_lookup, price_sweep,
             price_rescue, menu_term_sweep, places_cli)
-tests/      158 pytest tests, no network; run in CI before the crawl
+tests/      168 pytest tests, no network; run in CI before the crawl
 config/     season.json      THE ONLY FILE A CHANGEOVER EDITS
             rubric.json      composite-grade weights + cut-points
             awards.json      award sources, honour points, standing weights

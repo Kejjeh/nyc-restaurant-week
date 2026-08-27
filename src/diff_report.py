@@ -1,8 +1,13 @@
-"""Diff the two most recent listing snapshots (+ menu hash changes)."""
+"""Diff the two most recent listing snapshots (+ menu hashes, + the roster)."""
 import json
+import subprocess
 import sys
 
 from config import LISTING_DIR, MENUS_DIR
+
+ROOT = LISTING_DIR.parents[2]
+VENUES = ROOT / "docs" / "data" / "venues.json"
+LIST_CAP = 25   # rows printed per section before the report says how many it hid
 
 
 def index(snap):
@@ -15,10 +20,138 @@ def season_boundary(old, new):
     return len(old - new) > len(old) / 2 and len(new - old) > len(new) / 2
 
 
+def previous_payload(path=VENUES):
+    """Last week's roster, read from git rather than from a sidecar file.
+
+    The menu-hash section above keeps its own history file and pays for it with
+    a documented wart: the report writes state, so running it twice always shows
+    zero changes the second time. There is no need to repeat that here. The
+    previous payload is already stored, versioned and immutable in HEAD, because
+    the weekly workflow commits it -- and `export_venues.py` declines to rewrite
+    the file when nothing but the clock moved, so HEAD is the last roster that
+    actually differed, not merely the last run.
+
+    Returns None when there is nothing to compare against: a first run, a
+    shallow checkout, or a tree with no commits. That is not an error.
+    """
+    try:
+        raw = subprocess.run(
+            ["git", "show", f"HEAD:{path.relative_to(ROOT).as_posix()}"],
+            cwd=ROOT, capture_output=True, text=True, timeout=30, check=True).stdout
+        return json.loads(raw)
+    except (subprocess.SubprocessError, OSError, ValueError):
+        return None
+
+
+def roster_changes(now, was):
+    """-> what moved between two roster payloads. Pure; no files, no printing.
+
+    Split out from the reporting so it can be tested against two hand-built
+    payloads. The listing diff above cannot be, and the bug in its shortlist
+    path -- a wrong `parents[]` index that silently skipped the entire SHORTLIST
+    ALERTS block on every run for weeks -- is exactly what that costs.
+    """
+    a = {v["slug"]: v for v in now.get("venues", [])}
+    b = {v["slug"]: v for v in was.get("venues", [])}
+    both = sorted(set(a) & set(b))
+    counts = {}
+    for key in ("unverified", "mappable"):
+        before, after = was.get("counts", {}).get(key), now.get("counts", {}).get(key)
+        if before is not None and after is not None and before != after:
+            counts[key] = (before, after)
+    return {
+        "added": sorted(set(a) - set(b)),
+        "removed": sorted(set(b) - set(a)),
+        # Closures first: the only line here that changes what someone should
+        # do tonight.
+        "closed": [s for s in both
+                   if a[s]["status"] == "closed" and b[s]["status"] != "closed"],
+        "reopened": [s for s in both
+                     if b[s]["status"] == "closed" and a[s]["status"] == "open"],
+        "gained": [s for s in both if a[s]["award_count"] > b[s]["award_count"]],
+        "lost": [s for s in both if a[s]["award_count"] < b[s]["award_count"]],
+        "counts": counts,
+        "now": a, "was": b,
+    }
+
+
+def roster_diff():
+    """What changed about the restaurants themselves, not about the programme.
+
+    The listing diff above answers "who is in Restaurant Week this week". Now
+    that the roster is the spine, the weekly questions are different ones: who
+    got recognised, who closed, and who arrived. A closure in particular is the
+    most booking-relevant fact this repo holds, and it would otherwise reach
+    nobody -- it is not a listing change, so nothing above would print it.
+    """
+    if not VENUES.exists():
+        return
+    now = json.loads(VENUES.read_text(encoding="utf-8"))
+    was = previous_payload()
+    print("#" * 60)
+    print("## ROSTER")
+    if was is None:
+        c = now["counts"]
+        print(f"  no previous payload in HEAD to compare against — "
+              f"{c['venues']} venues, {c['with_recognition']} recognised")
+        print("#" * 60)
+        return
+
+    d = roster_changes(now, was)
+    a, b = d["now"], d["was"]
+
+    if d["closed"]:
+        print(f"  CLOSED since last week ({len(d['closed'])}):")
+        for s in d["closed"]:
+            print(f"    x {a[s]['name']} ({s}) — {a[s].get('status_source')}")
+    if d["reopened"]:
+        print(f"  reopened ({len(d['reopened'])}):")
+        for s in d["reopened"]:
+            print(f"    o {a[s]['name']} ({s})")
+    if d["gained"]:
+        print(f"  gained recognition ({len(d['gained'])}):")
+        for s in d["gained"]:
+            n = a[s]["award_count"] - b[s]["award_count"]
+            honour = ("" if a[s]["top_honor_label"] == b[s]["top_honor_label"]
+                      else f", now {a[s]['top_honor_label']}")
+            print(f"    + {a[s]['name']} ({s}) +{n} record"
+                  f"{'' if n == 1 else 's'}{honour}")
+    if d["lost"]:
+        print(f"  lost award records ({len(d['lost'])}) — usually a merge rule"
+              f" change, worth a look:")
+        for s in d["lost"]:
+            print(f"    - {a[s]['name']} ({s}) "
+                  f"{b[s]['award_count']} -> {a[s]['award_count']}")
+    for key, rows, sign, src in (("added", d["added"], "+", a),
+                                 ("removed", d["removed"], "-", b)):
+        if not rows:
+            continue
+        label = "new venues" if key == "added" else "venues gone"
+        print(f"  {label} ({len(rows)}):")
+        for s in rows[:LIST_CAP]:
+            v = src[s]
+            extra = (f" {v['top_honor_label'] or 'no honour'} · from {v.get('seeded_from')}"
+                     if key == "added" else "")
+            print(f"    {sign} {v['name']} ({s}){extra}")
+        # Never let a cap read as "that was all of them".
+        if len(rows) > LIST_CAP:
+            print(f"    … and {len(rows) - LIST_CAP} more not listed")
+
+    # Resolution progress, so 769 unverified rows do not quietly stay 769.
+    for key, (before, after) in d["counts"].items():
+        print(f"  {key}: {before} -> {after}")
+
+    if not any(d[k] for k in ("closed", "reopened", "gained", "lost",
+                              "added", "removed")):
+        print("  no change to the roster")
+    print("#" * 60)
+
+
 def main():
     snaps = sorted(LISTING_DIR.glob("snapshot-*.json"))
     if len(snaps) < 2:
         print("Only one snapshot exists; nothing to diff yet.")
+        roster_diff()
         return 0
     old_p, new_p = snaps[-2], snaps[-1]
     old, new = index(json.loads(old_p.read_text())), index(json.loads(new_p.read_text()))
@@ -27,6 +160,10 @@ def main():
     if season_boundary(set(old), set(new)):
         print(f"season boundary — diff suppressed "
               f"(roster replaced: {len(dropped)} dropped, {len(added)} added)")
+        # The roster is NOT season-scoped, so a changeover is exactly when its
+        # diff is most worth reading: the listing churns completely and the
+        # award side should barely move.
+        roster_diff()
         return 0
     # shortlist call-out first: any change touching config/shortlist.json slugs
     # parents: [0]=data/raw, [1]=data, [2]=repo root. parents[1] resolved to
@@ -86,6 +223,7 @@ def main():
             print(f"  ~ {s}")
         # quirk: a read-only report writes state, so a second run always shows 0 changed
         hist.write_text(json.dumps(cur, indent=1))
+    roster_diff()
     return 0
 
 

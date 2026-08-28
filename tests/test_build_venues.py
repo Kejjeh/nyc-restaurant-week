@@ -539,16 +539,43 @@ def test_a_portfolio_part_does_not_need_to_be_in_restaurant_week_to_get_its_awar
 
 
 def test_a_city_abbreviation_in_a_confirmed_list_is_still_refused():
+    """"Nobu, NY/Matsuhisa, LA" is one restaurant this roster wants, one it does
+    not, and two city abbreviations. The shape test refuses NY and LA on its own.
+
+    Matsuhisa is the part that needs a human: it IS a restaurant and the award is
+    real, but it is in Los Angeles. Before the slash became a separator it was
+    hidden inside "NY/Matsuhisa" and refused for having a slash in it -- the
+    right answer for the wrong reason. It is now ruled out by name in
+    config/venue_aliases.json, which is why the real alias file is passed here
+    rather than an empty one.
+    """
+    from build_venues import load_aliases, resolve_group_awards
+    not_venues, _ = load_aliases()
+    r = roster_with(("Nobu", {"seeded_from": "michelin"}))
+    r.awards = [{"venue_slug": "nobu", "source": "michelin", "level": "recommended",
+                 "year": 2025, "matched_name": "Nobu"}]
+    deferred = [{"name": "Nobu, NY/Matsuhisa, LA", "source": "james_beard",
+                 "award": {"source": "james_beard", "level": "winner", "year": 2003}}]
+    attached, _, unresolved, created = resolve_group_awards(
+        r, deferred, not_venues=not_venues)
+    assert [slug for slug, _ in attached] == ["nobu"]
+    assert created == []
+    assert sorted(u["part"] for u in unresolved) == ["LA", "Matsuhisa", "NY"]
+
+
+def test_without_the_alias_file_the_out_of_town_part_would_become_a_venue():
+    """The guard that used to stop this was the slash inside "NY/Matsuhisa", and
+    splitting on the slash removes it. Pinned so nobody restores the split
+    without the ruling that makes it safe."""
     from build_venues import resolve_group_awards
     r = roster_with(("Nobu", {"seeded_from": "michelin"}))
     r.awards = [{"venue_slug": "nobu", "source": "michelin", "level": "recommended",
                  "year": 2025, "matched_name": "Nobu"}]
     deferred = [{"name": "Nobu, NY/Matsuhisa, LA", "source": "james_beard",
                  "award": {"source": "james_beard", "level": "winner", "year": 2003}}]
-    attached, _, unresolved, created = resolve_group_awards(r, deferred)
-    assert [slug for slug, _ in attached] == ["nobu"]
-    assert created == []
-    assert sorted(u["part"] for u in unresolved) == ["LA", "NY/Matsuhisa"]
+    attached, _, _, created = resolve_group_awards(r, deferred)
+    assert created == ["Matsuhisa"], "this is what the alias ruling is preventing"
+    assert [slug for slug, _ in attached] == ["nobu", "matsuhisa"]
 
 
 def test_a_venue_that_only_joined_the_programme_cannot_vouch_for_a_list():
@@ -776,3 +803,98 @@ def test_the_bounds_have_exactly_one_definition():
     assert not config.in_nyc(31.4924, -100.4577)     # San Angelo
     assert config.sane_coords(37.7997, -122.2287) == (None, None)
     assert config.sane_coords(40.7128, -74.0060) == (40.7128, -74.0060)
+
+
+def _batali_deferred():
+    """The two records from issue 8. Po/Lupa/Babbo can only be shown to be a
+    list once Babbo/Lupa/Esca has vouched its parts onto the roster."""
+    return [{"name": "Babbo/Lupa/Esca", "source": "james_beard",
+             "award": {"source": "james_beard", "level": "nominee", "year": 2001}},
+            {"name": "Po/Lupa/Babbo", "source": "james_beard",
+             "award": {"source": "james_beard", "level": "nominee", "year": 2000}}]
+
+
+def _batali_roster():
+    from build_venues import Roster
+    r = Roster()
+    for name in ("Babbo", "Esca"):
+        r.add(name, "michelin")
+    r.awards = [{"venue_slug": "babbo", "source": "michelin", "level": "recommended",
+                 "year": 2025, "matched_name": "Babbo"},
+                {"venue_slug": "esca", "source": "michelin", "level": "recommended",
+                 "year": 2025, "matched_name": "Esca"}]
+    return r
+
+
+def test_a_portfolio_award_split_on_a_slash_reaches_its_restaurants():
+    """"Babbo/Lupa/Esca" is three Batali restaurants and no commas. Before the
+    slash was a separator it was one venue on the roster under that name, and
+    the three restaurants it names never received the award."""
+    from build_venues import resolve_group_awards
+    r = _batali_roster()
+    attached, kept_whole, _, created = resolve_group_awards(r, _batali_deferred()[:1])
+    assert sorted(slug for slug, _ in attached) == ["babbo", "esca", "lupa"]
+    assert created == ["Lupa"]
+    assert kept_whole == []
+
+
+def test_the_order_of_two_portfolio_records_does_not_change_the_answer():
+    """The reason this needed a fixed point rather than just a separator.
+
+    Resolved in one pass, Po/Lupa/Babbo finds only one award-holding part and is
+    kept whole -- but only because it was measured before Babbo/Lupa/Esca had
+    created Lupa. Reverse the file order and it succeeds. That is exactly the
+    kind of order dependence #7 was written to remove, so adding a new one for
+    the sake of three restaurants would have been a bad trade.
+    """
+    from build_venues import resolve_group_awards
+    forward = _batali_deferred()
+    results = []
+    for order in (forward, list(reversed(forward))):
+        r = _batali_roster()
+        attached, kept_whole, _, _ = resolve_group_awards(r, order)
+        results.append((sorted({slug for slug, _ in attached}),
+                        [i["name"] for i in kept_whole]))
+    assert results[0] == results[1], f"order changed the outcome: {results}"
+    assert results[0][0] == ["babbo", "esca", "lupa"]
+    assert results[0][1] == [], "a Batali portfolio was still kept whole"
+
+
+def test_the_fixed_point_terminates_when_nothing_resolves():
+    """A pass that resolves nothing ends the loop, so an unresolvable string
+    costs one pass rather than spinning."""
+    from build_venues import resolve_group_awards
+    from build_venues import Roster
+    deferred = [{"name": f"Ghost {n}/Phantom {n}", "source": "james_beard",
+                 "award": {"source": "james_beard", "level": "nominee", "year": 2001}}
+                for n in range(5)]
+    attached, kept_whole, _, created = resolve_group_awards(Roster(), deferred)
+    assert attached == [] and created == []
+    assert len(kept_whole) == 5
+
+
+def test_the_committed_roster_has_no_slash_separated_venue_left_that_is_a_list():
+    """Three of the five slash-named rows were portfolios and are gone. The two
+    that remain are deliberate: "Windows on the World/Cellar in the Sky" is a
+    room inside a restaurant, not a portfolio, and "Montrachet/Jeroboam Wines"
+    names one restaurant and one wine business and cannot prove it is a list."""
+    con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+    try:
+        names = sorted(n for (n,) in con.execute(
+            "SELECT name FROM venues WHERE name LIKE '%/%'"))
+    finally:
+        con.close()
+    assert names == ["Montrachet/Jeroboam Wines",
+                     "Windows on the World/Cellar in the Sky"], names
+
+
+def test_the_batali_restaurants_hold_the_awards_that_named_them():
+    con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+    try:
+        for slug in ("babbo", "lupa", "esca"):
+            rows = con.execute(
+                "SELECT COUNT(*) FROM venue_awards WHERE venue_slug = ?"
+                "  AND how LIKE '%group award%'", (slug,)).fetchone()[0]
+            assert rows, f"{slug} holds no award from a portfolio record"
+    finally:
+        con.close()

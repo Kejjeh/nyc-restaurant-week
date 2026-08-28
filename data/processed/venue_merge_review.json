@@ -83,7 +83,7 @@
   {
    "kept": "momfuku-ssam-bar",
    "kept_name": "Momofuku Ssam Bar",
-   "folded": "momofuku-ssam-bar",
+   "folded": "momfuku-ssam-bar-2",
    "folded_name": "Momfuku Ssam Bar",
    "name_was_a_tie": false,
    "reason": "one differing token, same first letter, similarity >= 0.85"
@@ -91,7 +91,7 @@
   {
    "kept": "saint-ambroeus",
    "kept_name": "Sant Ambroeus",
-   "folded": "sant-ambroeus",
+   "folded": "saint-ambroeus-2",
    "folded_name": "Saint Ambroeus",
    "name_was_a_tie": true,
    "reason": "one differing token, same first letter, similarity >= 0.85"
@@ -99,7 +99,7 @@
   {
    "kept": "uncle-boon",
    "kept_name": "Uncle Boons",
-   "folded": "uncle-boons",
+   "folded": "uncle-boon-2",
    "folded_name": "Uncle Boon",
    "name_was_a_tie": false,
    "reason": "one differing token, same first letter, similarity >= 0.85"
@@ -108,10 +108,17 @@
  "group_award_parts_unmatched": [
   {
    "group": "Nobu, NY/Matsuhisa, LA",
-   "part": "NY/Matsuhisa",
+   "part": "NY",
    "marker": "comma list",
    "year": 2001,
    "reason": "named in a group award but does not have the shape of a restaurant name"
+  },
+  {
+   "group": "Nobu, NY/Matsuhisa, LA",
+   "part": "Matsuhisa",
+   "marker": "comma list",
+   "year": 2001,
+   "reason": "The Los Angeles restaurant named alongside Nobu in \"Nobu, NY/Matsuhisa, LA\". A real restaurant and a real award, but not in New York, and this roster is a New York roster."
   },
   {
    "group": "Nobu, NY/Matsuhisa, LA",
@@ -121,11 +128,25 @@
    "reason": "named in a group award but does not have the shape of a restaurant name"
   },
   {
+   "group": "Po/Lupa/Babbo",
+   "part": "Po",
+   "marker": null,
+   "year": 2000,
+   "reason": "named in a group award but does not have the shape of a restaurant name"
+  },
+  {
    "group": "Nobu, NY/Matsuhisa, LA",
-   "part": "NY/Matsuhisa",
+   "part": "NY",
    "marker": "comma list",
    "year": 2000,
    "reason": "named in a group award but does not have the shape of a restaurant name"
+  },
+  {
+   "group": "Nobu, NY/Matsuhisa, LA",
+   "part": "Matsuhisa",
+   "marker": "comma list",
+   "year": 2000,
+   "reason": "The Los Angeles restaurant named alongside Nobu in \"Nobu, NY/Matsuhisa, LA\". A real restaurant and a real award, but not in New York, and this roster is a New York roster."
   },
   {
    "group": "Nobu, NY/Matsuhisa, LA",
@@ -136,10 +157,17 @@
   },
   {
    "group": "Nobu, NY/Matsuhisa, LA",
-   "part": "NY/Matsuhisa",
+   "part": "NY",
    "marker": "comma list",
    "year": 1999,
    "reason": "named in a group award but does not have the shape of a restaurant name"
+  },
+  {
+   "group": "Nobu, NY/Matsuhisa, LA",
+   "part": "Matsuhisa",
+   "marker": "comma list",
+   "year": 1999,
+   "reason": "The Los Angeles restaurant named alongside Nobu in \"Nobu, NY/Matsuhisa, LA\". A real restaurant and a real award, but not in New York, and this roster is a New York roster."
   },
   {
    "group": "Nobu, NY/Matsuhisa, LA",
@@ -163,6 +191,13 @@
    "year": 2010,
    "level": "winner",
    "reason": "Two magazines. The award is to their founders, not to a room."
+  },
+  {
+   "source": "james_beard",
+   "name": "Rosenthal Wine Merchant/Mad Rose Group",
+   "year": 2010,
+   "level": "semifinalist",
+   "reason": "An importer and a wine group. The award is Outstanding Wine & Spirits Professional; neither half is a room you can book."
   },
   {
    "source": "james_beard",

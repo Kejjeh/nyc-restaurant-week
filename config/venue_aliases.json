@@ -14,7 +14,9 @@
     "Elizabeth Street Hospitality": "A restaurant group's corporate name, same as above.",
     "Gracious Hospitality": "A restaurant group's corporate name, same as above.",
     "Gracious Hospitality Management": "A restaurant group's corporate name, same as above.",
-    "Overthrow Hospitality": "A restaurant group's corporate name, same as above."
+    "Overthrow Hospitality": "A restaurant group's corporate name, same as above.",
+    "Matsuhisa": "The Los Angeles restaurant named alongside Nobu in \"Nobu, NY/Matsuhisa, LA\". A real restaurant and a real award, but not in New York, and this roster is a New York roster. Reachable only since the slash became a separator: it used to be hidden inside the part \"NY/Matsuhisa\", which was refused for containing a slash -- the right answer for the wrong reason.",
+    "Rosenthal Wine Merchant/Mad Rose Group": "An importer and a wine group, for Outstanding Wine & Spirits Professional. Neither half is a room you can book, so unlike the other slash-separated records there is nothing here to split out."
   },
 
   "split_into": {

@@ -32,6 +32,7 @@ cost of a wrong merge is two restaurants silently becoming one row; the cost of
 a missed merge is one restaurant appearing twice. Both are bad. Only the first
 is invisible, so that is the one the thresholds are set against.
 """
+import datetime as dt
 import json
 import re
 import shutil
@@ -51,6 +52,7 @@ RAW = ROOT / "data" / "raw" / "recognition"
 AWARDS_CONFIG = ROOT / "config" / "awards.json"
 ALIASES = ROOT / "config" / "venue_aliases.json"
 REVIEW = ROOT / "data" / "processed" / "venue_merge_review.json"
+SLUG_LEDGER = ROOT / "data" / "venue_slugs.json"
 
 # How alike two tokens must be before one is treated as a misspelling of the
 # other. 0.85 sits in the gap the data leaves: the real variants measured here
@@ -128,6 +130,127 @@ def unique_slug(base, taken):
     return f"{base}-{n}"
 
 
+class Ledger:
+    """Venue slugs that outlive the build that minted them.
+
+    build_venues rebuilds the roster from scratch every run, so without this a
+    venue_slug is only ever a fact about the current inputs. 156 of the RW-seeded
+    venues take their slug from the programme's listing; when one of those
+    restaurants is absent from the next listing it is re-created from its award
+    records under a different slug, and the weekly report reads that as a
+    departure and an arrival rather than as the same restaurant.
+
+    The ledger is the memory that makes a slug an identity: once a restaurant
+    has one it keeps it, whichever source happens to seed it next season.
+
+    Reuse is not on name alone. Two different restaurants share a name often
+    enough (and the roster already carries "-2" slugs for them) that handing
+    over a slug on a name match would hand over another restaurant's identity,
+    and after issue #2 its paid Places lookup with it. An entry is eligible only
+    if the incoming address corroborates it or neither side has an address to
+    disagree with; a plain contradiction mints a new slug instead.
+    """
+
+    VERSION = 1
+
+    def __init__(self, entries=None, today=None):
+        self.entries = [dict(e) for e in (entries or [])]
+        self.today = today or dt.date.today().isoformat()
+        self.by_norm = {}
+        for e in self.entries:
+            self.by_norm.setdefault(e["norm"], []).append(e)
+        self.order = {id(e): i for i, e in enumerate(self.entries)}
+        # Slugs spoken for by a live entry and not yet claimed this build. A new
+        # venue must not mint one of these, or the restaurant it belongs to
+        # cannot have it back when it returns.
+        self.free = {e["slug"] for e in self.entries if not e.get("merged_into")}
+        self.claimed = {}         # slug -> entry, this build
+        self.minted = []          # slugs with no prior entry
+        self.reissued = []        # slugs an earlier build would have changed
+
+    @classmethod
+    def load(cls, path, today=None):
+        if not Path(path).exists():
+            return cls(today=today)
+        doc = json.loads(Path(path).read_text(encoding="utf-8"))
+        return cls(doc.get("entries"), today=today)
+
+    def _fit(self, entry, street, postal, has_address):
+        """How well an entry corroborates an incoming venue. Lower is better."""
+        # street_key is a SET of candidate numbers and corroborates by
+        # intersection, not equality -- "385 Ninth Ave." and "440 W. 33rd St."
+        # are one restaurant with two entrances.
+        if street and entry.get("street") and set(entry["street"]) & street:
+            return 0
+        if postal and entry.get("zip") and entry["zip"] == postal:
+            return 1
+        if not has_address or not (entry.get("street") or entry.get("zip")):
+            return 2      # nothing to disagree with
+        return 3          # a real contradiction; not this restaurant
+
+    def claim(self, name, address):
+        """The slug this restaurant held in an earlier build, or None."""
+        cands = [e for e in self.by_norm.get(norm_name(name), [])
+                 if not e.get("merged_into") and e["slug"] in self.free]
+        if not cands:
+            return None
+        street, postal = street_key(address), postal_key(address)
+        scored = [(self._fit(e, street, postal, bool(address)), self.order[id(e)], e)
+                  for e in cands]
+        fit, _, entry = min(scored, key=lambda t: t[:2])
+        if fit > 2:
+            return None
+        self.free.discard(entry["slug"])
+        self.claimed[entry["slug"]] = entry
+        return entry["slug"]
+
+    def reserved(self, slug):
+        return slug in self.free
+
+    def record(self, venue):
+        """Write this build's answer back, minting an entry for a new venue."""
+        slug = venue["venue_slug"]
+        entry = self.claimed.get(slug)
+        if entry is None:
+            entry = next((e for e in self.entries if e["slug"] == slug
+                          and not e.get("merged_into")), None)
+            if entry is None:
+                entry = {"slug": slug, "norm": norm_name(venue["name"]),
+                         "first_seen": self.today}
+                self.entries.append(entry)
+                self.order[id(entry)] = len(self.entries)
+                self.by_norm.setdefault(entry["norm"], []).append(entry)
+                self.minted.append(slug)
+            self.free.discard(slug)
+            self.claimed[slug] = entry
+        entry["name"] = venue["name"]
+        entry["norm"] = norm_name(venue["name"])
+        entry["street"] = sorted(street_key(venue.get("address")) or ()) or None
+        entry["zip"] = postal_key(venue.get("address"))
+        entry["last_seen"] = self.today
+
+    def retire(self, slug, into):
+        """One venue folded into another: the losing slug is never reissued.
+
+        Kept rather than deleted so a link to it can still be answered -- the
+        restaurant did not stop existing, its row did.
+        """
+        for e in self.entries:
+            if e["slug"] == slug and not e.get("merged_into"):
+                e["merged_into"] = into
+                e["last_seen"] = self.today
+        self.free.discard(slug)
+        self.claimed.pop(slug, None)
+
+    def document(self):
+        return {"_doc": "venue_slug is a durable identity, not a fact about one "
+                        "build. An entry is never deleted and a slug is never "
+                        "reissued to a different restaurant; a venue folded into "
+                        "another carries merged_into. See issue 25.",
+                "version": self.VERSION,
+                "entries": sorted(self.entries, key=lambda e: e["slug"])}
+
+
 class Roster:
     """The venue set under construction, with the indexes merging needs.
 
@@ -136,15 +259,27 @@ class Roster:
     and threading three dicts through every function was worse.
     """
 
-    def __init__(self):
+    def __init__(self, ledger=None):
         self.venues = {}          # slug -> dict
         self.by_norm = {}         # norm_name -> [slug]
         self.awards = []          # pending venue_awards rows
         self.refused = []         # merges this would not make, for a human
         self.confirm = []         # merges MADE on weaker evidence, for a human
+        self.ledger = ledger      # slugs held from earlier builds, or None
+        self.from_ledger = set()  # slugs this build did not get to choose
+
+    def taken(self):
+        """Slugs a new venue may not mint: in use, or held for an absent one."""
+        if self.ledger is None:
+            return self.venues
+        return set(self.venues) | self.ledger.free
 
     def add(self, name, seeded_from, **fields):
-        slug = unique_slug(slugify(name), self.venues)
+        slug = self.ledger.claim(name, fields.get("address")) if self.ledger else None
+        if slug:
+            self.from_ledger.add(slug)
+        else:
+            slug = unique_slug(slugify(name), self.taken())
         v = {"venue_slug": slug, "name": name, "seeded_from": seeded_from,
              "address": None, "lat": None, "lng": None, "borough": None,
              "neighborhood": None, "rw_slug": None, "status": "unknown",
@@ -374,6 +509,8 @@ def merge_spelling_variants(roster):
                            "reason": "one differing token, same first letter, "
                                      f"similarity >= {TOKEN_SIM}"})
             absorbed.add(drop["venue_slug"])
+            if roster.ledger is not None:
+                roster.ledger.retire(drop["venue_slug"], keep["venue_slug"])
             roster.by_norm[norm_name(drop["name"])].remove(drop["venue_slug"])
             del roster.venues[drop["venue_slug"]]
             break
@@ -677,8 +814,8 @@ def prestige_for(venue_awards, cfg, closed):
     return int(round(min(100.0, max(0.0, total)))), key, honors[key]["label"]
 
 
-def build(con, cfg, quiet=False):
-    roster = Roster()
+def build(con, cfg, quiet=False, ledger=None):
+    roster = Roster(ledger)
     not_venues, split_into = load_aliases()
     ruled_out = []
 
@@ -706,7 +843,16 @@ def build(con, cfg, quiet=False):
         # A venue slug and its RW slug should be the same string wherever the
         # name allows it; when slugify disagrees with the program's own slug,
         # the program's wins, because every cached artefact on disk is keyed by it.
-        if slug != v["venue_slug"] and slug not in roster.venues:
+        #
+        # Except over a slug this venue already holds. That is the whole of
+        # issue 25: the programme's slug is a fact about one season, and letting
+        # it overwrite a durable identity is what made a restaurant leaving the
+        # programme look like a different restaurant arriving. On the first build
+        # the ledger is empty, so every RW venue still takes the programme's slug
+        # -- and then keeps it.
+        held = v["venue_slug"] in roster.from_ledger
+        reserved = roster.ledger.reserved(slug) if roster.ledger else False
+        if not held and not reserved and slug != v["venue_slug"] and slug not in roster.venues:
             roster.venues.pop(v["venue_slug"])
             roster.by_norm[norm_name(name)].remove(v["venue_slug"])
             v["venue_slug"] = slug
@@ -856,6 +1002,14 @@ def build(con, cfg, quiet=False):
         v["prestige"], v["top_honor"], v["top_honor_label"] = prestige_for(
             aw, cfg, closed=(v["status"] == "closed"))
 
+    if ledger is not None:
+        for v in roster.venues.values():
+            ledger.record(v)
+        if not quiet:
+            reissued = sorted(roster.from_ledger)
+            print(f"\nslug ledger: {len(reissued)} venues kept an identity from an "
+                  f"earlier build, {len(ledger.minted)} minted a new one")
+
     # --- write ----------------------------------------------------------------
     con.executescript(SCHEMA)
     con.execute("DELETE FROM venue_awards")
@@ -904,10 +1058,16 @@ def main():
     tmp = Path(tempfile.mkdtemp()) / DB.name
     shutil.copyfile(DB, tmp)
     con = sqlite3.connect(tmp)
-    roster, seeded, _, review = build(con, cfg, quiet=quiet)
+    ledger = Ledger.load(SLUG_LEDGER)
+    roster, seeded, _, review = build(con, cfg, quiet=quiet, ledger=ledger)
     con.commit()
     REVIEW.write_text(json.dumps(review, indent=1, ensure_ascii=False),
                       encoding="utf-8")
+    # Written here rather than in build() for the same reason the review file is:
+    # build() takes whatever connection it is handed, including a temp copy in a
+    # test or a changeover simulation, and must not commit one of those to disk.
+    SLUG_LEDGER.write_text(
+        json.dumps(ledger.document(), indent=1, ensure_ascii=False), encoding="utf-8")
 
     awarded = con.execute(
         "SELECT COUNT(*) FROM venues WHERE award_count > 0").fetchone()[0]

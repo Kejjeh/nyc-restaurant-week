@@ -74,6 +74,8 @@ CREATE TABLE IF NOT EXISTS venues (
   award_count INTEGER NOT NULL DEFAULT 0,
   top_honor TEXT,            -- 'michelin:1 star' etc; the best single honor held
   top_honor_label TEXT,
+  top_honor_year INTEGER,    -- the year that honor was given
+  top_honor_is_latest INTEGER,  -- 1 if from that source's most recent selection
   prestige INTEGER,          -- 0-100, per config/awards.json
   seeded_from TEXT,          -- which source first created this row
   resolution TEXT            -- how identity was established, in words
@@ -839,7 +841,7 @@ def prestige_for(venue_awards, cfg, closed):
               for a in venue_awards
               if honor_key(a["source"], a["level"]) in honors]
     if not scored:
-        return 0, None, None
+        return 0, None, None, None, None
     base, best = max(scored, key=lambda p: p[0])
     total = float(base)
 
@@ -863,7 +865,8 @@ def prestige_for(venue_awards, cfg, closed):
         total *= cfg["closed_penalty"]["factor"]
 
     key = honor_key(best["source"], best["level"])
-    return int(round(min(100.0, max(0.0, total)))), key, honors[key]["label"]
+    return (int(round(min(100.0, max(0.0, total)))), key, honors[key]["label"],
+            best.get("year"), best["source"])
 
 
 def build(con, cfg, quiet=False, ledger=None):
@@ -1060,6 +1063,13 @@ def build(con, cfg, quiet=False, ledger=None):
     roster.folded = folded
 
     # --- derive ---------------------------------------------------------------
+    # The most recent selection each source has published, taken from the data
+    # rather than pinned, so a back-filled Michelin history (issue 3) moves it
+    # without a config edit.
+    latest_year = {}
+    for a in roster.awards:
+        if a.get("year"):
+            latest_year[a["source"]] = max(latest_year.get(a["source"], 0), a["year"])
     by_venue = {}
     for a in roster.awards:
         by_venue.setdefault(a["venue_slug"], []).append(a)
@@ -1070,8 +1080,17 @@ def build(con, cfg, quiet=False, ledger=None):
         v["award_sources"] = json.dumps(sorted({a["source"] for a in aw}))
         v["first_award_year"] = min(years) if years else None
         v["last_award_year"] = max(years) if years else None
-        v["prestige"], v["top_honor"], v["top_honor_label"] = prestige_for(
+        (v["prestige"], v["top_honor"], v["top_honor_label"],
+         v["top_honor_year"], honor_source) = prestige_for(
             aw, cfg, closed=(v["status"] == "closed"))
+        # Whether the badge should carry its year. NOT a claim that the honour
+        # lapsed: a Michelin star is a standing selection and does lapse, while
+        # a James Beard win is an event and never does. What both share is that
+        # a bare "James Beard winner" on a 1993 award reads as news, and 386 of
+        # the 782 badges on the roster were doing exactly that.
+        v["top_honor_is_latest"] = int(
+            v["top_honor_year"] is not None
+            and v["top_honor_year"] == latest_year.get(honor_source))
 
     if ledger is not None:
         for v in roster.venues.values():
@@ -1082,13 +1101,20 @@ def build(con, cfg, quiet=False, ledger=None):
                   f"earlier build, {len(ledger.minted)} minted a new one")
 
     # --- write ----------------------------------------------------------------
+    # Dropped, not DELETEd. Both tables are rebuilt in full every run, so the
+    # rows were never the problem -- the SCHEMA below is CREATE TABLE IF NOT
+    # EXISTS, so against a database that already had these tables a new column
+    # was silently never added, and the next INSERT failed with "table venues
+    # has no column named ...". Dropping first makes the schema in this file the
+    # schema on disk, which is what every reader already assumed.
+    con.execute("DROP TABLE IF EXISTS venue_awards")
+    con.execute("DROP TABLE IF EXISTS venues")
     con.executescript(SCHEMA)
-    con.execute("DELETE FROM venue_awards")
-    con.execute("DELETE FROM venues")
     cols = ("venue_slug", "name", "address", "lat", "lng", "borough", "neighborhood",
             "rw_slug", "status", "status_source", "place_id", "rating",
             "user_ratings_total", "first_award_year", "last_award_year",
             "award_sources", "award_count", "top_honor", "top_honor_label",
+            "top_honor_year", "top_honor_is_latest",
             "prestige", "seeded_from", "resolution")
     con.executemany(
         f"INSERT INTO venues ({','.join(cols)}) VALUES ({','.join('?' * len(cols))})",

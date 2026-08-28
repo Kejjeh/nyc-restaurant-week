@@ -273,7 +273,21 @@ function renderRow(v) {
   const title = el('h2', 'venueName', v.name);
   head.append(title);
   if (v.top_honor_label) {
-    head.append(el('span', `pill honor ${HONOR_CLASS(v.top_honor)}`, v.top_honor_label));
+    /* The year, when the honour is not from that source's most recent
+       selection. "James Beard winner" with nothing after it reads as news, and
+       387 of the 782 badges here are for an award given as long ago as 1993 --
+       several to restaurants that have since closed.
+
+       The year says WHEN, never that the honour was lost: a Michelin star is a
+       standing selection and does lapse, a Beard win is an event and does not.
+       Both are answered honestly by naming the year and claiming nothing else.
+
+       Kept out of top_honor_label itself on purpose -- that string is a facet
+       value in the "Highest honour" filter, and folding the year into it would
+       turn one option into several hundred. */
+    const label = v.top_honor_label
+      + (v.top_honor_year && !v.top_honor_is_latest ? ` · ${v.top_honor_year}` : '');
+    head.append(el('span', `pill honor ${HONOR_CLASS(v.top_honor)}`, label));
   }
   head.append(statusPill(v));
   if (v.rw) {

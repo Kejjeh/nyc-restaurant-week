@@ -98,6 +98,8 @@ def load(con):
             "prestige": v["prestige"],
             "top_honor": v["top_honor"],
             "top_honor_label": v["top_honor_label"],
+            "top_honor_year": v["top_honor_year"],
+            "top_honor_is_latest": bool(v["top_honor_is_latest"]),
             "award_count": v["award_count"],
             "award_sources": json.loads(v["award_sources"] or "[]"),
             "first_award_year": v["first_award_year"],

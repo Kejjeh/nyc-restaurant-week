@@ -198,7 +198,7 @@ def test_prestige_orders_the_way_the_config_says():
     bib = [{"source": "michelin", "level": "bib_gourmand", "year": 2025}]
     assert prestige_for(three, cfg, closed=False)[0] > prestige_for(bib, cfg, closed=False)[0]
     assert prestige_for(three, cfg, closed=False)[1] == "michelin:3 stars"
-    assert prestige_for([], cfg, closed=False) == (0, None, None)
+    assert prestige_for([], cfg, closed=False) == (0, None, None, None, None)
 
 
 def test_three_juries_agreeing_outscores_one_saying_it_twice():

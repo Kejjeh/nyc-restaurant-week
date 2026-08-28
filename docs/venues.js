@@ -452,6 +452,41 @@ function renderActive() {
   $('#clearBtn').hidden = n === 0;
 }
 
+/* Say which thing found nothing.
+
+   This page shipped the static "Nothing matches those filters." from
+   index.html and never touched it, so every empty result blamed filters —
+   including a typo in the search box, which is the commonest way to reach zero
+   rows and the one case where the Clear filters button beside it cannot help.
+
+   The dashboard had the same bug and the same fix; what decides the wording is
+   whether the term matches anything IGNORING the filters, because "are filters
+   set" answers a different question. Here it is doubly useless: the roster's
+   Restaurant Week and Still-trading facets start empty, so filters usually are
+   not set and the sentence was simply wrong. */
+function emptyMessage() {
+  const msg = $('#emptyMsg');
+  if (!msg) return;
+  if (!STATE.rows.length) {
+    msg.textContent = 'The roster loaded, but it lists no restaurants. '
+      + 'That is a problem with the data, not with anything you set.';
+    return;
+  }
+  const term = $('#q') && $('#q').value.trim();
+  if (!STATE.q) {
+    msg.textContent = STATE.threeWay
+      ? 'No restaurant is named by all three juries with those filters.'
+      : 'Nothing matches those filters.';
+    return;
+  }
+  const loose = STATE.rows.filter((v) => haystack(v).includes(STATE.q)).length;
+  msg.textContent = loose
+    ? `\u201c${term}\u201d matches ${loose} restaurant${loose === 1 ? '' : 's'}, `
+      + 'but the filters remove them all.'
+    : `Nothing matches \u201c${term}\u201d. Check the spelling, or search a chef, `
+      + 'a neighbourhood or an award.';
+}
+
 function apply() {
   const hits = STATE.rows.filter(matches);
   hits.sort(SORTS[STATE.sort] || SORTS.prestige);
@@ -463,6 +498,7 @@ function apply() {
   $('#shown').textContent = String(Math.min(STATE.shown, hits.length));
   $('#total').textContent = String(hits.length);
   $('#empty').hidden = hits.length !== 0;
+  if (!hits.length) emptyMessage();
   const more = $('#showMore');
   more.hidden = hits.length <= STATE.shown;
   more.textContent = `Show ${Math.min(PAGE, hits.length - STATE.shown)} more`;

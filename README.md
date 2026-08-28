@@ -978,6 +978,14 @@ error; the signal is the absence of `diff_report`, refresh.py's last step, which
 catches every way the chain can stop rather than guessing what the failure
 printed.
 
+**On both pages** — the roster shipped the static "Nothing matches those
+filters." from `index.html` and never wrote its own, so a misspelled search got
+that sentence beside a Clear filters button with no filter set at all. Its
+filters start empty, unlike the dashboard's default date, which makes the claim
+wrong more often rather than less. Same rule now: the wording turns on whether
+the term matches anything ignoring the filters, and the all-three-juries preset
+gets its own sentence because it is not a facet the reader can see to undo.
+
 **An empty result says which thing found nothing.** Every zero-row state used
 to read "Nothing matches those filters." beside a Clear filters button —
 including a typo in the search box, which is the commonest way to reach zero

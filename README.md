@@ -88,7 +88,7 @@ closed, and who arrived* — the questions that matter now that the roster is th
 spine. A closure is the most booking-relevant fact this repo holds and nothing
 else in the report would ever print it, because a restaurant closing is not a
 listing change. It also tracks whether the unverified count is going down, so
-778 unresolved rows do not quietly stay 778.
+704 unresolved rows do not quietly stay 704.
 
 Last week's roster is read from `git show HEAD:docs/data/venues.json` rather than
 from a sidecar history file. The menu-hash section keeps its own history and pays
@@ -419,7 +419,7 @@ run, and a non-integer there fails the run rather than scoring against garbage.
 
 ### Resolving venues against Google (`src/resolve_venues.py`)
 
-769 venues arrive with no coordinates and no confirmed open/closed status,
+704 venues arrive with no coordinates and no confirmed open/closed status,
 because the Beard file carries no addresses. `resolve_venues.py --fetch` looks
 them up — roughly 700–800 Text Search calls, billed once and then cached in
 `data/raw/venues_google/` exactly like `data/raw/google/`.
@@ -436,6 +436,41 @@ ones with no address on our side (`!` — only the name and the NYC bounds can
 confirm those), and estimates the bill. It sends nothing and needs no key. The
 run it previews costs real money and cannot be undone, so the person paying
 should be able to read the queries first.
+
+#### Running the fetch yourself
+
+The key never has to leave your machine, and nothing about this step runs in CI
+or in this repo's automation. The whole round trip:
+
+```
+# 1. read what it would send, and what it would cost. No key, no network.
+python src/resolve_venues.py --dry-run | less
+
+# 2. the key, for this shell only. Restrict it to the Places API in Cloud
+#    Console first -- an unrestricted key is a billing liability if it leaks.
+export GOOGLE_PLACES_KEY="..."
+
+# 3. spend a dollar before you spend twenty, and read the 30 answers
+python src/resolve_venues.py --fetch --limit 30
+python src/resolve_venues.py --report
+
+# 4. the rest. Resumable: results cache per slug and --fetch skips a venue
+#    that already has a cache file, so an interrupted run costs nothing twice.
+python src/resolve_venues.py --fetch
+
+# 5. apply, re-export, and commit the CACHE -- not the key
+python src/refresh.py            # or the four export steps by hand
+git add data/raw/venues_google docs/data data/processed
+git commit -m "Places lookups for the award-only roster"
+```
+
+`config/secrets.py` and the key itself are gitignored; `data/raw/venues_google/`
+is not, and committing it is the point — it is what lets everyone else, and CI,
+apply the result without a key or a cent. Step 5's `resolve_venues.py` with no
+flags reads only that cache.
+
+At the time of writing step 4 is 709 venues and about $23. It is billed once:
+re-running after a cache is in place calls nothing.
 
 Both paths build the query through `query_for()` rather than each rolling its
 own, and a test enforces that: a dry run that constructs its own string is worse
@@ -716,7 +751,7 @@ key, so a viewer's choice survives the hop between them.
 
   **Dish tags** are the only thing on the roster that answers *what does this
   place actually cook*. The cuisine facet cannot: cuisines come from the
-  Restaurant Week listing, so the 778 venues that were never in the programme
+  Restaurant Week listing, so the 704 venues that were never in the programme
   have none. Tags come from the parsed menus — `game meats`, `foie gras`,
   `snails`, `sweetbreads` — and are searchable, filterable, and printed on the
   row. There is a `Game, offal & odd cuts` preset because that is the question
@@ -1289,10 +1324,10 @@ Every figure printed beside another is derived so the two reconcile.
 
 ### The roster specifically
 
-- **769 of 1,405 venues have never been checked against anything but a name.**
+- **704 of 1,340 venues have never been checked against anything but a name.**
   They came from the James Beard file, which carries no addresses, so they have
   no coordinates, no rating, and an `unknown` trading status until someone spends
-  a Places lookup on them. Only 634 venues can be plotted on a map at all.
+  a Places lookup on them. Only 631 venues can be plotted on a map at all.
 - **`unknown` is not `closed`.** It means nobody has looked. The site says
   "Unverified" and explains that on hover; do not read it as a claim either way.
 - **The Beard file goes back to 1991**, so the roster deliberately includes

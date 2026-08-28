@@ -917,6 +917,7 @@ def build(con, cfg, quiet=False, ledger=None):
     order = ("michelin", "nyt", "james_beard")
     stats = {}
     deferred = []      # portfolio awards, resolved once every venue exists
+    person_only = []   # awards to a person with no room, dropped with a reason
     for source in order:
         spec = cfg["sources"][source]
         f = RAW / spec["file"]
@@ -926,9 +927,23 @@ def build(con, cfg, quiet=False, ledger=None):
         records = json.loads(f.read_text(encoding="utf-8"))
         merged = created = refused = confirmed = skipped = 0
         for e in records:
-            name = e.get(spec["name_field"]) or e.get("name")
+            # No fallback to e["name"]. For michelin and nyt that field IS
+            # name_field, so the fallback was dead; for James Beard it is the
+            # HONOREE, and falling back to it put 66 people on the roster as
+            # restaurants -- Anthony Bourdain, Craig Claiborne, Gael Greene --
+            # scoring 53-77 and outranking most of the real ones. All 77 Beard
+            # records with no `restaurant` are a person: Who's Who inductees,
+            # Lifetime Achievement, Humanitarian of the Year, and a few
+            # restaurateur and wine awards recorded without their room.
+            name = e.get(spec["name_field"])
             if not name:
-                skipped += 1          # a Beard award to a person with no venue
+                skipped += 1
+                person_only.append({
+                    "source": source, "person": e.get("name"),
+                    "award": e.get("award"), "year": e.get("year"),
+                    "level": e.get("level"),
+                    "reason": f"honours a person, and the record names no "
+                              f"{spec['name_field']}"})
                 continue
             address = e.get("address")
             rank_pat = spec.get("rank_from_notes")
@@ -1023,6 +1038,10 @@ def build(con, cfg, quiet=False, ledger=None):
         roster.awards.append(a)
     roster.group_unresolved = unresolved
     roster.ruled_out = ruled_out
+    roster.person_only = person_only
+    if person_only and not quiet:
+        print(f"awards to a person with no room: {len(person_only)} records "
+              f"across {len({r['person'] for r in person_only})} people, dropped")
     if ruled_out and not quiet:
         print(f"ruled out by config/venue_aliases.json: {len(ruled_out)} records "
               f"across {len({r['name'] for r in ruled_out})} names that are not restaurants")
@@ -1101,6 +1120,7 @@ def review_payload(roster):
         "folded_spelling_variants": getattr(roster, "folded", []),
         "group_award_parts_unmatched": getattr(roster, "group_unresolved", []),
         "ruled_out_by_venue_aliases": getattr(roster, "ruled_out", []),
+        "awards_to_a_person_with_no_room": getattr(roster, "person_only", []),
     }
 
 

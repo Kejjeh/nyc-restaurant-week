@@ -118,7 +118,7 @@
    "part": "Matsuhisa",
    "marker": "comma list",
    "year": 2001,
-   "reason": "The Los Angeles restaurant named alongside Nobu in \"Nobu, NY/Matsuhisa, LA\". A real restaurant and a real award, but not in New York, and this roster is a New York roster."
+   "reason": "The Los Angeles restaurant named alongside Nobu in \"Nobu, NY/Matsuhisa, LA\". A real restaurant and a real award, but not in New York, and this roster is a New York roster. Reachable only since the slash became a separator: it used to be hidden inside the part \"NY/Matsuhisa\", which was refused for containing a slash -- the right answer for the wrong reason."
   },
   {
    "group": "Nobu, NY/Matsuhisa, LA",
@@ -146,7 +146,7 @@
    "part": "Matsuhisa",
    "marker": "comma list",
    "year": 2000,
-   "reason": "The Los Angeles restaurant named alongside Nobu in \"Nobu, NY/Matsuhisa, LA\". A real restaurant and a real award, but not in New York, and this roster is a New York roster."
+   "reason": "The Los Angeles restaurant named alongside Nobu in \"Nobu, NY/Matsuhisa, LA\". A real restaurant and a real award, but not in New York, and this roster is a New York roster. Reachable only since the slash became a separator: it used to be hidden inside the part \"NY/Matsuhisa\", which was refused for containing a slash -- the right answer for the wrong reason."
   },
   {
    "group": "Nobu, NY/Matsuhisa, LA",
@@ -167,7 +167,7 @@
    "part": "Matsuhisa",
    "marker": "comma list",
    "year": 1999,
-   "reason": "The Los Angeles restaurant named alongside Nobu in \"Nobu, NY/Matsuhisa, LA\". A real restaurant and a real award, but not in New York, and this roster is a New York roster."
+   "reason": "The Los Angeles restaurant named alongside Nobu in \"Nobu, NY/Matsuhisa, LA\". A real restaurant and a real award, but not in New York, and this roster is a New York roster. Reachable only since the slash became a separator: it used to be hidden inside the part \"NY/Matsuhisa\", which was refused for containing a slash -- the right answer for the wrong reason."
   },
   {
    "group": "Nobu, NY/Matsuhisa, LA",
@@ -197,7 +197,7 @@
    "name": "Rosenthal Wine Merchant/Mad Rose Group",
    "year": 2010,
    "level": "semifinalist",
-   "reason": "An importer and a wine group. The award is Outstanding Wine & Spirits Professional; neither half is a room you can book."
+   "reason": "An importer and a wine group, for Outstanding Wine & Spirits Professional. Neither half is a room you can book, so unlike the other slash-separated records there is nothing here to split out."
   },
   {
    "source": "james_beard",
@@ -212,6 +212,624 @@
    "year": 2009,
    "level": "winner",
    "reason": "A bartender's company. The award is to Dale DeGroff, who has no restaurant in these files."
+  }
+ ],
+ "awards_to_a_person_with_no_room": [
+  {
+   "source": "james_beard",
+   "person": "Alex Raij",
+   "award": "Outstanding Restaurateur",
+   "year": 2019,
+   "level": "nominee",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Eder Montero",
+   "award": "Outstanding Restaurateur",
+   "year": 2019,
+   "level": "nominee",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Jason Wang",
+   "award": "Outstanding Restaurateur",
+   "year": 2019,
+   "level": "semifinalist",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Daniel Johnnes",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2018,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Dale Degroff",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2015,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Wylie Dufresne",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2015,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Andrew Tarlow",
+   "award": "Outstanding Restaurateur",
+   "year": 2014,
+   "level": "semifinalist",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "David Wondrich",
+   "award": "Outstanding Wine, Spirits, or Beer Professional",
+   "year": 2014,
+   "level": "nominee",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Dorothy Kalins",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2013,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Eric Asimov",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2013,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Zarela Martinez",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2013,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Dana Cowin",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2012,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Mark Bittman",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2012,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Marvin Shanken",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2012,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Charles Masson",
+   "award": "Outstanding Service",
+   "year": 2011,
+   "level": "nominee",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "David Wondrich",
+   "award": "Outstanding Wine & Spirits Professional",
+   "year": 2011,
+   "level": "semifinalist",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Nick Valenti",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2011,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "David Rockwell",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2010,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Jessica B Harris",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2010,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Betty Fussell",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2009,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Clark Wolf",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2009,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Dorothy C. Hamilton",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2009,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Anthony Bourdain",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2008,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Dan Barber",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2008,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Barbara Kafka",
+   "award": "Lifetime Achievement Award",
+   "year": 2007,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Bobby Flay",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2007,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Dorie Greenspan",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2007,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Judith A. Jones",
+   "award": "Lifetime Achievement Award",
+   "year": 2006,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Gray Kunz",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2006,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Joe Bastianich",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2005,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Eric Ripert",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2004,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Julia Erickson",
+   "award": "Humanitarian of the Year",
+   "year": 2003,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Alain Sailhac",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2003,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Jacques Torres",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2003,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Marion Nestle",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2003,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "George H. Lang",
+   "award": "Lifetime Achievement Award",
+   "year": 2002,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Alain Ducasse",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2002,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Frank Prial",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2002,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Sara Moulton",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2002,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Tom Colicchio",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2002,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Richard Grausman",
+   "award": "Humanitarian of the Year",
+   "year": 2001,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Mario Batali",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2001,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Drew Nieporent",
+   "award": "Humanitarian of the Year",
+   "year": 2000,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Jeffrey Steingarten",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2000,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Michael Romano",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 2000,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Frank Prial",
+   "award": "Outstanding Wine & Spirits Professional",
+   "year": 1999,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Gail Zweigenthal",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1999,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Charles Palmer",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1998,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Jean-Georges Vongerichten",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1998,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Joseph Baum",
+   "award": "Lifetime Achievement Award",
+   "year": 1997,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Adam D. Tihany",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1997,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Alex Von Bidder",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1997,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Julian Niccolini",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1997,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Danny Meyer",
+   "award": "Humanitarian of the Year",
+   "year": 1996,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Peter Kump",
+   "award": "Lifetime Achievement Award",
+   "year": 1996,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Danny Meyer",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1996,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Jean-Jacques Rachou",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1996,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Lidia Bastianich",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1996,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Nicholas Malgieri",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1996,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Daniel Boulud",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1995,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Madhur Jaffrey",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1995,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Milton Glaser",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1995,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Elizabeth Schneider",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1994,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "George Faison",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1994,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Giorgio DeLuca",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1994,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Tim Zagat",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1994,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "André Soltner",
+   "award": "Lifetime Achievement Award",
+   "year": 1993,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Ariane Batterberry",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1993,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Gael Greene",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1993,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Michael Batterberry",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1993,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Gael Greene",
+   "award": "Humanitarian of the Year",
+   "year": 1992,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Craig Claiborne",
+   "award": "Lifetime Achievement Award",
+   "year": 1992,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Drew Nieporent",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1992,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Michael Stern",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1992,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Sheila Lukins",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1992,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "Bryan Miller",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1991,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
+  },
+  {
+   "source": "james_beard",
+   "person": "David Bouley",
+   "award": "Who's Who of Food & Beverage in America",
+   "year": 1991,
+   "level": "winner",
+   "reason": "honours a person, and the record names no restaurant"
   }
  ]
 }

@@ -3,6 +3,13 @@
 **PUBLIC REPO as of 2026-08-02.** Dashboard:
 <https://kejjeh.github.io/nyc-restaurant-week/>
 
+**Frozen 2026-08-29 at `caf08f6`.** This is the Restaurant Week tracker as it
+stood before the project widened to cover NYC dining generally. Everything from
+`0e9af3b` onward — the 1,408-venue award roster, the merge rules, the Places
+enrichment — lives in <https://github.com/Kejjeh/nyc-restaurants> instead. Nothing
+here is maintained; the weekly refresh below still runs against a season that
+ends 2026-09-06.
+
 This repo was private until 2026-08-02. It was opened after the owner spoke to
 NYC Tourism, who said the only violation would be **hosting the exact PDFs** —
 extracted text is fine. That conversation is the authority for this change; if

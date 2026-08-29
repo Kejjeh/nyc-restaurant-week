@@ -132,7 +132,7 @@ const FILTERS = {
   menu: new Set(),        // 'pdf' | 'image_only' | 'none'
   subway: new Set(),      // route ids: '4', '6', 'N', 'L' …
   outdoor: new Set(),     // 'licensed' | 'sidewalk' | 'roadway' | 'described'
-  bookableBy: null,       // ISO date — keep rows still open ON this date
+  bookableBy: null,       // ISO date — keep rows whose WINDOW covers this date
   minRating: null,        // floor on the WEIGHTED Google score, not raw stars
   endingBy: null,         // ISO date — keep rows that CLOSE on/before this date
   savedOnly: false,       // your own shortlist
@@ -1140,14 +1140,14 @@ function buildFacets() {
   host.append(rsec);
 
   const sec = el('div', 'facet');
-  sec.append(el('h3', null, 'Still bookable on'));
+  sec.append(el('h3', null, 'Still running on'));
   const wrapEl = el('div', 'dateFacet');
   const input = el('input');
   input.type = 'date';
   input.id = 'bookableBy';
   // The <h3> above names this group, not the control — without a label of its
   // own the input announces as a bare "date".
-  const lab = el('label', 'sr-only', 'Still bookable on');
+  const lab = el('label', 'sr-only', 'Still running on');
   lab.htmlFor = input.id;
   wrapEl.append(lab);
   // Bounded by the season itself: no window opens before it starts or survives
@@ -1271,6 +1271,26 @@ function buildPresets() {
 
 /* ---------- active filters (visible once the panel is closed) ------------ */
 
+/* The date filter keeps rows whose WINDOW covers the date. That is not a claim
+   that any of them serves that day, and on two days of the week the difference
+   is the whole answer: the programme excludes Saturdays outright, and Sunday
+   service is per-restaurant. A chip reading "Open on Aug 29" above 434 rows
+   promises 434 Saturday dinners, 430 of which do not exist. So the chip names
+   what it filters, and on a Saturday or Sunday says how many of the rows on
+   screen survive the programme's own day rules. */
+function dayCaveat(iso) {
+  const dow = dowOf(iso);
+  if (dow === 6) {
+    const n = RESULTS.filter((r) => (r.flags || []).includes('saturday_service')).length;
+    return ` · Sat: ${n} serve`;
+  }
+  if (dow === 0) {
+    const n = RESULTS.filter((r) => r.sunday === true).length;
+    return ` · Sun: ${n} serve`;
+  }
+  return '';
+}
+
 function buildActiveFilters() {
   const host = $('#activeFilters');
   host.textContent = '';
@@ -1297,7 +1317,8 @@ function buildActiveFilters() {
       () => { FILTERS.minRating = null; });
   }
   if (FILTERS.bookableBy) {
-    add('Open on', fmtDate(FILTERS.bookableBy), () => { FILTERS.bookableBy = null; });
+    add('Still running', fmtDate(FILTERS.bookableBy) + dayCaveat(FILTERS.bookableBy),
+      () => { FILTERS.bookableBy = null; });
   }
   if (FILTERS.endingBy) {
     add('Closes by', fmtDate(FILTERS.endingBy), () => { FILTERS.endingBy = null; });
